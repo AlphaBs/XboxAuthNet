@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30709.132
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XboxAuthNet", "XboxAuthNet\XboxAuthNet.csproj", "{637BD3DA-4847-4106-83BD-80F92262020B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XboxAuthTest", "XboxAuthTest\XboxAuthTest.csproj", "{81D1F5F7-D96B-4C9A-BD5D-1E23E5FB796F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{637BD3DA-4847-4106-83BD-80F92262020B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{637BD3DA-4847-4106-83BD-80F92262020B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{637BD3DA-4847-4106-83BD-80F92262020B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{637BD3DA-4847-4106-83BD-80F92262020B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81D1F5F7-D96B-4C9A-BD5D-1E23E5FB796F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81D1F5F7-D96B-4C9A-BD5D-1E23E5FB796F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81D1F5F7-D96B-4C9A-BD5D-1E23E5FB796F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81D1F5F7-D96B-4C9A-BD5D-1E23E5FB796F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7018D4B-9B23-4DEC-A52A-0AE9717AA8A9}
+	EndGlobalSection
+EndGlobal
