@@ -36,7 +36,7 @@ namespace XboxAuthNet.Exchange
                 HttpUtil.WriteRequest(req, reqBody.ToString());
 
                 var res = req.GetResponseNoException();
-                if ((int)res.StatusCode % 100 != 2)
+                if ((int)res.StatusCode / 100 != 2)
                     throw new XboxAuthException("Could not exchange specified 'Rps'.", null, res);
 
                 var body = HttpUtil.ReadResponse(res);
@@ -84,9 +84,9 @@ namespace XboxAuthNet.Exchange
                 HttpUtil.WriteRequest(req, reqBody.ToString());
 
                 var res = req.GetResponseNoException();
-                if ((int)res.StatusCode % 100 != 2)
+                if ((int)res.StatusCode / 100 != 2)
                 {
-                    if ((int)res.StatusCode % 100 == 4) // 4xx
+                    if ((int)res.StatusCode / 100 == 4) // 4xx
                         throw new XboxAuthException(
                             "Could not exchange 'userToken', please double check the specified '" +
                            $"XSTSRelyingParty' or refer to {IssueLink.UserTokenIssue}.", IssueLink.UserTokenIssue, res);
