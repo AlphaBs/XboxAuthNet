@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Net;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Web;
 
 namespace XboxAuthNet
 {
     public class HttpUtil
     {
         public const string UserAgent = "Mozilla/5.0 (XboxReplay; XboxLiveAuth/3.0)" +
-	                                    "AppleWebKit/537.36 (KHTML, like Gecko)" +
-	                                    "Chrome/71.0.3578.98 Safari/537.36";
+                                        "AppleWebKit/537.36 (KHTML, like Gecko)" +
+                                        "Chrome/71.0.3578.98 Safari/537.36";
 
         public static string GetQueryString(Dictionary<string, string> queries)
         {
@@ -60,6 +57,24 @@ namespace XboxAuthNet
         public static NameValueCollection ParseQuery(string q)
         {
             return HttpUtility.ParseQueryString(q);
+        }
+    }
+
+    public static class HttpWebResponseExt
+    {
+        public static HttpWebResponse GetResponseNoException(this HttpWebRequest req)
+        {
+            try
+            {
+                return (HttpWebResponse)req.GetResponse();
+            }
+            catch (WebException we)
+            {
+                var resp = we.Response as HttpWebResponse;
+                if (resp == null)
+                    throw;
+                return resp;
+            }
         }
     }
 }
