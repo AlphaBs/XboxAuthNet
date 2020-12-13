@@ -63,7 +63,11 @@ namespace XboxAuthNet.OAuth
 
                 return new PreAuthResponse(cookie, ppft, urlPost);
             }
-            catch (Exception ex) when (ex is not XboxAuthException)
+            catch (XboxAuthException)
+            {
+                throw;
+            }
+            catch (Exception ex)
             {
                 throw new XboxAuthException("Failed to " + nameof(PreAuth), null, ex);
             }
@@ -128,7 +132,11 @@ namespace XboxAuthNet.OAuth
                     UserId = qs["user_id"]
                 };
             }
-            catch (Exception ex) when (ex is not XboxAuthException)
+            catch (XboxAuthException)
+            {
+                throw;
+            }
+            catch (Exception ex)
             {
                 throw new XboxAuthException("Failed to " + nameof(LogUser), null, ex);
             }

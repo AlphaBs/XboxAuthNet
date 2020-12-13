@@ -42,7 +42,11 @@ namespace XboxAuthNet.Exchange
                 var body = HttpUtil.ReadResponse(res);
                 return JsonConvert.DeserializeObject<XboxExchangerResponse>(body);
             }
-            catch (Exception ex) when (ex is not XboxAuthException)
+            catch (XboxAuthException)
+            {
+                throw;
+            }
+            catch (Exception ex)
             {
                 throw new XboxAuthException("Failed to " + nameof(ExchangeRpsTicketForUserToken),  null, ex);
             }
@@ -100,6 +104,10 @@ namespace XboxAuthNet.Exchange
                     XSTSToken = job["Token"]?.ToString(),
                     ExpireOn = job["NotAfter"]?.ToString()
                 };
+            }
+            catch (XboxAuthException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
