@@ -42,7 +42,7 @@ namespace XboxAuthNet.OAuth
 
                 var req = HttpUtil.CreateDefaultRequest(url, query);
                 var res = req.GetResponseNoException();
-                if ((int)res.StatusCode % 100 != 2)
+                if ((int)res.StatusCode / 100 != 2)
                     throw new XboxAuthException("Pre-authentication failed to request.", null, res);
 
                 // parse only key=value. remove domain, Secure, path, HttpOnly
@@ -96,7 +96,7 @@ namespace XboxAuthNet.OAuth
                 HttpUtil.WriteRequest(req, HttpUtil.GetQueryString(query));
 
                 var res = req.GetResponseNoException();
-                if ((int)res.StatusCode % 100 != 2)
+                if ((int)res.StatusCode / 100 != 2)
                     throw new XboxAuthException("Authentication failed to request.", null, res);
 
                 var responseUri = res.ResponseUri.OriginalString;
