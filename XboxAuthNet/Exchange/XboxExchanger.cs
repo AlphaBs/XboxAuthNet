@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace XboxAuthNet.Exchange
 {
     public class XboxExchanger
     {
         const string UserAuthenticate = "https://user.auth.xboxlive.com/user/authenticate";
-		const string XSTSAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
+        const string XSTSAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
         const string DefaultRelyingParty = "http://xboxlive.com";
 
         public XboxExchangerResponse ExchangeRpsTicketForUserToken(string rps)
@@ -23,11 +18,11 @@ namespace XboxAuthNet.Exchange
             req.Headers[HttpRequestHeader.Accept] = "application/json";
             req.Headers["x-xbl-contract-version"] = "0";
 
-            var reqBody = new JObject() 
+            var reqBody = new JObject()
             {
                 { "RelyingParty", "http://auth.xboxlive.com" },
                 { "TokenType", "JWT" },
-                { "Properties", new JObject() 
+                { "Properties", new JObject()
                     {
                         { "AuthMethod", "RPS" },
                         { "SiteName", "user.auth.xboxlive.com" },
@@ -42,7 +37,7 @@ namespace XboxAuthNet.Exchange
             return JsonConvert.DeserializeObject<XboxExchangerResponse>(body);
         }
 
-        public XboxAuthResponse ExchangeTokensForXSTSIdentity(string userToken, string deviceToken, string titleToken, 
+        public XboxAuthResponse ExchangeTokensForXSTSIdentity(string userToken, string deviceToken, string titleToken,
             string XSTSRelyingParty, string[] optionalDisplayClaims)
         {
             var req = HttpUtil.CreateDefaultRequest(XSTSAuthorize);
@@ -51,21 +46,23 @@ namespace XboxAuthNet.Exchange
             req.Headers[HttpRequestHeader.Accept] = "application/json";
             req.Headers["x-xbl-contract-version"] = "1";
 
-            var prop = JObject.FromObject(new
-            {
-                UserTokens = NullHandle(userToken),
-                DeviceToken = deviceToken,
-                TitleToken = titleToken,
-                OptionalDisplayClaims = NullHandle(optionalDisplayClaims),
-                SandboxId = "RETAIL"
-            }, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore });
-
             var reqBody = JObject.FromObject(new
             {
                 RelyingParty = XSTSRelyingParty ?? DefaultRelyingParty,
                 TokenType = "JWT",
-                Properties = prop
-            }, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore });
+                Properties = new
+                {
+                    UserTokens = NullHandle(userToken),
+                    DeviceToken = deviceToken,
+                    TitleToken = titleToken,
+                    OptionalDisplayClaims = NullHandle(optionalDisplayClaims),
+                    SandboxId = "RETAIL"
+                }
+            },
+            new JsonSerializer
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
 
             HttpUtil.WriteRequest(req, reqBody.ToString());
 
