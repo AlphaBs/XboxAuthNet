@@ -1,11 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;net452;netcoreapp3.1</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Xbox Live authentication for .NET</Description>
+    <Copyright>MIT</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/AlphaBs/XboxAuthNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AlphaBs/XboxAuthNet</RepositoryUrl>
+    <Authors>ksi123456ab</Authors>
+    <PackageTags>xbox live login auth authentication</PackageTags>
+    <Company></Company>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+    <Reference Include="System.Web"/>
   </ItemGroup>
 
 </Project>
