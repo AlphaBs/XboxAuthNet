@@ -15,7 +15,7 @@ namespace XboxAuthNet
 
         public static string GetQueryString(Dictionary<string, string> queries)
         {
-            return string.Join('&',
+            return string.Join("&",
                 queries.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"));
         }
 
