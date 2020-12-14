@@ -12,15 +12,14 @@ namespace XboxAuthNet
     {
         public XboxAuthResponse Authenticate(string email, string pw, string XSTSRelyingParty=null)
         {
-            var oauth = new XboxLiveOAuth();
-            var preAuthRes = oauth.PreAuth();
-            var logUserRes = oauth.LogUser(email, pw, preAuthRes);
+            var oauth = new MicrosoftOAuth();
 
             var exchanger = new XboxExchanger();
-            var rpsRes = exchanger.ExchangeRpsTicketForUserToken(logUserRes.AccessToken);
-            var xstsRes = exchanger.ExchangeTokensForXSTSIdentity(rpsRes.Token, null, null, XSTSRelyingParty, null);
+            //var rpsRes = exchanger.ExchangeRpsTicketForUserToken(logUserRes.AccessToken);
+            //var xstsRes = exchanger.ExchangeTokensForXSTSIdentity(rpsRes.Token, null, null, XSTSRelyingParty, null);
 
-            return xstsRes;
+            //return xstsRes;
+            return null;
         }
     }
 }
