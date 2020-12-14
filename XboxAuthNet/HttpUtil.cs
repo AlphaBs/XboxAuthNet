@@ -58,6 +58,11 @@ namespace XboxAuthNet
         {
             return HttpUtility.ParseQueryString(q);
         }
+
+        public static string UrlEncode(string q)
+        {
+            return HttpUtility.UrlEncode(q);
+        }
     }
 
     public static class HttpWebResponseExt

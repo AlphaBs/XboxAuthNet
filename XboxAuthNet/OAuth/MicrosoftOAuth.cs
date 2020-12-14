@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -8,10 +9,16 @@ namespace XboxAuthNet.OAuth
 {
     // core/live/config.ts
     // core/live/index.ts
-    public class XboxLiveOAuth
+    public class MicrosoftOAuth
     {
         const string MyXboxLive = "0000000048093EE3";
         const string XboxApp = "000000004C12AE6F";
+
+        const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
+        const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
+        const string OAuthToken = "https://login.live.com/oauth20_token.srf";
+
+        public string ClientId { get; set; } = XboxApp;
 
         Lazy<Regex> FTagRegex = new Lazy<Regex>(() 
             => new Regex(@"sFTTag:'.*value=\""(.*)\""\/>'"));
@@ -25,20 +32,99 @@ namespace XboxAuthNet.OAuth
         Lazy<Regex> ActivityConfirmationRegex = new Lazy<Regex>(()
             => new Regex(@"identity\/confirm"));
 
-        public PreAuthResponse PreAuth()
+        public string CreateUrl()
+        {
+            return CreateUrl(OAuthDesktop, null);
+        }
+
+        public string CreateUrl(string redirectUrl, string state)
+        {
+            var url = OAuthAuthorize;
+            var query = createCommonQueriesForAuth(OAuthDesktop);
+            query["response_type"] = "code";
+
+            if (!string.IsNullOrEmpty(state))
+                query["state"] = state;
+
+            return url + "?" + HttpUtil.GetQueryString(query);
+        }
+
+        public string CheckLoginSuccess(string url)
+        {
+            var uri = new Uri(url);
+            var query = HttpUtil.ParseQuery(uri.Query);
+            var code = query["code"];
+
+            return code;
+
+            if (string.IsNullOrEmpty(code))
+                return null;
+
+            return code.Split('.').Last();
+        }
+
+        private Dictionary<string, string> createCommonQueriesForAuth(string redirectUrl)
+        {
+            return new Dictionary<string, string>()
+            {
+                { "client_id", ClientId },
+                { "grant_type", "authorization_code" },
+                { "redirect_uri", redirectUrl },
+                { "scope", "service::user.auth.xboxlive.com::MBI_SSL" }
+            };
+        }
+
+        public MicrosoftOAuthResponse GetAuthToken(string code, string redirectUrl=OAuthDesktop)
+        {
+            var url = OAuthToken;
+            var query = createCommonQueriesForAuth(redirectUrl);
+            query["code"] = code;
+
+            var req = HttpUtil.CreateDefaultRequest(url);
+            req.Method = "POST";
+            req.ContentType = "application/x-www-form-urlencoded";
+
+            HttpUtil.WriteRequest(req, HttpUtil.GetQueryString(query));
+
+            var res = req.GetResponse();
+            var resBody = HttpUtil.ReadResponse(res);
+
+            return JsonConvert.DeserializeObject<MicrosoftOAuthResponse>(resBody);
+        }
+
+        public MicrosoftOAuthResponse RefreshToken(string refreshToken, string redirectUrl=OAuthDesktop)
+        {
+            var url = OAuthToken;
+            var query = createCommonQueriesForAuth(redirectUrl);
+            query["refresh_token"] = refreshToken;
+
+            var req = HttpUtil.CreateDefaultRequest(url);
+            req.Method = "POST";
+            req.ContentType = "application/x-www-form-urlencoded";
+
+            HttpUtil.WriteRequest(req, HttpUtil.GetQueryString(query));
+
+            var res = req.GetResponse();
+            var resBody = HttpUtil.ReadResponse(res);
+
+            return JsonConvert.DeserializeObject<MicrosoftOAuthResponse>(resBody);
+        }
+
+        public MicrosoftOAuthResponse AutoLogin(string email, string password)
+        {
+            var pre = AutoLoginPreAuth();
+            return AutoLoginUrlPost(email, password, pre);
+        }
+
+        private PreAuthResponse AutoLoginPreAuth()
         {
             try
             {
-                var url = "https://login.live.com/oauth20_authorize.srf";
-                Dictionary<string, string> query = new Dictionary<string, string>
-                {
-                    ["client_id"] = XboxApp,
-                    ["redirect_uri"] = "https://login.live.com/oauth20_desktop.srf",
-                    ["scope"] = "service::user.auth.xboxlive.com::MBI_SSL",
-                    ["display"] = "touch",
-                    ["response_type"] = "token",
-                    ["locale"] = "en"
-                };
+                var url = OAuthAuthorize;
+                var query = createCommonQueriesForAuth(OAuthDesktop);
+                query["display"] = "touch";
+                query["locale"] = "en";
+                query["response_type"] = "token";
 
                 var req = HttpUtil.CreateDefaultRequest(url, query);
                 var res = req.GetResponseNoException();
@@ -69,11 +155,11 @@ namespace XboxAuthNet.OAuth
             }
             catch (Exception ex)
             {
-                throw new XboxAuthException("Failed to " + nameof(PreAuth), null, ex);
+                throw new XboxAuthException("Failed to " + nameof(AutoLoginPreAuth), null, ex);
             }
         }
 
-        public LogUserResponse LogUser(string email, string password, PreAuthResponse pre)
+        private MicrosoftOAuthResponse AutoLoginUrlPost(string email, string password, PreAuthResponse pre)
         {
             try
             {
@@ -122,7 +208,7 @@ namespace XboxAuthNet.OAuth
                 var hash = uriSplit[1];
                 var qs = HttpUtil.ParseQuery(hash);
 
-                return new LogUserResponse()
+                return new MicrosoftOAuthResponse()
                 {
                     AccessToken = qs["access_token"],
                     TokenType = qs["token_type"],
@@ -138,7 +224,7 @@ namespace XboxAuthNet.OAuth
             }
             catch (Exception ex)
             {
-                throw new XboxAuthException("Failed to " + nameof(LogUser), null, ex);
+                throw new XboxAuthException("Failed to " + nameof(AutoLoginUrlPost), null, ex);
             }
         }
 
