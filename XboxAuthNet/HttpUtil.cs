@@ -29,7 +29,7 @@ namespace XboxAuthNet
             var req = WebRequest.CreateHttp(url);
             req.Headers[HttpRequestHeader.AcceptEncoding] = "gzip";
             req.Headers[HttpRequestHeader.AcceptLanguage] = "en-US";
-            req.Headers[HttpRequestHeader.UserAgent] = UserAgent;
+            req.UserAgent = UserAgent;
 
             req.AutomaticDecompression = DecompressionMethods.GZip;
             req.Method = "GET";
