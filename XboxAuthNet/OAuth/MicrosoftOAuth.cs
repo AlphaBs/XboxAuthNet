@@ -11,7 +11,6 @@ namespace XboxAuthNet.OAuth
     // core/live/index.ts
     public class MicrosoftOAuth
     {
-        const string MyXboxLive = "0000000048093EE3";
         const string XboxApp = "000000004C12AE6F";
 
         const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";

@@ -18,7 +18,7 @@ namespace XboxAuthNet.Exchange
                 var req = HttpUtil.CreateDefaultRequest(UserAuthenticate);
                 req.Method = "POST";
                 req.ContentType = "application/json";
-                req.Headers[HttpRequestHeader.Accept] = "application/json";
+                req.Accept = "application/json";
                 req.Headers["x-xbl-contract-version"] = "0";
 
                 var reqBody = new JObject()
@@ -60,7 +60,7 @@ namespace XboxAuthNet.Exchange
                 var req = HttpUtil.CreateDefaultRequest(XSTSAuthorize);
                 req.Method = "POST";
                 req.ContentType = "application/json";
-                req.Headers[HttpRequestHeader.Accept] = "application/json";
+                req.Accept = "application/json";
                 req.Headers["x-xbl-contract-version"] = "1";
 
                 var reqBody = JObject.FromObject(new
