@@ -9,6 +9,8 @@ namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuthResponse
     {
+        public bool IsSuccess => string.IsNullOrEmpty(this.Error);
+
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
 
@@ -16,7 +18,7 @@ namespace XboxAuthNet.OAuth
         public string TokenType { get; set; }
 
         [JsonProperty("expires_in")]
-        public string ExpireIn { get; set; }
+        public int ExpireIn { get; set; }
 
         [JsonProperty("scope")]
         public string Scope { get; set; }
@@ -32,5 +34,14 @@ namespace XboxAuthNet.OAuth
 
         [JsonProperty("user_id")]
         public string UserId { get; set; }
+
+        [JsonProperty("error")]
+        public string Error { get; set; }
+
+        [JsonProperty("error_description")]
+        public string ErrorDescription { get; set; }
+
+        [JsonProperty("error_codes")]
+        public int[] ErrorCodes { get; set; }
     }
 }

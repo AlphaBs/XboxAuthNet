@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Net;
+
+//var rpsRes = exchanger.ExchangeRpsTicketForUserToken(AccessToken);
+//var xstsRes = exchanger.ExchangeTokensForXSTSIdentity(rpsRes.Token, null, null, XSTSRelyingParty, null);
 
 namespace XboxAuthNet.Exchange
 {
