@@ -5,7 +5,7 @@ using System;
 //var rpsRes = exchanger.ExchangeRpsTicketForUserToken(AccessToken);
 //var xstsRes = exchanger.ExchangeTokensForXSTSIdentity(rpsRes.Token, null, null, XSTSRelyingParty, null);
 
-namespace XboxAuthNet.Exchange
+namespace XboxAuthNet.XboxLive
 {
     public class XboxExchanger
     {
