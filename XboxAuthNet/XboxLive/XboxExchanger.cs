@@ -9,6 +9,8 @@ namespace XboxAuthNet.Exchange
 {
     public class XboxExchanger
     {
+        public const string XboxScope = "service::user.auth.xboxlive.com::MBI_SSL";
+
         const string UserAuthenticate = "https://user.auth.xboxlive.com/user/authenticate";
         const string XSTSAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
         const string DefaultRelyingParty = "http://xboxlive.com";
