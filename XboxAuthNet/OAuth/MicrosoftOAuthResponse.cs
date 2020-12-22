@@ -9,6 +9,7 @@ namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuthResponse
     {
+        [JsonIgnore]
         public bool IsSuccess => string.IsNullOrEmpty(this.Error);
 
         [JsonProperty("access_token")]
@@ -26,9 +27,10 @@ namespace XboxAuthNet.OAuth
         [JsonProperty("refresh_token")]
         private string rawRefreshToken { get; set; }
 
+        [JsonIgnore]
         public string RefreshToken
         {
-            get => rawRefreshToken.Split('.').Last();
+            get => rawRefreshToken?.Split('.')?.Last();
             set => rawRefreshToken = "M.R3_BAY." + value;
         }
 
