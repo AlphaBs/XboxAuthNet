@@ -62,7 +62,8 @@ namespace XboxAuthNet.OAuth
         public bool CheckLoginSuccess(string url)
         {
             var uri = new Uri(url);
-            var path = uri.AbsoluteUri;
+            var path = uri.AbsolutePath;
+            
             
             if (!path.Equals(OAuthDesktopPath) && !path.Equals(OAuthErrorPath))
                 return false;
@@ -125,6 +126,7 @@ namespace XboxAuthNet.OAuth
             var url = OAuthToken;
             var query = createCommonQueriesForAuth(Scope);
             query["refresh_token"] = refreshToken;
+            query["grant_type"] = "refresh_token";
 
             var req = HttpUtil.CreateDefaultRequest(url);
             req.Method = "POST";
@@ -136,6 +138,11 @@ namespace XboxAuthNet.OAuth
             var resBody = HttpUtil.ReadResponse(res);
 
             return JsonConvert.DeserializeObject<MicrosoftOAuthResponse>(resBody);
+        }
+
+        public static string GetSignOutUrl()
+        {
+            return "https://login.microsoftonline.com/consumer/oauth2/v2.0/logout";
         }
     }
 }
