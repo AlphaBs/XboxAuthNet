@@ -12,6 +12,7 @@ using XboxAuthNet.OAuth;
 using System.Threading;
 using System.IO;
 using Newtonsoft.Json;
+using XboxAuthNet.Exchange;
 
 namespace XboxAuthNetTest
 {
@@ -24,14 +25,15 @@ namespace XboxAuthNetTest
         }
 
         bool headlessMode = false;
-        string refreshToken = null;
+        MicrosoftOAuthResponse response;
         MicrosoftOAuth oauth;
 
         string sessionFilePath = "auth.json";
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            readSession();
+            var res = readSession();
+            showResponse(res);
         }
 
         private MicrosoftOAuthResponse readSession()
@@ -42,13 +44,13 @@ namespace XboxAuthNetTest
             var file = File.ReadAllText(sessionFilePath);
             var response = JsonConvert.DeserializeObject<MicrosoftOAuthResponse>(file);
 
-            this.refreshToken = response.RefreshToken;
+            this.response = response;
             return response;
         }
 
         private void writeSession(MicrosoftOAuthResponse response)
         {
-            this.refreshToken = response.RefreshToken;
+            this.response = response;
 
             var json = JsonConvert.SerializeObject(response);
             File.WriteAllText(sessionFilePath, json);
@@ -59,14 +61,22 @@ namespace XboxAuthNetTest
             MicrosoftOAuthResponse response;
 
             // try login using refresh token
-            if (oauth.TryGetTokens(out response, refreshToken))
+            if (oauth.TryGetTokens(out response, this.response?.RefreshToken))
+            {
+                Console.WriteLine("refresh login success");
                 loginSuccess(response);
+            }
             else
             {
                 if (headlessMode)
                 {
                     var headless = new MicrosoftOAuthHeadless(oauth.ClientId, oauth.Scope);
-                    headless.GetTokensHeadless("email", "password");
+                    var res = headless.GetTokensHeadless("email", "password");
+
+                    if (res.IsSuccess)
+                        loginSuccess(res);
+                    else
+                        loginFail(res);
                 }
                 else // show login page
                 {
@@ -82,11 +92,15 @@ namespace XboxAuthNetTest
 
             if (e.IsRedirected && oauth.CheckLoginSuccess(e.Uri)) // login success
             {
+                Console.WriteLine("browser login succses");
+
                 new Thread(() =>
                 {
                     var result = oauth.TryGetTokens(out MicrosoftOAuthResponse response); // get token
                     Invoke(new Action(() =>
                     {
+                        Console.WriteLine("browser login gettokens");
+
                         if (result)
                             loginSuccess(response);
                         else
@@ -96,7 +110,7 @@ namespace XboxAuthNetTest
             }
         }
 
-        private void loginSuccess(MicrosoftOAuthResponse res)
+        private void showResponse(MicrosoftOAuthResponse res)
         {
             textBox1.Text = res.AccessToken;
             textBox2.Text = res.ExpireIn.ToString();
@@ -104,9 +118,24 @@ namespace XboxAuthNetTest
             textBox4.Text = res.Scope;
             textBox5.Text = res.TokenType;
             textBox6.Text = res.UserId;
+        }
+
+        private void showResponse(XboxAuthResponse res)
+        {
+            txtXboxAccessToken.Text = res.XSTSToken;
+            txtXboxExpire.Text = res.ExpireOn;
+            txtXboxUserXUID.Text = res.UserXUID;
+            txtXboxUserHash.Text = res.UserHash;
+        }
+
+        private void loginSuccess(MicrosoftOAuthResponse res)
+        {
+            showResponse(res);
 
             writeSession(res);
             MessageBox.Show("SUCCESS");
+            button2.Enabled = true;
+            button1.Enabled = false;
         }
 
         private void loginFail(MicrosoftOAuthResponse response)
@@ -115,6 +144,45 @@ namespace XboxAuthNetTest
                 $"Failed to login : {response.Error}\n" +
                 $"ErrorDescription : {response.ErrorDescription}\n" +
                 $"ErrorCodes : {string.Join(',', response.ErrorCodes)}");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            button2.Enabled = false;
+            button1.Enabled = false;
+
+            //var relyingParty = txtXboxRelyingParty.Text;
+            var relyingParty = "rp://api.minecraftservices.com/";
+
+            new Thread(() => {
+                try
+                {
+                    var xbox = new XboxExchanger();
+                    var ex = xbox.ExchangeRpsTicketForUserToken(response?.AccessToken);
+                    var res = xbox.ExchangeTokensForXSTSIdentity(ex.Token, null, null, relyingParty, null);
+
+                    Invoke(new Action(() =>
+                    {
+                        showResponse(res);
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }).Start();
+        }
+
+        private void btnMSSignout_Click(object sender, EventArgs e)
+        {
+            webView21.Source = new Uri(MicrosoftOAuth.GetSignOutUrl());
+            writeSession(null);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var f2 = new Form2();
+            f2.Show();
         }
     }
 }
