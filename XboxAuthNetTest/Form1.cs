@@ -12,7 +12,7 @@ using XboxAuthNet.OAuth;
 using System.Threading;
 using System.IO;
 using Newtonsoft.Json;
-using XboxAuthNet.Exchange;
+using XboxAuthNet.XboxLive;
 
 namespace XboxAuthNetTest
 {
@@ -122,7 +122,7 @@ namespace XboxAuthNetTest
 
         private void showResponse(XboxAuthResponse res)
         {
-            txtXboxAccessToken.Text = res.XSTSToken;
+            txtXboxAccessToken.Text = res.Token;
             txtXboxExpire.Text = res.ExpireOn;
             txtXboxUserXUID.Text = res.UserXUID;
             txtXboxUserHash.Text = res.UserHash;
@@ -157,7 +157,7 @@ namespace XboxAuthNetTest
             new Thread(() => {
                 try
                 {
-                    var xbox = new XboxExchanger();
+                    var xbox = new XboxAuth();
                     var ex = xbox.ExchangeRpsTicketForUserToken(response?.AccessToken);
                     var res = xbox.ExchangeTokensForXSTSIdentity(ex.Token, null, null, relyingParty, null);
 

@@ -7,7 +7,7 @@ using System;
 
 namespace XboxAuthNet.XboxLive
 {
-    public class XboxExchanger
+    public class XboxAuth
     {
         public const string XboxScope = "service::user.auth.xboxlive.com::MBI_SSL";
 
@@ -15,7 +15,7 @@ namespace XboxAuthNet.XboxLive
         const string XSTSAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
         const string DefaultRelyingParty = "http://xboxlive.com";
 
-        public XboxExchangerResponse ExchangeRpsTicketForUserToken(string rps)
+        public XboxAuthResponse ExchangeRpsTicketForUserToken(string rps)
         {
             try
             {
@@ -40,11 +40,9 @@ namespace XboxAuthNet.XboxLive
                 HttpUtil.WriteRequest(req, reqBody.ToString());
 
                 var res = req.GetResponseNoException();
-                if ((int)res.StatusCode / 100 != 2)
-                    throw new XboxAuthException("Could not exchange specified 'Rps'.", null, res);
-
                 var body = HttpUtil.ReadResponse(res);
-                return JsonConvert.DeserializeObject<XboxExchangerResponse>(body);
+
+                return parseAuthResponse(body);
             }
             catch (XboxAuthException)
             {
@@ -88,26 +86,9 @@ namespace XboxAuthNet.XboxLive
                 HttpUtil.WriteRequest(req, reqBody.ToString());
 
                 var res = req.GetResponseNoException();
-                if ((int)res.StatusCode / 100 != 2)
-                {
-                    if ((int)res.StatusCode / 100 == 4) // 4xx
-                        throw new XboxAuthException(
-                            "Could not exchange 'userToken', please double check the specified '" +
-                           $"XSTSRelyingParty' or refer to {IssueLink.UserTokenIssue}.", IssueLink.UserTokenIssue, res);
-                    else // 5xx
-                        throw new XboxAuthException("Could not exchange specified 'userToken'.", null, res);
-                }
-
                 var body = HttpUtil.ReadResponse(res);
-                var job = JObject.Parse(body);
 
-                return new XboxAuthResponse()
-                {
-                    UserXUID = job["DisplayClaims"]?["xui"]?[0]?["xid"]?.ToString(),
-                    UserHash = job["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString(),
-                    XSTSToken = job["Token"]?.ToString(),
-                    ExpireOn = job["NotAfter"]?.ToString()
-                };
+                return parseAuthResponse(body);
             }
             catch (XboxAuthException)
             {
@@ -117,6 +98,17 @@ namespace XboxAuthNet.XboxLive
             {
                 throw new XboxAuthException("Failed to" + nameof(ExchangeTokensForXSTSIdentity), null, ex);
             }
+        }
+
+        private XboxAuthResponse parseAuthResponse(string json)
+        {
+            var job = JObject.Parse(json);
+            var authres = job.ToObject<XboxAuthResponse>();
+
+            authres.UserXUID = job["DisplayClaims"]?["xui"]?[0]?["xid"]?.ToString();
+            authres.UserHash = job["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString();
+
+            return authres;
         }
 
         private JArray NullHandle(string str)
