@@ -12,7 +12,7 @@ namespace XboxAuthNet.XboxLive
         public const string XboxScope = "service::user.auth.xboxlive.com::MBI_SSL";
 
         const string UserAuthenticate = "https://user.auth.xboxlive.com/user/authenticate";
-        const string XSTSAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
+        const string XstsAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
         const string DefaultRelyingParty = "http://xboxlive.com";
 
         public XboxAuthResponse ExchangeRpsTicketForUserToken(string rps)
@@ -54,12 +54,12 @@ namespace XboxAuthNet.XboxLive
             }
         }
 
-        public XboxAuthResponse ExchangeTokensForXSTSIdentity(string userToken, string deviceToken, string titleToken,
-            string XSTSRelyingParty, string[] optionalDisplayClaims)
+        public XboxAuthResponse ExchangeTokensForXstsIdentity(string userToken, string? deviceToken, string? titleToken,
+            string? xstsRelyingParty, string[]? optionalDisplayClaims)
         {
             try
             {
-                var req = HttpUtil.CreateDefaultRequest(XSTSAuthorize);
+                var req = HttpUtil.CreateDefaultRequest(XstsAuthorize);
                 req.Method = "POST";
                 req.ContentType = "application/json";
                 req.Accept = "application/json";
@@ -67,14 +67,14 @@ namespace XboxAuthNet.XboxLive
 
                 var reqBody = JObject.FromObject(new
                 {
-                    RelyingParty = XSTSRelyingParty ?? DefaultRelyingParty,
+                    RelyingParty = xstsRelyingParty ?? DefaultRelyingParty,
                     TokenType = "JWT",
                     Properties = new
                     {
-                        UserTokens = NullHandle(userToken),
+                        UserTokens = nullHandle(userToken),
                         DeviceToken = deviceToken,
                         TitleToken = titleToken,
-                        OptionalDisplayClaims = NullHandle(optionalDisplayClaims),
+                        OptionalDisplayClaims = nullHandle(optionalDisplayClaims),
                         SandboxId = "RETAIL"
                     }
                 },
@@ -96,7 +96,7 @@ namespace XboxAuthNet.XboxLive
             }
             catch (Exception ex)
             {
-                throw new XboxAuthException("Failed to" + nameof(ExchangeTokensForXSTSIdentity), null, ex);
+                throw new XboxAuthException("Failed to" + nameof(ExchangeTokensForXstsIdentity), null, ex);
             }
         }
 
@@ -104,6 +104,8 @@ namespace XboxAuthNet.XboxLive
         {
             var job = JObject.Parse(json);
             var authres = job.ToObject<XboxAuthResponse>();
+            if (authres == null)
+                return new XboxAuthResponse();
 
             authres.UserXUID = job["DisplayClaims"]?["xui"]?[0]?["xid"]?.ToString();
             authres.UserHash = job["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString();
@@ -111,7 +113,7 @@ namespace XboxAuthNet.XboxLive
             return authres;
         }
 
-        private JArray NullHandle(string str)
+        private JArray? nullHandle(string str)
         {
             if (string.IsNullOrEmpty(str))
                 return null;
@@ -119,12 +121,12 @@ namespace XboxAuthNet.XboxLive
                 return new JArray(str);
         }
 
-        private JArray NullHandle(string[] strs)
+        private JArray? nullHandle(object[]? objs)
         {
-            if (strs == null || strs.Length == 0)
+            if (objs == null || objs.Length == 0)
                 return null;
             else
-                return new JArray(strs);
+                return new JArray(objs);
         }
     }
 }

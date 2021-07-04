@@ -15,19 +15,28 @@ namespace XboxAuthNet.XboxLive
             base.HelpLink = link;
         }
 
-        public XboxAuthException(string message, string link, Exception inner)
+        public XboxAuthException(string message, string? link, Exception inner)
             : base(message, inner)
         {
             base.HelpLink = link;
         }
 
-        public XboxAuthException(string message, string link, HttpWebResponse res)
+        public XboxAuthException(string message, string? link, HttpWebResponse res)
             : base($"{message} {res.StatusCode}: {res.StatusDescription}")
         {
             base.HelpLink = link;
             this.Response = res;
         }
 
-        public HttpWebResponse Response { get; private set; }
+        public XboxAuthException(string message, string errorCode, string responseMessage)
+            : base(message)
+        {
+            this.ErrorCode = errorCode;
+            this.ResponseMessage = responseMessage;
+        }
+
+        public HttpWebResponse? Response { get; private set; }
+        public string? ErrorCode { get; private set; }
+        public string? ResponseMessage { get; private set; }
     }
 }

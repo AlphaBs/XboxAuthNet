@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -17,7 +18,6 @@ namespace XboxAuthNet.OAuth
         {
             this.ClientId = clientId;
             this.Scope = scope;
-            this.AuthCode = new MicrosoftOAuthAuthCode(); // create empty code
         }
 
         protected const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
@@ -29,7 +29,7 @@ namespace XboxAuthNet.OAuth
         public string ClientId { get; private set; }
         public string Scope { get; private set; }
 
-        public MicrosoftOAuthAuthCode AuthCode { get; protected set; }
+        public MicrosoftOAuthAuthCode? AuthCode { get; protected set; }
 
         protected Dictionary<string, string> createCommonQueriesForAuth(string scope, string redirectUrl = OAuthDesktop)
         {
@@ -44,14 +44,17 @@ namespace XboxAuthNet.OAuth
 
         public string CreateUrl()
         {
-            return CreateUrl(null);
+            return CreateUrl(null, null);
         }
 
-        public string CreateUrl(string state)
+        public string CreateUrl(string? redirect, string? state)
         {
             var url = OAuthAuthorize;
             var query = createCommonQueriesForAuth(Scope);
             query["response_type"] = "code";
+
+            if (!string.IsNullOrEmpty(redirect))
+                query["redirect_uri"] = redirect;
 
             if (!string.IsNullOrEmpty(state))
                 query["state"] = state;
@@ -62,29 +65,36 @@ namespace XboxAuthNet.OAuth
         public bool CheckLoginSuccess(string url)
         {
             var uri = new Uri(url);
-            var path = uri.AbsolutePath;
-            
-            
-            if (!path.Equals(OAuthDesktopPath) && !path.Equals(OAuthErrorPath))
-                return false;
-
-            var query = HttpUtil.ParseQuery(uri.Query);
-            var authcode = new MicrosoftOAuthAuthCode
-            {
-                Code = query["code"],
-                Error = query["error"],
-                ErrorDescription = HttpUtil.UrlDecode(query["error_description"])
-            };
-
-            this.AuthCode = authcode;
-            return authcode.IsSuccess;
+            return CheckLoginSuccess(uri);
         }
 
-        public bool TryGetTokens(out MicrosoftOAuthResponse response, string refreshToken = null)
+        public bool CheckLoginSuccess(Uri uri)
+        {
+            try
+            {
+                var query = HttpUtil.ParseQuery(uri.Query);
+                var authcode = new MicrosoftOAuthAuthCode
+                {
+                    Code = query["code"],
+                    Error = query["error"],
+                    ErrorDescription = HttpUtil.UrlDecode(query["error_description"])
+                };
+
+                this.AuthCode = authcode;
+                return authcode.IsSuccess;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return false;
+            }
+        }
+
+        public bool TryGetTokens(out MicrosoftOAuthResponse? response, string? refreshToken = null)
         {
             if (string.IsNullOrEmpty(refreshToken))
             {
-                if (AuthCode.IsSuccess)
+                if (AuthCode?.IsSuccess ?? false)
                 {
                     response = GetTokens();
                     return response.IsSuccess;
@@ -102,12 +112,12 @@ namespace XboxAuthNet.OAuth
 
         public MicrosoftOAuthResponse GetTokens()
         {
-            if (!AuthCode.IsSuccess)
+            if (AuthCode == null || !AuthCode.IsSuccess)
                 throw new InvalidOperationException("AuthCode.IsSuccess was not true. Create AuthCode first.");
 
             var url = OAuthToken;
             var query = createCommonQueriesForAuth(Scope);
-            query["code"] = AuthCode.Code;
+            query["code"] = AuthCode.Code ?? "";
 
             var req = HttpUtil.CreateDefaultRequest(url);
             req.Method = "POST";
