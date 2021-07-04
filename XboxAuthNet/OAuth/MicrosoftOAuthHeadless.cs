@@ -69,7 +69,9 @@ namespace XboxAuthNet.OAuth
 
                 // parse only key=value. remove domain, Secure, path, HttpOnly
                 var setCookie = res.Headers["Set-Cookie"];
-                var cookie = string.Join(";", setCookie.Split(',').Select(x => x.Split(';')[0]));
+                string? cookie = null;
+                if (setCookie != null)
+                    cookie = string.Join(";", setCookie.Split(',').Select(x => x.Split(';')[0]));
 
                 var body = HttpUtil.ReadResponse(res);
 
@@ -100,7 +102,10 @@ namespace XboxAuthNet.OAuth
             try
             {
                 var url = pre.UrlPost;
-                Dictionary<string, string> query = new Dictionary<string, string>
+                if (url == null)
+                    throw new MicrosoftOAuthException("pre.UrlPost was null.");
+                
+                Dictionary<string, string?> query = new Dictionary<string, string?>
                 {
                     ["login"] = email,
                     ["loginfmt"] = email,
@@ -119,11 +124,11 @@ namespace XboxAuthNet.OAuth
 
                 var res = req.GetResponseNoException();
                 if ((int)res.StatusCode / 100 != 2)
-                    throw new XboxAuthException("Authentication failed to request.", null, res);
+                    throw new MicrosoftOAuthException("Authentication failed to request.");
 
                 var responseUri = res.ResponseUri.OriginalString;
                 if (responseUri == pre.UrlPost)
-                    throw new XboxAuthException("Invalid credentials.", null);
+                    throw new MicrosoftOAuthException("Invalid credentials.");
 
                 var uriSplit = responseUri.Split('#');
                 if (uriSplit.Length <= 1 || string.IsNullOrEmpty(uriSplit[1]))
@@ -132,19 +137,17 @@ namespace XboxAuthNet.OAuth
                     Console.WriteLine(body);
 
                     if (requiresIdentityConfirmation(body))
-                        throw new XboxAuthException("Activity confirmation required, please refer to " +
-                            IssueLink.UnauthorizedActivityError,
-                            IssueLink.UnauthorizedActivityError);
+                        throw new MicrosoftOAuthException("Activity confirmation required, please refer to " +
+                                                          IssueLink.UnauthorizedActivityError);
                     else
-                        throw new XboxAuthException("Invalid credentials or 2FA enabled, please refer to " +
-                            IssueLink.TwoFactorAuthenticationError,
-                            IssueLink.TwoFactorAuthenticationError);
+                        throw new MicrosoftOAuthException("Invalid credentials or 2FA enabled, please refer to " +
+                                                          IssueLink.TwoFactorAuthenticationError);
                 }
 
                 var hash = uriSplit[1];
                 var qs = HttpUtil.ParseQuery(hash);
 
-                int exp = 0;
+                int exp;
                 int.TryParse(qs["expire_in"], out exp);
 
                 return new MicrosoftOAuthResponse()
@@ -157,13 +160,13 @@ namespace XboxAuthNet.OAuth
                     UserId = qs["user_id"]
                 };
             }
-            catch (XboxAuthException)
+            catch (MicrosoftOAuthException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new XboxAuthException("Failed to " + nameof(AutoLoginUrlPost), null, ex);
+                throw new MicrosoftOAuthException("Failed to " + nameof(AutoLoginUrlPost));
             }
         }
 
@@ -176,7 +179,7 @@ namespace XboxAuthNet.OAuth
                 return getMatchIndex(action, ActivityConfirmationRegex.Value, 0) != null;
         }
 
-        private string getMatchIndex(string input, Regex r, int i)
+        private string? getMatchIndex(string input, Regex r, int i)
         {
             var match = r.Match(input);
             if (!match.Success || match.Groups.Count <= i)

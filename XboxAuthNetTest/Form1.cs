@@ -112,6 +112,9 @@ namespace XboxAuthNetTest
 
         private void showResponse(MicrosoftOAuthResponse res)
         {
+            if (res == null)
+                return;
+
             textBox1.Text = res.AccessToken;
             textBox2.Text = res.ExpireIn.ToString();
             textBox3.Text = res.RefreshToken;
@@ -159,7 +162,7 @@ namespace XboxAuthNetTest
                 {
                     var xbox = new XboxAuth();
                     var ex = xbox.ExchangeRpsTicketForUserToken(response?.AccessToken);
-                    var res = xbox.ExchangeTokensForXSTSIdentity(ex.Token, null, null, relyingParty, null);
+                    var res = xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
 
                     Invoke(new Action(() =>
                     {

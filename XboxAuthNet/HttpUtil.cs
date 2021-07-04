@@ -13,7 +13,7 @@ namespace XboxAuthNet
                                         "AppleWebKit/537.36 (KHTML, like Gecko)" +
                                         "Chrome/71.0.3578.98 Safari/537.36";
 
-        public static string GetQueryString(Dictionary<string, string> queries)
+        public static string GetQueryString(Dictionary<string, string?> queries)
         {
             return string.Join("&",
                 queries.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"));
@@ -64,7 +64,7 @@ namespace XboxAuthNet
             return HttpUtility.UrlEncode(q);
         }
 
-        public static string UrlDecode(string q)
+        public static string? UrlDecode(string? q)
         {
             return HttpUtility.UrlDecode(q);
         }

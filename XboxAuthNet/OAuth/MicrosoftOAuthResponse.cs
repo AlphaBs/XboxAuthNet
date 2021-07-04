@@ -13,37 +13,37 @@ namespace XboxAuthNet.OAuth
         public bool IsSuccess => string.IsNullOrEmpty(this.Error);
 
         [JsonProperty("access_token")]
-        public string AccessToken { get; set; }
+        public string? AccessToken { get; set; }
 
         [JsonProperty("token_type")]
-        public string TokenType { get; set; }
+        public string? TokenType { get; set; }
 
         [JsonProperty("expires_in")]
         public int ExpireIn { get; set; }
 
         [JsonProperty("scope")]
-        public string Scope { get; set; }
+        public string? Scope { get; set; }
 
         [JsonProperty("refresh_token")]
-        private string rawRefreshToken { get; set; }
+        private string? rawRefreshToken { get; set; }
 
         [JsonIgnore]
-        public string RefreshToken
+        public string? RefreshToken
         {
             get => rawRefreshToken?.Split('.')?.Last();
             set => rawRefreshToken = "M.R3_BAY." + value;
         }
 
         [JsonProperty("user_id")]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         [JsonProperty("error")]
-        public string Error { get; set; }
+        public string? Error { get; set; }
 
         [JsonProperty("error_description")]
-        public string ErrorDescription { get; set; }
+        public string? ErrorDescription { get; set; }
 
         [JsonProperty("error_codes")]
-        public int[] ErrorCodes { get; set; }
+        public int[]? ErrorCodes { get; set; }
     }
 }

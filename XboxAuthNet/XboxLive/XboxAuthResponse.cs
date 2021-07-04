@@ -15,25 +15,25 @@ namespace XboxAuthNet.XboxLive
         [JsonIgnore]
         public bool IsSuccess => string.IsNullOrEmpty(Error);
 
-        public string UserXUID { get; set; }
-        public string UserHash { get; set; }
+        public string? UserXUID { get; set; }
+        public string? UserHash { get; set; }
         
         [JsonProperty("IssueInstant")]
-        public string IssueInstant { get; set; }
+        public string? IssueInstant { get; set; }
 
         [JsonProperty("Token")]
-        public string Token { get; set; }
+        public string? Token { get; set; }
 
         [JsonProperty("NotAfter")]
-        public string ExpireOn { get; set; }
+        public string? ExpireOn { get; set; }
 
         [JsonProperty("XErr")]
-        public string Error { get; set; }
+        public string? Error { get; set; }
 
         [JsonProperty("Message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         [JsonProperty("Redirect")]
-        public string Redirect { get; set; }
+        public string? Redirect { get; set; }
     }
 }
