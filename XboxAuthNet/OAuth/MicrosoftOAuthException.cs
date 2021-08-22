@@ -9,17 +9,17 @@ namespace XboxAuthNet.OAuth
 
         }
 
-        public MicrosoftOAuthException(string message)
+        public MicrosoftOAuthException(string? message)
             : base(message)
         {
             
         }
 
-        public MicrosoftOAuthException(MicrosoftOAuthResponse oauth)
+        public MicrosoftOAuthException(MicrosoftOAuthResponse? oauth)
         {
-            this.Error = oauth.Error;
-            this.ErrorDescription = oauth.ErrorDescription;
-            this.ErrorCodes = oauth.ErrorCodes;
+            this.Error = oauth?.Error;
+            this.ErrorDescription = oauth?.ErrorDescription;
+            this.ErrorCodes = oauth?.ErrorCodes;
         }
 
         public string? Error { get; private set; }
