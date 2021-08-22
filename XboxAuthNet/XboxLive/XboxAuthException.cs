@@ -9,7 +9,7 @@ namespace XboxAuthNet.XboxLive
 {
     public class XboxAuthException : Exception
     {
-        public XboxAuthException(string message, string link)
+        public XboxAuthException(string message, string? link)
             : base(message)
         {
             base.HelpLink = link;
