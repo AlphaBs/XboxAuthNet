@@ -1,10 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Web;
 
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
 // https://docs.microsoft.com/en-us/advertising/guides/authentication-oauth
@@ -14,11 +13,14 @@ namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuth
     {
-        public MicrosoftOAuth(string clientId, string scope)
+        public MicrosoftOAuth(string clientId, string scope, HttpClient client)
         {
             this.ClientId = clientId;
             this.Scope = scope;
+            this.httpClient = client;
         }
+
+        private readonly HttpClient httpClient;
 
         protected const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
         protected const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
@@ -26,14 +28,12 @@ namespace XboxAuthNet.OAuth
         protected const string OAuthErrorPath = "/err.srf";
         protected const string OAuthToken = "https://login.live.com/oauth20_token.srf";
 
-        public string ClientId { get; private set; }
-        public string Scope { get; private set; }
+        public string ClientId { get; }
+        public string Scope { get; }
 
-        public MicrosoftOAuthAuthCode? AuthCode { get; protected set; }
-
-        protected Dictionary<string, string> createCommonQueriesForAuth(string scope, string redirectUrl = OAuthDesktop)
+        protected Dictionary<string, string?> createQueriesForAuth(string scope, string redirectUrl = OAuthDesktop)
         {
-            return new Dictionary<string, string>()
+            return new Dictionary<string, string?>()
             {
                 { "client_id", ClientId },
                 { "grant_type", "authorization_code" },
@@ -42,15 +42,32 @@ namespace XboxAuthNet.OAuth
             };
         }
 
-        public string CreateUrl()
+        private async Task<MicrosoftOAuthResponse> microsoftOAuthRequest(HttpRequestMessage req)
         {
-            return CreateUrl(null, null);
+            req.Headers.Add("User-Agent", HttpUtil.UserAgent);
+            req.Headers.Add("Accept-Encoding", "gzip");
+            req.Headers.Add("Accept-Language", "en-US");
+
+            var res = await httpClient.SendAsync(req)
+                .ConfigureAwait(false);
+
+            res.EnsureSuccessStatusCode();
+            var resBody = await res.Content.ReadAsStringAsync()
+                .ConfigureAwait(false);
+            
+            return JsonSerializer.Deserialize<MicrosoftOAuthResponse>(resBody)
+                ?? new MicrosoftOAuthResponse(result: false);
         }
 
-        public string CreateUrl(string? redirect, string? state)
+        public string CreateUrlForOAuth()
+        {
+            return CreateUrlForOAuth(null, null);
+        }
+
+        public string CreateUrlForOAuth(string? redirect, string? state)
         {
             var url = OAuthAuthorize;
-            var query = createCommonQueriesForAuth(Scope);
+            var query = createQueriesForAuth(Scope);
             query["response_type"] = "code";
 
             if (!string.IsNullOrEmpty(redirect))
@@ -58,96 +75,71 @@ namespace XboxAuthNet.OAuth
 
             if (!string.IsNullOrEmpty(state))
                 query["state"] = state;
-
+            
             return url + "?" + HttpUtil.GetQueryString(query);
         }
 
-        public bool CheckLoginSuccess(string url)
+        public bool CheckLoginSuccess(string url, out MicrosoftOAuthAuthCode authCode)
         {
             var uri = new Uri(url);
-            return CheckLoginSuccess(uri);
+            return CheckLoginSuccess(uri, out authCode);
         }
 
-        public bool CheckLoginSuccess(Uri uri)
+        public bool CheckLoginSuccess(Uri uri, out MicrosoftOAuthAuthCode authCode)
         {
-            try
+            var query = HttpUtility.ParseQueryString(uri.Query);
+            authCode = new MicrosoftOAuthAuthCode
             {
-                var query = HttpUtil.ParseQuery(uri.Query);
-                var authcode = new MicrosoftOAuthAuthCode
-                {
-                    Code = query["code"],
-                    Error = query["error"],
-                    ErrorDescription = HttpUtil.UrlDecode(query["error_description"])
-                };
+                Code = query["code"],
+                Error = query["error"],
+                ErrorDescription = HttpUtility.UrlDecode(query["error_description"])
+            };
 
-                this.AuthCode = authcode;
-                return authcode.IsSuccess;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                return false;
-            }
+            return authCode.IsSuccess;
         }
 
-        public bool TryGetTokens(out MicrosoftOAuthResponse? response, string? refreshToken = null)
+        public async Task<MicrosoftOAuthResponse> GetTokens(MicrosoftOAuthAuthCode authCode)
         {
-            if (string.IsNullOrEmpty(refreshToken))
-            {
-                if (AuthCode?.IsSuccess ?? false)
-                {
-                    response = GetTokens();
-                    return response.IsSuccess;
-                }
-                else
-                {
-                    response = null;
-                    return false;
-                }
-            }
-
-            response = RefreshToken(refreshToken);
-            return response.IsSuccess;
-        }
-
-        public MicrosoftOAuthResponse GetTokens()
-        {
-            if (AuthCode == null || !AuthCode.IsSuccess)
+            if (authCode == null || !authCode.IsSuccess)
                 throw new InvalidOperationException("AuthCode.IsSuccess was not true. Create AuthCode first.");
 
-            var url = OAuthToken;
-            var query = createCommonQueriesForAuth(Scope);
-            query["code"] = AuthCode.Code ?? "";
+            var query = createQueriesForAuth(Scope);
+            query["code"] = authCode.Code ?? "";
 
-            var req = HttpUtil.CreateDefaultRequest(url);
-            req.Method = "POST";
-            req.ContentType = "application/x-www-form-urlencoded";
-
-            HttpUtil.WriteRequest(req, HttpUtil.GetQueryString(query));
-
-            var res = req.GetResponse();
-            var resBody = HttpUtil.ReadResponse(res);
-
-            return JsonConvert.DeserializeObject<MicrosoftOAuthResponse>(resBody);
+            try
+            {
+                return await microsoftOAuthRequest(new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(OAuthToken),
+                    Content = new FormUrlEncodedContent(query)
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new MicrosoftOAuthException("Failed to " + nameof(GetTokens), ex);
+            }
         }
 
-        public MicrosoftOAuthResponse RefreshToken(string refreshToken)
+        public async Task<MicrosoftOAuthResponse> RefreshToken(string refreshToken)
         {
-            var url = OAuthToken;
-            var query = createCommonQueriesForAuth(Scope);
+            var query = createQueriesForAuth(Scope);
             query["refresh_token"] = refreshToken;
             query["grant_type"] = "refresh_token";
 
-            var req = HttpUtil.CreateDefaultRequest(url);
-            req.Method = "POST";
-            req.ContentType = "application/x-www-form-urlencoded";
-
-            HttpUtil.WriteRequest(req, HttpUtil.GetQueryString(query));
-
-            var res = req.GetResponse();
-            var resBody = HttpUtil.ReadResponse(res);
-
-            return JsonConvert.DeserializeObject<MicrosoftOAuthResponse>(resBody);
+            try
+            {
+                return await microsoftOAuthRequest(new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(OAuthToken),
+                    Content = new FormUrlEncodedContent(query)
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new MicrosoftOAuthException("Failed to " + nameof(refreshToken), ex);
+            }
         }
 
         public static string GetSignOutUrl()

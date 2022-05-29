@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace XboxAuthNet.XboxLive
 {
@@ -12,28 +12,42 @@ namespace XboxAuthNet.XboxLive
         public const string NoXboxAccountError = "2148916233";
         public const string ChildError = "2148916238";
 
+        public XboxAuthResponse()
+        {
+
+        }
+
+        public XboxAuthResponse(bool result)
+        {
+            this.result = result;
+            this.useResult = true;
+        }
+
+        private bool result;
+        private bool useResult = false;
+
         [JsonIgnore]
-        public bool IsSuccess => string.IsNullOrEmpty(Error);
+        public bool IsSuccess => useResult ? result : string.IsNullOrEmpty(Error);
 
         public string? UserXUID { get; set; }
         public string? UserHash { get; set; }
         
-        [JsonProperty("IssueInstant")]
+        [JsonPropertyName("IssueInstant")]
         public string? IssueInstant { get; set; }
 
-        [JsonProperty("Token")]
+        [JsonPropertyName("Token")]
         public string? Token { get; set; }
 
-        [JsonProperty("NotAfter")]
+        [JsonPropertyName("NotAfter")]
         public string? ExpireOn { get; set; }
 
-        [JsonProperty("XErr")]
+        [JsonPropertyName("XErr")]
         public string? Error { get; set; }
 
-        [JsonProperty("Message")]
+        [JsonPropertyName("Message")]
         public string? Message { get; set; }
 
-        [JsonProperty("Redirect")]
+        [JsonPropertyName("Redirect")]
         public string? Redirect { get; set; }
     }
 }

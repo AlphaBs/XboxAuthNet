@@ -1,49 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuthResponse
     {
-        [JsonIgnore]
-        public bool IsSuccess => string.IsNullOrEmpty(this.Error);
+        public MicrosoftOAuthResponse()
+        {
 
-        [JsonProperty("access_token")]
+        }
+
+        public MicrosoftOAuthResponse(bool result)
+        {
+            this.result = result;
+            this.useResult = true;
+        }
+
+        private bool result = true;
+        private bool useResult = false;
+
+        [JsonIgnore]
+        public bool IsSuccess => useResult ? result : string.IsNullOrEmpty(this.Error);
+
+        [JsonPropertyName("access_token")]
         public string? AccessToken { get; set; }
 
-        [JsonProperty("token_type")]
+        [JsonPropertyName("token_type")]
         public string? TokenType { get; set; }
 
-        [JsonProperty("expires_in")]
+        [JsonPropertyName("expires_in")]
         public int ExpireIn { get; set; }
 
-        [JsonProperty("scope")]
+        [JsonPropertyName("scope")]
         public string? Scope { get; set; }
 
-        [JsonProperty("refresh_token")]
-        private string? rawRefreshToken { get; set; }
+        [JsonPropertyName("refresh_token")]
+        public string? RawRefreshToken { get; set; }
 
         [JsonIgnore]
         public string? RefreshToken
         {
-            get => rawRefreshToken?.Split('.')?.Last();
-            set => rawRefreshToken = "M.R3_BAY." + value;
+            get => RawRefreshToken?.Split('.')?.Last();
+            set => RawRefreshToken = "M.R3_BAY." + value;
         }
 
-        [JsonProperty("user_id")]
+        [JsonPropertyName("user_id")]
         public string? UserId { get; set; }
 
-        [JsonProperty("error")]
+        [JsonPropertyName("error")]
         public string? Error { get; set; }
 
-        [JsonProperty("error_description")]
+        [JsonPropertyName("error_description")]
         public string? ErrorDescription { get; set; }
 
-        [JsonProperty("error_codes")]
+        [JsonPropertyName("error_codes")]
         public int[]? ErrorCodes { get; set; }
     }
 }
