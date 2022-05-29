@@ -72,7 +72,6 @@ namespace XboxAuthNetTest
             this.webView21.Size = new System.Drawing.Size(707, 568);
             this.webView21.Source = new System.Uri("https://google.com", System.UriKind.Absolute);
             this.webView21.TabIndex = 0;
-            this.webView21.Text = "webView21";
             this.webView21.ZoomFactor = 1D;
             this.webView21.NavigationStarting += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs>(this.webView21_NavigationStarting);
             // 
