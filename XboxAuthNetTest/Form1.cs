@@ -1,31 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using XboxAuthNet;
-using XboxAuthNet.OAuth;
-using System.Threading;
+﻿using Microsoft.Web.WebView2.Core;
+using System;
 using System.IO;
-using Newtonsoft.Json;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading;
+using System.Windows.Forms;
+using XboxAuthNet.OAuth;
 using XboxAuthNet.XboxLive;
 
 namespace XboxAuthNetTest
 {
     public partial class Form1 : Form
     {
+        private readonly HttpClient httpClient;
+
         public Form1()
         {
-            oauth = new MicrosoftOAuth("00000000402B5328", "service::user.auth.xboxlive.com::MBI_SSL");
+            httpClient = new HttpClient();
+            oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient);
             InitializeComponent();
         }
 
-        bool headlessMode = false;
-        MicrosoftOAuthResponse response;
         MicrosoftOAuth oauth;
 
         string sessionFilePath = "auth.json";
@@ -42,71 +38,70 @@ namespace XboxAuthNetTest
                 return null;
 
             var file = File.ReadAllText(sessionFilePath);
-            var response = JsonConvert.DeserializeObject<MicrosoftOAuthResponse>(file);
+            var response = JsonSerializer.Deserialize<MicrosoftOAuthResponse>(file);
 
-            this.response = response;
             return response;
         }
 
         private void writeSession(MicrosoftOAuthResponse response)
         {
-            this.response = response;
-
-            var json = JsonConvert.SerializeObject(response);
+            var json = JsonSerializer.Serialize(response);
             File.WriteAllText(sessionFilePath, json);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            MicrosoftOAuthResponse response;
+            button1.Enabled = false;
 
-            // try login using refresh token
-            if (oauth.TryGetTokens(out response, this.response?.RefreshToken))
+            try
             {
-                Console.WriteLine("refresh login success");
-                loginSuccess(response);
-            }
-            else
-            {
-                if (headlessMode)
+                // try login using refresh token
+                MicrosoftOAuthResponse res = readSession();
+                if (!string.IsNullOrEmpty(res?.RefreshToken))
                 {
-                    var headless = new MicrosoftOAuthHeadless(oauth.ClientId, oauth.Scope);
-                    var res = headless.GetTokensHeadless("email", "password");
+                    res = await oauth.RefreshToken(res?.RefreshToken);
+
+                    if (res.IsSuccess)
+                    {
+                        log("refresh login success");
+                        loginSuccess(res);
+                        return;
+                    }
+                }
+
+                var url = oauth.CreateUrlForOAuth();
+                log("CreateUrlForOAuth(): " + url);
+                webView21.Source = new Uri(url);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                button1.Enabled = true;
+            }
+        }
+
+        private async void webView21_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            log("nav " + e.Uri + ", " + e.IsRedirected);
+
+            if (e.IsRedirected && oauth.CheckLoginSuccess(e.Uri, out var authCode)) // login success
+            {
+                try
+                {
+                    log("browser login succses");
+
+                    var res = await oauth.GetTokens(authCode); // get token
+                    log("GetTokens(): " + res.IsSuccess);
 
                     if (res.IsSuccess)
                         loginSuccess(res);
                     else
                         loginFail(res);
                 }
-                else // show login page
+                catch (Exception ex)
                 {
-                    var url = oauth.CreateUrl();
-                    webView21.Source = new Uri(url);
+                    MessageBox.Show(ex.ToString());
                 }
-            }
-        }
-
-        private void webView21_NavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
-        {
-            richTextBox1.AppendText("nav " + e.Uri + ", " + e.IsRedirected + "\n");
-
-            if (e.IsRedirected && oauth.CheckLoginSuccess(e.Uri)) // login success
-            {
-                Console.WriteLine("browser login succses");
-
-                new Thread(() =>
-                {
-                    var result = oauth.TryGetTokens(out MicrosoftOAuthResponse response); // get token
-                    Invoke(new Action(() =>
-                    {
-                        Console.WriteLine("browser login gettokens");
-
-                        if (result)
-                            loginSuccess(response);
-                        else
-                            loginFail(response);
-                    }));
-                }).Start();
             }
         }
 
@@ -149,7 +144,7 @@ namespace XboxAuthNetTest
                 $"ErrorCodes : {string.Join(',', response.ErrorCodes)}");
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             button2.Enabled = false;
             button1.Enabled = false;
@@ -157,23 +152,17 @@ namespace XboxAuthNetTest
             //var relyingParty = txtXboxRelyingParty.Text;
             var relyingParty = "rp://api.minecraftservices.com/";
 
-            new Thread(() => {
-                try
-                {
-                    var xbox = new XboxAuth();
-                    var ex = xbox.ExchangeRpsTicketForUserToken(response?.AccessToken);
-                    var res = xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
-
-                    Invoke(new Action(() =>
-                    {
-                        showResponse(res);
-                    }));
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }).Start();
+            try
+            {
+                var xbox = new XboxAuth(httpClient);
+                var ex = await xbox.ExchangeRpsTicketForUserToken(textBox1.Text);
+                var res = await xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
+                showResponse(res);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void btnMSSignout_Click(object sender, EventArgs e)
@@ -182,10 +171,9 @@ namespace XboxAuthNetTest
             writeSession(null);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void log(string msg)
         {
-            var f2 = new Form2();
-            f2.Show();
+            richTextBox1.AppendText(msg + "\n");
         }
     }
 }
