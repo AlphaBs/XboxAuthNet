@@ -32,7 +32,6 @@ namespace XboxAuthNet.XboxLive
             req.Headers.Add("Accept-Encoding", "gzip");
             req.Headers.Add("Accept-Language", "en-US");
             req.Headers.Add("x-xbl-contract-version", contractVersion);
-            req.Headers.TransferEncodingChunked = false;
 
             var res = await httpClient.SendAsync(req)
                 .ConfigureAwait(false);
