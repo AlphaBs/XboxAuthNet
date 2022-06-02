@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -12,17 +13,19 @@ namespace XboxAuthNet.XboxLive
 {
     public class XboxAuth
     {
-        private readonly HttpClient httpClient;
-
         public const string XboxScope = "service::user.auth.xboxlive.com::MBI_SSL";
 
         const string UserAuthenticate = "https://user.auth.xboxlive.com/user/authenticate";
         const string XstsAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
         const string DefaultRelyingParty = "http://xboxlive.com";
 
-        public XboxAuth(HttpClient client)
+        private readonly HttpClient httpClient;
+        private readonly ILogger<XboxAuth>? logger;
+
+        public XboxAuth(HttpClient client, ILoggerFactory? logFactory = null)
         {
             this.httpClient = client;
+            this.logger = logFactory?.CreateLogger<XboxAuth>();
         }
 
         private async Task<XboxAuthResponse> xboxRequest(HttpRequestMessage req, string contractVersion)
@@ -33,13 +36,16 @@ namespace XboxAuthNet.XboxLive
             req.Headers.Add("Accept-Language", "en-US");
             req.Headers.Add("x-xbl-contract-version", contractVersion);
 
+            logger?.LogTrace("Request to {RequestUri}", req.RequestUri.ToString());
+
             var res = await httpClient.SendAsync(req)
                 .ConfigureAwait(false);
-
-            res.EnsureSuccessStatusCode();
             var resBody = await res.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
 
+            logger?.LogTrace("code: {Code}, body: {Body}", res.StatusCode, resBody);
+
+            res.EnsureSuccessStatusCode();
             return parseAuthResponse(resBody);
         }
 
@@ -53,13 +59,16 @@ namespace XboxAuthNet.XboxLive
                 root.TryGetProperty("DisplayClaims", out var displayClaims) &&
                 displayClaims.TryGetProperty("xui", out var xui))
             {
-                var firstXui = xui.EnumerateArray().First();
+                var xuis = xui.EnumerateArray();
+                if (xuis.Any())
+                {
+                    var firstXui = xuis.First();
+                    if (firstXui.TryGetProperty("xid", out var xid))
+                        xboxResponse.UserXUID = xid.GetString();
 
-                if (firstXui.TryGetProperty("xid", out var xid))
-                    xboxResponse.UserXUID = xid.GetString();
-
-                if (firstXui.TryGetProperty("uhs", out var uhs))
-                    xboxResponse.UserHash = uhs.GetString();
+                    if (firstXui.TryGetProperty("uhs", out var uhs))
+                        xboxResponse.UserHash = uhs.GetString();
+                }
             }
 
             return xboxResponse ?? new XboxAuthResponse(false);
