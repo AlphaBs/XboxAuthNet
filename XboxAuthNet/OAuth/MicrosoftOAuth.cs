@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -13,20 +14,22 @@ namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuth
     {
-        public MicrosoftOAuth(string clientId, string scope, HttpClient client)
-        {
-            this.ClientId = clientId;
-            this.Scope = scope;
-            this.httpClient = client;
-        }
-
-        private readonly HttpClient httpClient;
-
         protected const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
         protected const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
         protected const string OAuthDesktopPath = "/oauth20_desktop.srf";
         protected const string OAuthErrorPath = "/err.srf";
         protected const string OAuthToken = "https://login.live.com/oauth20_token.srf";
+
+        private readonly ILogger<MicrosoftOAuth>? logger;
+        private readonly HttpClient httpClient;
+
+        public MicrosoftOAuth(string clientId, string scope, HttpClient client, ILoggerFactory? logFactory = null)
+        {
+            this.ClientId = clientId;
+            this.Scope = scope;
+            this.httpClient = client;
+            this.logger = logFactory?.CreateLogger<MicrosoftOAuth>();
+        }
 
         public string ClientId { get; }
         public string Scope { get; }
@@ -48,13 +51,17 @@ namespace XboxAuthNet.OAuth
             req.Headers.Add("Accept-Encoding", "gzip");
             req.Headers.Add("Accept-Language", "en-US");
 
+            logger?.LogTrace("Request to {RequestUri}", req.RequestUri.ToString());
+
             var res = await httpClient.SendAsync(req)
                 .ConfigureAwait(false);
-
-            res.EnsureSuccessStatusCode();
             var resBody = await res.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
-            
+
+            logger?.LogTrace("code: {Code}, body: {Body}", res.StatusCode, resBody);
+
+            res.EnsureSuccessStatusCode();
+
             return JsonSerializer.Deserialize<MicrosoftOAuthResponse>(resBody)
                 ?? new MicrosoftOAuthResponse(result: false);
         }
@@ -95,6 +102,8 @@ namespace XboxAuthNet.OAuth
                 ErrorDescription = HttpUtility.UrlDecode(query["error_description"])
             };
 
+            logger?.LogTrace("AuthCode detected: {Code}, {Error}, {ErrorDescription}", 
+                authCode.Code, authCode.Error, authCode.ErrorDescription);
             return authCode.IsSuccess;
         }
 
@@ -138,7 +147,7 @@ namespace XboxAuthNet.OAuth
             }
             catch (Exception ex)
             {
-                throw new MicrosoftOAuthException("Failed to " + nameof(refreshToken), ex);
+                throw new MicrosoftOAuthException("Failed to " + nameof(RefreshToken), ex);
             }
         }
 
