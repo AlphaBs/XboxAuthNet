@@ -19,8 +19,8 @@ namespace XboxAuthNet.XboxLive
         const string XstsAuthorize = "https://xsts.auth.xboxlive.com/xsts/authorize";
         const string DefaultRelyingParty = "http://xboxlive.com";
 
-        private readonly HttpClient httpClient;
-        private readonly ILogger<XboxAuth>? logger;
+        protected readonly HttpClient httpClient;
+        protected readonly ILogger<XboxAuth>? logger;
 
         public XboxAuth(HttpClient client, ILoggerFactory? logFactory = null)
         {
@@ -45,92 +45,89 @@ namespace XboxAuthNet.XboxLive
 
             logger?.LogTrace("code: {Code}, body: {Body}", res.StatusCode, resBody);
 
-            res.EnsureSuccessStatusCode();
-            return parseAuthResponse(resBody);
-        }
-
-        private XboxAuthResponse parseAuthResponse(string json)
-        {
-            using var jsonDocument = JsonDocument.Parse(json);
-            var root = jsonDocument.RootElement;
-            var xboxResponse = root.Deserialize<XboxAuthResponse>();
-
-            if (xboxResponse != null &&
-                root.TryGetProperty("DisplayClaims", out var displayClaims) &&
-                displayClaims.TryGetProperty("xui", out var xui))
+            try
             {
-                var xuis = xui.EnumerateArray();
-                if (xuis.Any())
-                {
-                    var firstXui = xuis.First();
-                    if (firstXui.TryGetProperty("xid", out var xid))
-                        xboxResponse.UserXUID = xid.GetString();
+                using var jsonDocument = JsonDocument.Parse(resBody);
+                var root = jsonDocument.RootElement;
+                var xboxResponse = root.Deserialize<XboxAuthResponse>();
 
-                    if (firstXui.TryGetProperty("uhs", out var uhs))
-                        xboxResponse.UserHash = uhs.GetString();
+                if (xboxResponse != null &&
+                    root.TryGetProperty("DisplayClaims", out var displayClaims) &&
+                    displayClaims.TryGetProperty("xui", out var xui))
+                {
+                    var xuis = xui.EnumerateArray();
+                    if (xuis.Any())
+                    {
+                        var firstXui = xuis.First();
+                        if (firstXui.TryGetProperty("xid", out var xid))
+                            xboxResponse.UserXUID = xid.GetString();
+
+                        if (firstXui.TryGetProperty("uhs", out var uhs))
+                            xboxResponse.UserHash = uhs.GetString();
+                    }
+
+                    return xboxResponse;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(xboxResponse?.Error))
+                        throw new XboxAuthException(xboxResponse?.Error);
+                    else
+                        throw new XboxAuthException("Status code: " + (int)res.StatusCode);
                 }
             }
-
-            return xboxResponse ?? new XboxAuthResponse(false);
+            catch (JsonException)
+            {
+                if (!string.IsNullOrWhiteSpace(resBody))
+                    throw new XboxAuthException(res.StatusCode.ToString(), resBody);
+                else
+                    throw new XboxAuthException("Status code: " + (int)res.StatusCode);
+            }
         }
 
         public async Task<XboxAuthResponse> ExchangeRpsTicketForUserToken(string rps)
         {
-            try
+            var res = await xboxRequest(new HttpRequestMessage
             {
-                var res = await xboxRequest(new HttpRequestMessage
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(UserAuthenticate),
+                Content = createJsonContent(new
                 {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(UserAuthenticate),
-                    Content = createJsonContent(new
+                    RelyingParty = "http://auth.xboxlive.com",
+                    TokenType = "JWT",
+                    Properties = new
                     {
-                        RelyingParty = "http://auth.xboxlive.com",
-                        TokenType = "JWT",
-                        Properties = new
-                        {
-                            AuthMethod = "RPS",
-                            SiteName = "user.auth.xboxlive.com",
-                            RpsTicket = rps
-                        }
-                    })
-                }, contractVersion: "0").ConfigureAwait(false);
-                return res;
-            }
-            catch (Exception ex)
-            {
-                throw new XboxAuthException("Failed to " + nameof(ExchangeRpsTicketForUserToken), null, ex);
-            }
+                        AuthMethod = "RPS",
+                        SiteName = "user.auth.xboxlive.com",
+                        RpsTicket = rps
+                    }
+                })
+            }, contractVersion: "0").ConfigureAwait(false);
+            return res;
         }
 
         public async Task<XboxAuthResponse> ExchangeTokensForXstsIdentity(string userToken, string? deviceToken, string? titleToken,
             string? xstsRelyingParty, string[]? optionalDisplayClaims)
         {
-            try
+            var res = await xboxRequest(new HttpRequestMessage
             {
-                var res = await xboxRequest(new HttpRequestMessage
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(XstsAuthorize),
+                Content = createJsonContent(new
                 {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(XstsAuthorize),
-                    Content = createJsonContent(new
+                    RelyingParty = xstsRelyingParty ?? DefaultRelyingParty,
+                    TokenType = "JWT",
+                    Properties = new
                     {
-                        RelyingParty = xstsRelyingParty ?? DefaultRelyingParty,
-                        TokenType = "JWT",
-                        Properties = new
-                        {
-                            UserTokens = new string[] { userToken },
-                            DeviceToken = deviceToken,
-                            TitleToken = titleToken,
-                            OptionalDisplayClaims = optionalDisplayClaims,
-                            SandboxId = "RETAIL"
-                        }
-                    }),
-                }, contractVersion: "1").ConfigureAwait(false);
-                return res;
-            }
-            catch (Exception ex)
-            {
-                throw new XboxAuthException("Failed to" + nameof(ExchangeTokensForXstsIdentity), null, ex);
-            }
+                        UserTokens = new string[] { userToken },
+                        DeviceToken = deviceToken,
+                        TitleToken = titleToken,
+                        OptionalDisplayClaims = optionalDisplayClaims,
+                        SandboxId = "RETAIL"
+                    }
+                }),
+            }, contractVersion: "1").ConfigureAwait(false);
+            return res;
         }
 
         private JsonContent createJsonContent<T>(T obj)

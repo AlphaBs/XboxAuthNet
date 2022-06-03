@@ -12,23 +12,6 @@ namespace XboxAuthNet.XboxLive
         public const string NoXboxAccountError = "2148916233";
         public const string ChildError = "2148916238";
 
-        public XboxAuthResponse()
-        {
-
-        }
-
-        public XboxAuthResponse(bool result)
-        {
-            this.result = result;
-            this.useResult = true;
-        }
-
-        private bool result;
-        private bool useResult = false;
-
-        [JsonIgnore]
-        public bool IsSuccess => useResult ? result : string.IsNullOrEmpty(Error);
-
         public string? UserXUID { get; set; }
         public string? UserHash { get; set; }
         

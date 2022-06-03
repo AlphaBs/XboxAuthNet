@@ -16,15 +16,16 @@ namespace XboxAuthNet.OAuth
             
         }
 
-        public MicrosoftOAuthException(string? message, string? error, string? errorDes, int[]? codes)
-            : base(message)
+        public MicrosoftOAuthException(string? error, string? errorDes, int[]? codes)
+            : base(error)
         {
             this.Error = error;
             this.ErrorDescription = errorDes;
             this.ErrorCodes = codes;
         }
 
-        public MicrosoftOAuthException(string? message, MicrosoftOAuthResponse oauthResponse)
+        public MicrosoftOAuthException(MicrosoftOAuthResponse oauthResponse)
+            : base(oauthResponse.Error)
         {
             this.Response = oauthResponse;
             this.Error = Response.Error;

@@ -14,14 +14,14 @@ namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuth
     {
-        protected const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
-        protected const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
-        protected const string OAuthDesktopPath = "/oauth20_desktop.srf";
-        protected const string OAuthErrorPath = "/err.srf";
-        protected const string OAuthToken = "https://login.live.com/oauth20_token.srf";
+        const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
+        const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
+        const string OAuthDesktopPath = "/oauth20_desktop.srf";
+        const string OAuthErrorPath = "/err.srf";
+        const string OAuthToken = "https://login.live.com/oauth20_token.srf";
 
-        private readonly ILogger<MicrosoftOAuth>? logger;
-        private readonly HttpClient httpClient;
+        protected readonly ILogger<MicrosoftOAuth>? logger;
+        protected readonly HttpClient httpClient;
 
         public MicrosoftOAuth(string clientId, string scope, HttpClient client, ILoggerFactory? logFactory = null)
         {
@@ -58,12 +58,31 @@ namespace XboxAuthNet.OAuth
             var resBody = await res.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
 
-            logger?.LogTrace("code: {Code}, body: {Body}", res.StatusCode, resBody);
+            logger?.LogTrace("code: {Code}, body: {Body}", (int)res.StatusCode, resBody);
 
-            res.EnsureSuccessStatusCode();
+            try
+            {
+                var resObj = JsonSerializer.Deserialize<MicrosoftOAuthResponse>(resBody);
+                if (resObj == null)
+                    throw new MicrosoftOAuthException("Response was null", null, null);
 
-            return JsonSerializer.Deserialize<MicrosoftOAuthResponse>(resBody)
-                ?? new MicrosoftOAuthResponse(result: false);
+                if (!res.IsSuccessStatusCode)
+                {
+                    if (!string.IsNullOrEmpty(resObj.Error) || !string.IsNullOrEmpty(resObj.ErrorDescription))
+                        throw new MicrosoftOAuthException(resObj);
+                    else
+                        throw new MicrosoftOAuthException("Status code: " + (int)res.StatusCode);
+                }
+
+                return resObj;
+            }
+            catch (JsonException)
+            {
+                if (!string.IsNullOrWhiteSpace(resBody))
+                    throw new MicrosoftOAuthException(res.StatusCode.ToString(), resBody, null);
+                else
+                    throw new MicrosoftOAuthException("Status code: " + (int)res.StatusCode);
+            }
         }
 
         public string CreateUrlForOAuth()
@@ -115,19 +134,12 @@ namespace XboxAuthNet.OAuth
             var query = createQueriesForAuth(Scope);
             query["code"] = authCode.Code ?? "";
 
-            try
+            return await microsoftOAuthRequest(new HttpRequestMessage
             {
-                return await microsoftOAuthRequest(new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(OAuthToken),
-                    Content = new FormUrlEncodedContent(query)
-                }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw new MicrosoftOAuthException("Failed to " + nameof(GetTokens), ex);
-            }
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(OAuthToken),
+                Content = new FormUrlEncodedContent(query)
+            }).ConfigureAwait(false);
         }
 
         public async Task<MicrosoftOAuthResponse> RefreshToken(string refreshToken)
@@ -136,19 +148,12 @@ namespace XboxAuthNet.OAuth
             query["refresh_token"] = refreshToken;
             query["grant_type"] = "refresh_token";
 
-            try
+            return await microsoftOAuthRequest(new HttpRequestMessage
             {
-                return await microsoftOAuthRequest(new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(OAuthToken),
-                    Content = new FormUrlEncodedContent(query)
-                }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw new MicrosoftOAuthException("Failed to " + nameof(RefreshToken), ex);
-            }
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(OAuthToken),
+                Content = new FormUrlEncodedContent(query)
+            }).ConfigureAwait(false);
         }
 
         public static string GetSignOutUrl()
