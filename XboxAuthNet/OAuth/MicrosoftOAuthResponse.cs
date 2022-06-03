@@ -5,23 +5,6 @@ namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuthResponse
     {
-        public MicrosoftOAuthResponse()
-        {
-
-        }
-
-        public MicrosoftOAuthResponse(bool result)
-        {
-            this.result = result;
-            this.useResult = true;
-        }
-
-        private bool result = true;
-        private bool useResult = false;
-
-        [JsonIgnore]
-        public bool IsSuccess => useResult ? result : string.IsNullOrEmpty(this.Error);
-
         [JsonPropertyName("access_token")]
         public string? AccessToken { get; set; }
 

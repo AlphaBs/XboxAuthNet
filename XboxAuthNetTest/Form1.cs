@@ -1,4 +1,6 @@
-﻿using Microsoft.Web.WebView2.Core;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Core;
 using System;
 using System.IO;
 using System.Net;
@@ -14,11 +16,22 @@ namespace XboxAuthNetTest
     public partial class Form1 : Form
     {
         private readonly HttpClient httpClient;
+        private readonly ILoggerFactory loggerFactory;
+        private readonly ILogger<Form1> logger;
 
         public Form1()
         {
+            loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddFilter(level => level >= LogLevel.Trace);
+                builder.AddSimpleConsole();
+                builder.AddDebug();
+            });
+            logger = loggerFactory.CreateLogger<Form1>();
+            logger.LogTrace("Logger ready");
+
             httpClient = new HttpClient();
-            oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient);
+            oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient, loggerFactory);
             InitializeComponent();
         }
 
@@ -60,13 +73,9 @@ namespace XboxAuthNetTest
                 if (!string.IsNullOrEmpty(res?.RefreshToken))
                 {
                     res = await oauth.RefreshToken(res?.RefreshToken);
-
-                    if (res.IsSuccess)
-                    {
-                        log("refresh login success");
-                        loginSuccess(res);
-                        return;
-                    }
+                    log("refresh login success");
+                    loginSuccess(res);
+                    return;
                 }
 
                 var url = oauth.CreateUrlForOAuth();
@@ -91,12 +100,7 @@ namespace XboxAuthNetTest
                     log("browser login succses");
 
                     var res = await oauth.GetTokens(authCode); // get token
-                    log("GetTokens(): " + res.IsSuccess);
-
-                    if (res.IsSuccess)
-                        loginSuccess(res);
-                    else
-                        loginFail(res);
+                    loginSuccess(res);
                 }
                 catch (Exception ex)
                 {
@@ -136,25 +140,17 @@ namespace XboxAuthNetTest
             button1.Enabled = false;
         }
 
-        private void loginFail(MicrosoftOAuthResponse response)
-        {
-            MessageBox.Show(
-                $"Failed to login : {response.Error}\n" +
-                $"ErrorDescription : {response.ErrorDescription}\n" +
-                $"ErrorCodes : {string.Join(',', response.ErrorCodes)}");
-        }
-
         private async void button2_Click(object sender, EventArgs e)
         {
             button2.Enabled = false;
             button1.Enabled = false;
 
-            //var relyingParty = txtXboxRelyingParty.Text;
-            var relyingParty = "rp://api.minecraftservices.com/";
+            var relyingParty = txtXboxRelyingParty.Text;
+            //var relyingParty = "rp://api.minecraftservices.com/";
 
             try
             {
-                var xbox = new XboxAuth(httpClient);
+                var xbox = new XboxAuth(httpClient, loggerFactory);
                 var ex = await xbox.ExchangeRpsTicketForUserToken(textBox1.Text);
                 var res = await xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
                 showResponse(res);
