@@ -24,8 +24,25 @@ namespace XboxAuthNet.XboxLive
         public XboxAuthException(string? errorCode, string? responseMessage)
             : base(responseMessage)
         {
-            this.ErrorCode = errorCode;
+            this.ErrorCode = tryConvertToHexErrorCode(errorCode);
             this.ResponseMessage = responseMessage;
+        }
+
+        private string? tryConvertToHexErrorCode(string? errorCode)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(errorCode))
+                { 
+                    var errorInt = long.Parse(errorCode);
+                    errorCode = errorInt.ToString("x");
+                }
+                return errorCode;
+            }
+            catch (Exception ex) when (ex is FormatException || ex is OverflowException)
+            {
+                return errorCode;
+            }
         }
 
         public string? ErrorCode { get; }
