@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -20,15 +19,13 @@ namespace XboxAuthNet.OAuth
         const string OAuthErrorPath = "/err.srf";
         const string OAuthToken = "https://login.live.com/oauth20_token.srf";
 
-        protected readonly ILogger<MicrosoftOAuth>? logger;
         protected readonly HttpClient httpClient;
 
-        public MicrosoftOAuth(string clientId, string scope, HttpClient client, ILoggerFactory? logFactory = null)
+        public MicrosoftOAuth(string clientId, string scope, HttpClient client)
         {
             this.ClientId = clientId;
             this.Scope = scope;
             this.httpClient = client;
-            this.logger = logFactory?.CreateLogger<MicrosoftOAuth>();
         }
 
         public string ClientId { get; }
@@ -51,14 +48,16 @@ namespace XboxAuthNet.OAuth
             req.Headers.Add("Accept-Encoding", "gzip");
             req.Headers.Add("Accept-Language", "en-US");
 
-            logger?.LogTrace("Request to {RequestUri}", req.RequestUri.ToString());
-
             var res = await httpClient.SendAsync(req)
                 .ConfigureAwait(false);
+
+            return await handleMicrosoftOAuthResponse(res);
+        }
+
+        internal async Task<MicrosoftOAuthResponse> handleMicrosoftOAuthResponse(HttpResponseMessage res)
+        {
             var resBody = await res.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
-
-            logger?.LogTrace("code: {Code}, body: {Body}", (int)res.StatusCode, resBody);
 
             try
             {
@@ -70,7 +69,7 @@ namespace XboxAuthNet.OAuth
                 return resObj;
             }
             catch (Exception ex) when (
-                ex is JsonException || 
+                ex is JsonException ||
                 ex is HttpRequestException)
             {
                 try
@@ -120,8 +119,6 @@ namespace XboxAuthNet.OAuth
                 ErrorDescription = HttpUtility.UrlDecode(query["error_description"])
             };
 
-            logger?.LogTrace("AuthCode detected: {Code}, {Error}, {ErrorDescription}", 
-                authCode.Code, authCode.Error, authCode.ErrorDescription);
             return authCode.IsSuccess;
         }
 

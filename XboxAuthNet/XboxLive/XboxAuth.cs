@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -21,12 +20,10 @@ namespace XboxAuthNet.XboxLive
         const string DefaultRelyingParty = "http://xboxlive.com";
 
         protected readonly HttpClient httpClient;
-        protected readonly ILogger<XboxAuth>? logger;
 
-        public XboxAuth(HttpClient client, ILoggerFactory? logFactory = null)
+        public XboxAuth(HttpClient client)
         {
             this.httpClient = client;
-            this.logger = logFactory?.CreateLogger<XboxAuth>();
         }
 
         private async Task<XboxAuthResponse> xboxRequest(HttpRequestMessage req, string contractVersion)
@@ -37,14 +34,15 @@ namespace XboxAuthNet.XboxLive
             req.Headers.Add("Accept-Language", "en-US");
             req.Headers.Add("x-xbl-contract-version", contractVersion);
 
-            logger?.LogTrace("Request to {RequestUri}", req.RequestUri.ToString());
-
             var res = await httpClient.SendAsync(req)
                 .ConfigureAwait(false);
+            return await handleXboxResponse(res);
+        }
+
+        internal async Task<XboxAuthResponse> handleXboxResponse(HttpResponseMessage res)
+        {
             var resBody = await res.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
-
-            logger?.LogTrace("code: {Code}, body: {Body}", res.StatusCode, resBody);
 
             try
             {
@@ -68,8 +66,8 @@ namespace XboxAuthNet.XboxLive
                 }
             }
             catch (Exception ex) when (
-                ex is JsonException || 
-                ex is KeyNotFoundException || 
+                ex is JsonException ||
+                ex is KeyNotFoundException ||
                 ex is HttpRequestException)
             {
                 try
