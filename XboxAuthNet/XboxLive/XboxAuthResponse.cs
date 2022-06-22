@@ -9,9 +9,6 @@ namespace XboxAuthNet.XboxLive
 {
     public class XboxAuthResponse
     {
-        public const string NoXboxAccountError = "2148916233";
-        public const string ChildError = "2148916238";
-
         public string? UserXUID { get; set; }
         public string? UserHash { get; set; }
         
@@ -23,14 +20,5 @@ namespace XboxAuthNet.XboxLive
 
         [JsonPropertyName("NotAfter")]
         public string? ExpireOn { get; set; }
-
-        [JsonPropertyName("XErr")]
-        public string? Error { get; set; }
-
-        [JsonPropertyName("Message")]
-        public string? Message { get; set; }
-
-        [JsonPropertyName("Redirect")]
-        public string? Redirect { get; set; }
     }
 }
