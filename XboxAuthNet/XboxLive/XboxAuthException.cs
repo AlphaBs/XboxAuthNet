@@ -14,13 +14,18 @@ namespace XboxAuthNet.XboxLive
         public XboxAuthException(string message, int statusCode) : base(message) =>
             StatusCode = statusCode;
 
-        public XboxAuthException(string? error, string? message, string? redirect, int statusCode) =>
+        public XboxAuthException(string? error, string? message, string? redirect, int statusCode) : base(CreateMessageFromError(error, message)) =>
             (Error, ErrorMessage, Redirect, StatusCode) = (error, message, redirect, statusCode);
 
         public XboxAuthException(string? message)
             : base(message)
         {
             
+        }
+
+        private static string CreateMessageFromError(string? error, string? errorDes)
+        {
+            return string.Join(", ", new string?[] { error, errorDes }.Where(x => !string.IsNullOrEmpty(x)));
         }
 
         public int StatusCode { get; private set; }

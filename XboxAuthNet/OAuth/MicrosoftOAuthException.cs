@@ -16,7 +16,7 @@ namespace XboxAuthNet.OAuth
         public MicrosoftOAuthException(string? message, int statusCode) : base(message)
             => StatusCode = statusCode;
 
-        public MicrosoftOAuthException(string? error, string? errorDes, int[]? codes, int statusCode) : base(error)
+        public MicrosoftOAuthException(string? error, string? errorDes, int[]? codes, int statusCode) : base(CreateMessageFromError(error, errorDes))
             => (StatusCode, Error, ErrorDescription, ErrorCodes) = (statusCode, error, errorDes, codes);
 
         public int StatusCode { get; private set; }
@@ -26,6 +26,11 @@ namespace XboxAuthNet.OAuth
         public string? ErrorDescription { get; private set; }
 
         public int[]? ErrorCodes { get; private set; }
+
+        private static string CreateMessageFromError(string? error, string? errorDes)
+        {
+            return string.Join(", ", new string?[] { error, errorDes }.Where(x => !string.IsNullOrEmpty(x)));
+        }
 
         public static MicrosoftOAuthException FromResponseBody(string responseBody, int statusCode)
         {
