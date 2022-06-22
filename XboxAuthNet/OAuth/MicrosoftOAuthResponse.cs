@@ -29,14 +29,5 @@ namespace XboxAuthNet.OAuth
 
         [JsonPropertyName("user_id")]
         public string? UserId { get; set; }
-
-        [JsonPropertyName("error")]
-        public string? Error { get; set; }
-
-        [JsonPropertyName("error_description")]
-        public string? ErrorDescription { get; set; }
-
-        [JsonPropertyName("error_codes")]
-        public int[]? ErrorCodes { get; set; }
     }
 }

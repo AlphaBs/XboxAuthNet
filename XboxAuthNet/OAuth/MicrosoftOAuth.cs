@@ -62,26 +62,25 @@ namespace XboxAuthNet.OAuth
 
             try
             {
+                res.EnsureSuccessStatusCode();
                 var resObj = JsonSerializer.Deserialize<MicrosoftOAuthResponse>(resBody);
                 if (resObj == null)
-                    throw new MicrosoftOAuthException("Response was null", null, null);
-
-                if (!res.IsSuccessStatusCode)
-                {
-                    if (!string.IsNullOrEmpty(resObj.Error) || !string.IsNullOrEmpty(resObj.ErrorDescription))
-                        throw new MicrosoftOAuthException(resObj);
-                    else
-                        throw new MicrosoftOAuthException("Status code: " + (int)res.StatusCode);
-                }
+                    throw new MicrosoftOAuthException("Response was null", (int)res.StatusCode);
 
                 return resObj;
             }
-            catch (JsonException)
+            catch (Exception ex) when (
+                ex is JsonException || 
+                ex is HttpRequestException)
             {
-                if (!string.IsNullOrWhiteSpace(resBody))
-                    throw new MicrosoftOAuthException(res.StatusCode.ToString(), resBody, null);
-                else
-                    throw new MicrosoftOAuthException("Status code: " + (int)res.StatusCode);
+                try
+                {
+                    throw MicrosoftOAuthException.FromResponseBody(resBody, (int)res.StatusCode);
+                }
+                catch (FormatException)
+                {
+                    throw new MicrosoftOAuthException($"{(int)res.StatusCode}: {res.ReasonPhrase}", (int)res.StatusCode);
+                }
             }
         }
 

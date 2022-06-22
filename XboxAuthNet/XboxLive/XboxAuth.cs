@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -47,41 +48,38 @@ namespace XboxAuthNet.XboxLive
 
             try
             {
+                res.EnsureSuccessStatusCode();
+
                 using var jsonDocument = JsonDocument.Parse(resBody);
                 var root = jsonDocument.RootElement;
                 var xboxResponse = root.Deserialize<XboxAuthResponse>();
 
-                if (xboxResponse != null &&
-                    root.TryGetProperty("DisplayClaims", out var displayClaims) &&
-                    displayClaims.TryGetProperty("xui", out var xui))
+                var xuis = root.GetProperty("DisplayClaims").GetProperty("xui").EnumerateArray();
+                if (xboxResponse != null && xuis.Any())
                 {
-                    var xuis = xui.EnumerateArray();
-                    if (xuis.Any())
-                    {
-                        var firstXui = xuis.First();
-                        if (firstXui.TryGetProperty("xid", out var xid))
-                            xboxResponse.UserXUID = xid.GetString();
-
-                        if (firstXui.TryGetProperty("uhs", out var uhs))
-                            xboxResponse.UserHash = uhs.GetString();
-                    }
-
+                    var xui = xuis.First();
+                    xboxResponse.UserXUID = xui.GetProperty("xid").GetString();
+                    xboxResponse.UserHash = xui.GetProperty("uhs").GetString();
                     return xboxResponse;
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(xboxResponse?.Error))
-                        throw new XboxAuthException(xboxResponse?.Error);
-                    else
-                        throw new XboxAuthException("Status code: " + (int)res.StatusCode);
+                    throw new KeyNotFoundException();
                 }
             }
-            catch (JsonException)
+            catch (Exception ex) when (
+                ex is JsonException || 
+                ex is KeyNotFoundException || 
+                ex is HttpRequestException)
             {
-                if (!string.IsNullOrWhiteSpace(resBody))
-                    throw new XboxAuthException(res.StatusCode.ToString(), resBody);
-                else
-                    throw new XboxAuthException("Status code: " + (int)res.StatusCode);
+                try
+                {
+                    throw XboxAuthException.FromResponseBody(resBody, (int)res.StatusCode);
+                }
+                catch (FormatException)
+                {
+                    throw new XboxAuthException($"{(int)res.StatusCode}: {res.ReasonPhrase}", (int)res.StatusCode);
+                }
             }
         }
 
