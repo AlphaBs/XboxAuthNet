@@ -103,26 +103,32 @@ namespace XboxAuthNet.OAuth
             return url + "?" + HttpUtil.GetQueryString(query);
         }
 
-        public bool CheckLoginSuccess(string url, out MicrosoftOAuthAuthCode authCode)
+        public bool CheckLoginSuccess(string url, out MicrosoftOAuthCode authCode)
         {
             var uri = new Uri(url);
             return CheckLoginSuccess(uri, out authCode);
         }
 
-        public bool CheckLoginSuccess(Uri uri, out MicrosoftOAuthAuthCode authCode)
+        public bool CheckLoginSuccess(Uri uri, out MicrosoftOAuthCode authCode)
+        {
+            var result = CheckOAuthCodeResult(uri, out authCode);
+            return result && authCode.IsSuccess;
+        }
+
+        public bool CheckOAuthCodeResult(Uri uri, out MicrosoftOAuthCode authCode)
         {
             var query = HttpUtility.ParseQueryString(uri.Query);
-            authCode = new MicrosoftOAuthAuthCode
+            authCode = new MicrosoftOAuthCode
             {
                 Code = query["code"],
                 Error = query["error"],
                 ErrorDescription = HttpUtility.UrlDecode(query["error_description"])
             };
 
-            return authCode.IsSuccess;
+            return !authCode.IsEmpty;
         }
 
-        public async Task<MicrosoftOAuthResponse> GetTokens(MicrosoftOAuthAuthCode authCode)
+        public async Task<MicrosoftOAuthResponse> GetTokens(MicrosoftOAuthCode authCode)
         {
             if (authCode == null || !authCode.IsSuccess)
                 throw new InvalidOperationException("AuthCode.IsSuccess was not true. Create AuthCode first.");
