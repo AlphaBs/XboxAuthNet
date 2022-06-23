@@ -14,18 +14,12 @@ namespace XboxAuthNet.XboxLive
         public XboxAuthException(string message, int statusCode) : base(message) =>
             StatusCode = statusCode;
 
-        public XboxAuthException(string? error, string? message, string? redirect, int statusCode) : base(CreateMessageFromError(error, message)) =>
+        public XboxAuthException(string? error, string? message, string? redirect, int statusCode) : base(CreateMessageFromError(error, message, redirect)) =>
             (Error, ErrorMessage, Redirect, StatusCode) = (error, message, redirect, statusCode);
 
-        public XboxAuthException(string? message)
-            : base(message)
+        private static string CreateMessageFromError(params string?[] inputs)
         {
-            
-        }
-
-        private static string CreateMessageFromError(string? error, string? errorDes)
-        {
-            return string.Join(", ", new string?[] { error, errorDes }.Where(x => !string.IsNullOrEmpty(x)));
+            return string.Join(", ", inputs.Where(x => !string.IsNullOrEmpty(x)));
         }
 
         public int StatusCode { get; private set; }
@@ -47,9 +41,13 @@ namespace XboxAuthNet.XboxLive
                 string? errorMessage = null;
                 string? redirect = null;
 
-                if (root.TryGetProperty("XErr", out var errProp) &&
-                    errProp.ValueKind == JsonValueKind.String)
-                    error = errProp.GetString();
+                if (root.TryGetProperty("XErr", out var errProp))
+                {
+                    if (errProp.ValueKind == JsonValueKind.Number)
+                        error = errProp.GetUInt32().ToString();
+                    if (errProp.ValueKind == JsonValueKind.String)
+                        error = errProp.GetString();
+                }
                 if (root.TryGetProperty("Message", out var messageProp) &&
                     messageProp.ValueKind == JsonValueKind.String)
                     errorMessage = messageProp.GetString();

@@ -56,8 +56,22 @@ namespace XboxAuthNet.XboxLive
                 if (xboxResponse != null && xuis.Any())
                 {
                     var xui = xuis.First();
-                    xboxResponse.UserXUID = xui.GetProperty("xid").GetString();
-                    xboxResponse.UserHash = xui.GetProperty("uhs").GetString();
+
+                    string? xid = null;
+                    string? uhs = null;
+
+                    if (xui.TryGetProperty("xid", out var xidProp) &&
+                        xidProp.ValueKind == JsonValueKind.String)
+                        xid = xidProp.GetString();
+                    if (xui.TryGetProperty("uhs", out var uhsProp) &&
+                        uhsProp.ValueKind == JsonValueKind.String)
+                        uhs = uhsProp.GetString();
+
+                    if (!string.IsNullOrEmpty(xid) && !string.IsNullOrEmpty(uhs))
+                        throw new KeyNotFoundException();
+
+                    xboxResponse.UserXUID = xid;
+                    xboxResponse.UserHash = uhs;
                     return xboxResponse;
                 }
                 else
@@ -65,9 +79,12 @@ namespace XboxAuthNet.XboxLive
                     throw new KeyNotFoundException();
                 }
             }
+            catch (KeyNotFoundException)
+            {
+                throw new XboxAuthException(resBody, (int)res.StatusCode);
+            }
             catch (Exception ex) when (
                 ex is JsonException ||
-                ex is KeyNotFoundException ||
                 ex is HttpRequestException)
             {
                 try
