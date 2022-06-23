@@ -1,6 +1,6 @@
 ﻿namespace XboxAuthNet.OAuth
 {
-    public class MicrosoftOAuthAuthCode
+    public class MicrosoftOAuthCode
     {
         public string? Code { get; set; }
         public string? Error { get; set; }
