@@ -26,7 +26,7 @@ namespace XboxAuthNet.Test
         {
             new object?[]
             {
-                "{\"XErr\":\"2148916233\", \"Message\":\"Message\", \"Redirect\":\"Redirect\"}",
+                "{\"XErr\":2148916233, \"Message\":\"Message\", \"Redirect\":\"Redirect\"}",
                 HttpStatusCode.BadRequest,
                 "8015dc09, Message", "8015dc09", "Message", "Redirect"
             },
