@@ -16,22 +16,11 @@ namespace XboxAuthNetTest
     public partial class Form1 : Form
     {
         private readonly HttpClient httpClient;
-        private readonly ILoggerFactory loggerFactory;
-        private readonly ILogger<Form1> logger;
 
         public Form1()
         {
-            loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddFilter(level => level >= LogLevel.Trace);
-                builder.AddSimpleConsole();
-                builder.AddDebug();
-            });
-            logger = loggerFactory.CreateLogger<Form1>();
-            logger.LogTrace("Logger ready");
-
             httpClient = new HttpClient();
-            oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient, loggerFactory);
+            oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient);
             InitializeComponent();
         }
 
@@ -93,8 +82,14 @@ namespace XboxAuthNetTest
         {
             log("nav " + e.Uri + ", " + e.IsRedirected);
 
-            if (e.IsRedirected && oauth.CheckLoginSuccess(e.Uri, out var authCode)) // login success
+            if (e.IsRedirected && oauth.CheckOAuthCodeResult(new Uri(e.Uri), out var authCode)) // login success
             {
+                if (!authCode.IsSuccess)
+                {
+                    MessageBox.Show($"{authCode.Error}\n{authCode.ErrorDescription}");
+                    return;
+                }
+
                 try
                 {
                     log("browser login succses");
@@ -150,7 +145,7 @@ namespace XboxAuthNetTest
 
             try
             {
-                var xbox = new XboxAuth(httpClient, loggerFactory);
+                var xbox = new XboxAuth(httpClient);
                 var ex = await xbox.ExchangeRpsTicketForUserToken(textBox1.Text);
                 var res = await xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
                 showResponse(res);
