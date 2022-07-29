@@ -9,9 +9,12 @@ namespace XboxAuthNet.XboxLive
 {
     public class XboxAuthResponse
     {
-        public string? UserXUID { get; set; }
-        public string? UserHash { get; set; }
-        
+        // for backward compatibility
+        public string? UserXUID => XuiClaims?.XboxUserId;
+        public string? UserHash => XuiClaims?.UserHash;
+
+        public XboxAuthXuiClaims? XuiClaims { get; set; }
+
         [JsonPropertyName("IssueInstant")]
         public string? IssueInstant { get; set; }
 

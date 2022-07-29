@@ -50,38 +50,19 @@ namespace XboxAuthNet.XboxLive
 
                 using var jsonDocument = JsonDocument.Parse(resBody);
                 var root = jsonDocument.RootElement;
-                var xboxResponse = root.Deserialize<XboxAuthResponse>();
+                var xboxResponse = root.Deserialize<XboxAuthResponse>()
+                    ?? throw new JsonException();
 
-                var xuis = root.GetProperty("DisplayClaims").GetProperty("xui").EnumerateArray();
-                if (xboxResponse != null && xuis.Any())
+                if (root.TryGetProperty("DisplayClaims", out var displayClaimsProp) &&
+                    displayClaimsProp.ValueKind == JsonValueKind.Object &&
+                    displayClaimsProp.TryGetProperty("xui", out var xuiProp) &&
+                    xuiProp.ValueKind == JsonValueKind.Array &&
+                    xuiProp.EnumerateArray().Any())
                 {
-                    var xui = xuis.First();
-
-                    string? xid = null;
-                    string? uhs = null;
-
-                    if (xui.TryGetProperty("xid", out var xidProp) &&
-                        xidProp.ValueKind == JsonValueKind.String)
-                        xid = xidProp.GetString();
-                    if (xui.TryGetProperty("uhs", out var uhsProp) &&
-                        uhsProp.ValueKind == JsonValueKind.String)
-                        uhs = uhsProp.GetString();
-
-                    if (!string.IsNullOrEmpty(xid) && !string.IsNullOrEmpty(uhs))
-                        throw new KeyNotFoundException();
-
-                    xboxResponse.UserXUID = xid;
-                    xboxResponse.UserHash = uhs;
-                    return xboxResponse;
+                    xboxResponse.XuiClaims = xuiProp.EnumerateArray().First().Deserialize<XboxAuthXuiClaims>();
                 }
-                else
-                {
-                    throw new KeyNotFoundException();
-                }
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new XboxAuthException(resBody, (int)res.StatusCode);
+
+                return xboxResponse;
             }
             catch (Exception ex) when (
                 ex is JsonException ||
