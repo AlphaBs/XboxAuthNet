@@ -6,6 +6,17 @@ namespace XboxAuthNet.Utils
 {
     public class KeyPairGeneratorFactory
     {
+        public static IAsymmetricCipherKeyPairGenerator CreateDefaultAsymmetricKeyPair()
+        {
+            var pem =
+                "-----BEGIN EC PRIVATE KEY-----" +
+                "MHcCAQEEIBmQFwiEgUsjIsFT2DUursdHKcr/Vmx6C2vuS7fBIMzLoAoGCCqGSM49" +
+                "AwEHoUQDQgAEUeVH3ZwR4BYEUCCsRohY31SvwrJDztJzbSScHtZGybV/k+OkGvUv" +
+                "SS3ZRNHdNJiJc4PFLJLFRj254lyHax66BA==" +
+                "-----END EC PRIVATE KEY-----";
+            return CreateAsymmetricKeyPairFromPemString(pem);
+        }
+
         public static IAsymmetricCipherKeyPairGenerator CreateAsymmetricKeyPairFromPemFile(string path)
         {
             using var file = File.OpenText(path);
