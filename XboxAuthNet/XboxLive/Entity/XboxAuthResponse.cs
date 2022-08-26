@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace XboxAuthNet.XboxLive.Entity
 {
@@ -20,5 +21,20 @@ namespace XboxAuthNet.XboxLive.Entity
 
         [JsonPropertyName("NotAfter")]
         public string? ExpireOn { get; set; }
+
+        /// <summary>
+        /// checks token is not null and not empty, checks token is not expired
+        /// </summary>
+        /// <returns></returns>
+        public bool Validate()
+        {
+            if (DateTime.Parse(ExpireOn) < DateTime.Now)
+                return false;
+
+            if (string.IsNullOrEmpty(Token))
+                return false;
+
+            return true;
+        }
     }
 }

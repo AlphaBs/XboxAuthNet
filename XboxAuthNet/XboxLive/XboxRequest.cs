@@ -39,7 +39,14 @@ namespace XboxAuthNet.XboxLive.Entity
                 }
                 catch (FormatException)
                 {
-                    throw new XboxAuthException($"{(int)res.StatusCode}: {res.ReasonPhrase}", (int)res.StatusCode);
+                    try
+                    {
+                        throw XboxAuthException.FromResponseHeaders(res.Headers, (int)res.StatusCode);
+                    }
+                    catch (FormatException)
+                    {
+                        throw new XboxAuthException($"{(int)res.StatusCode}: {res.ReasonPhrase}", (int)res.StatusCode);
+                    }
                 }
             }
         }

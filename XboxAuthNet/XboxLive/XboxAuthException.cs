@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using XboxAuthNet.XboxLive.Entity;
 
@@ -42,6 +43,22 @@ namespace XboxAuthNet.XboxLive
             {
                 throw new FormatException();
             }
+        }
+
+        public static XboxAuthException FromResponseHeaders(HttpResponseHeaders headers, int statusCode)
+        {
+            string? xerr = null;
+            if (headers.TryGetValues("X-Err", out var xerrValues))
+                xerr = xerrValues.FirstOrDefault();
+
+            string? message = null;
+            if (headers.TryGetValues("WWW-Authenticate", out var authValues))
+                message = authValues.FirstOrDefault();
+
+            if (string.IsNullOrEmpty(xerr) && string.IsNullOrEmpty(message))
+                throw new FormatException();
+
+            return new XboxAuthException(ErrorUtils.TryConvertToHexErrorCode(xerr), message, null, statusCode);
         }
     }
 }
