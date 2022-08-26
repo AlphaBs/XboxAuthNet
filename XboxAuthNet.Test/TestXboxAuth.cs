@@ -1,13 +1,9 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using XboxAuthNet.OAuth;
 using XboxAuthNet.XboxLive;
+using XboxAuthNet.XboxLive.Entity;
 
 namespace XboxAuthNet.Test
 {
@@ -71,7 +67,7 @@ namespace XboxAuthNet.Test
             res.Content = new StringContent(resBody);
             res.StatusCode = statusCode;
 
-            var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await xbox!.handleXboxResponse(res));
+            var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await XboxRequest.HandleResponse<XboxAuthResponse>(res));
             Assert.NotNull(ex);
             Assert.AreEqual(expectedMessage, ex!.Message);
             Assert.AreEqual(expectedError, ex!.Error);
@@ -86,7 +82,7 @@ namespace XboxAuthNet.Test
             res.Content = new StringContent("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[{\"gtg\":\"gtg\",\"xid\":\"xid\",\"uhs\":\"uhs\",\"usr\":\"usr\",\"utr\":\"utr\",\"prv\":\"prv\",\"agg\":\"Adult\"}]}}");
             res.StatusCode = HttpStatusCode.OK;
 
-            var result = await xbox!.handleXboxResponse(res);
+            var result = await XboxRequest.HandleResponse<XboxAuthResponse>(res);
             Assert.AreEqual("jwt", result.Token);
             Assert.AreEqual("gtg", result.XuiClaims?.Gamertag);
             Assert.AreEqual("xid", result.XuiClaims?.XboxUserId);
@@ -103,14 +99,20 @@ namespace XboxAuthNet.Test
         [Test]
         [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\"}")]
         [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[]}}")]
+        [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[{}]}}")]
+        [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[null]}}")]
+        [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":null}}")]
+        [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"x23\":null}}")]
+        [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":null}")]
         public async Task TestSuccessResponseWithoutClaims(string tc)
         {
             var res = new HttpResponseMessage();
             res.Content = new StringContent(tc);
             res.StatusCode = HttpStatusCode.OK;
 
-            var result = await xbox!.handleXboxResponse(res);
+            var result = await XboxRequest.HandleResponse<XboxAuthResponse>(res);
             Assert.AreEqual("jwt", result.Token);
+            Assert.IsNull(result.XuiClaims);
         }
     }
 }

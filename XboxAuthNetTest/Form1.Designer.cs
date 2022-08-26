@@ -61,6 +61,8 @@ namespace XboxAuthNetTest
             this.label14 = new System.Windows.Forms.Label();
             this.txtXboxRelyingParty = new System.Windows.Forms.TextBox();
             this.btnMSSignout = new System.Windows.Forms.Button();
+            this.btnXboxSisu = new System.Windows.Forms.Button();
+            this.btnXboxLiveFull = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.webView21)).BeginInit();
             this.SuspendLayout();
             // 
@@ -204,7 +206,7 @@ namespace XboxAuthNetTest
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(809, 318);
+            this.label7.Location = new System.Drawing.Point(809, 361);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(144, 75);
             this.label7.TabIndex = 16;
@@ -213,21 +215,21 @@ namespace XboxAuthNetTest
             // 
             // txtXboxAccessToken
             // 
-            this.txtXboxAccessToken.Location = new System.Drawing.Point(794, 123);
+            this.txtXboxAccessToken.Location = new System.Drawing.Point(794, 199);
             this.txtXboxAccessToken.Name = "txtXboxAccessToken";
             this.txtXboxAccessToken.Size = new System.Drawing.Size(171, 23);
             this.txtXboxAccessToken.TabIndex = 17;
             // 
             // txtXboxExpire
             // 
-            this.txtXboxExpire.Location = new System.Drawing.Point(794, 167);
+            this.txtXboxExpire.Location = new System.Drawing.Point(794, 243);
             this.txtXboxExpire.Name = "txtXboxExpire";
             this.txtXboxExpire.Size = new System.Drawing.Size(171, 23);
             this.txtXboxExpire.TabIndex = 18;
             // 
             // txtXboxUserXUID
             // 
-            this.txtXboxUserXUID.Location = new System.Drawing.Point(794, 211);
+            this.txtXboxUserXUID.Location = new System.Drawing.Point(794, 287);
             this.txtXboxUserXUID.Name = "txtXboxUserXUID";
             this.txtXboxUserXUID.Size = new System.Drawing.Size(171, 23);
             this.txtXboxUserXUID.TabIndex = 19;
@@ -235,7 +237,7 @@ namespace XboxAuthNetTest
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(794, 105);
+            this.label8.Location = new System.Drawing.Point(794, 181);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(77, 15);
             this.label8.TabIndex = 20;
@@ -244,7 +246,7 @@ namespace XboxAuthNetTest
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(794, 149);
+            this.label9.Location = new System.Drawing.Point(794, 225);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(66, 15);
             this.label9.TabIndex = 21;
@@ -253,7 +255,7 @@ namespace XboxAuthNetTest
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(794, 193);
+            this.label10.Location = new System.Drawing.Point(794, 269);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(68, 15);
             this.label10.TabIndex = 22;
@@ -262,7 +264,7 @@ namespace XboxAuthNetTest
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(794, 236);
+            this.label11.Location = new System.Drawing.Point(794, 312);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(68, 15);
             this.label11.TabIndex = 24;
@@ -270,7 +272,7 @@ namespace XboxAuthNetTest
             // 
             // txtXboxUserHash
             // 
-            this.txtXboxUserHash.Location = new System.Drawing.Point(794, 254);
+            this.txtXboxUserHash.Location = new System.Drawing.Point(794, 330);
             this.txtXboxUserHash.Name = "txtXboxUserHash";
             this.txtXboxUserHash.Size = new System.Drawing.Size(171, 23);
             this.txtXboxUserHash.TabIndex = 23;
@@ -334,11 +336,33 @@ namespace XboxAuthNetTest
             this.btnMSSignout.UseVisualStyleBackColor = true;
             this.btnMSSignout.Click += new System.EventHandler(this.btnMSSignout_Click);
             // 
+            // btnXboxSisu
+            // 
+            this.btnXboxSisu.Location = new System.Drawing.Point(794, 136);
+            this.btnXboxSisu.Name = "btnXboxSisu";
+            this.btnXboxSisu.Size = new System.Drawing.Size(171, 34);
+            this.btnXboxSisu.TabIndex = 32;
+            this.btnXboxSisu.Text = "XboxSisu";
+            this.btnXboxSisu.UseVisualStyleBackColor = true;
+            this.btnXboxSisu.Click += new System.EventHandler(this.btnXboxSisu_Click);
+            // 
+            // btnXboxLiveFull
+            // 
+            this.btnXboxLiveFull.Location = new System.Drawing.Point(794, 101);
+            this.btnXboxLiveFull.Name = "btnXboxLiveFull";
+            this.btnXboxLiveFull.Size = new System.Drawing.Size(171, 34);
+            this.btnXboxLiveFull.TabIndex = 33;
+            this.btnXboxLiveFull.Text = "XboxLive (full)";
+            this.btnXboxLiveFull.UseVisualStyleBackColor = true;
+            this.btnXboxLiveFull.Click += new System.EventHandler(this.btnXboxLiveFull_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(977, 450);
+            this.Controls.Add(this.btnXboxLiveFull);
+            this.Controls.Add(this.btnXboxSisu);
             this.Controls.Add(this.btnMSSignout);
             this.Controls.Add(this.txtXboxRelyingParty);
             this.Controls.Add(this.label14);
@@ -414,6 +438,8 @@ namespace XboxAuthNetTest
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox txtXboxRelyingParty;
         private System.Windows.Forms.Button btnMSSignout;
+        private System.Windows.Forms.Button btnXboxSisu;
+        private System.Windows.Forms.Button btnXboxLiveFull;
     }
 }
 
