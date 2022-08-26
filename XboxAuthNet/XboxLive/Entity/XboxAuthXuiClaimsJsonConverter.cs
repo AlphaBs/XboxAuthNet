@@ -62,7 +62,6 @@ namespace XboxAuthNet.XboxLive.Entity
 
         public override void Write(Utf8JsonWriter writer, XboxAuthXuiClaims value, JsonSerializerOptions options)
         {
-            writer.WritePropertyName("DisplayClaims");
             writer.WriteStartObject();
             writer.WritePropertyName("xui");
             writer.WriteStartArray();

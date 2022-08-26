@@ -57,12 +57,12 @@ namespace XboxAuthNet.XboxLive
             _signer = signer;
         }
 
-        public Task<XboxSisuResponse> SisuAuth(string accessToken, string authTitle, string deviceToken, string relyingParty)
+        public Task<XboxSisuResponse> SisuAuth(string accessToken, string clientId, string deviceToken, string relyingParty)
         {
             return signAndRequest<XboxSisuResponse>(SisuAuthorize, new
             {
                 AccessToken = "t=" + accessToken,
-                AppId = authTitle,
+                AppId = clientId,
                 DeviceToken = deviceToken,
                 Sandbox = "RETAIL",
                 UseModernGamertag = true,
