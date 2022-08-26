@@ -13,7 +13,7 @@ namespace XboxAuthNet.XboxLive.Entity
         [JsonPropertyName("UserToken")]
         public XboxAuthResponse? UserToken { get; set; }
 
-        [JsonPropertyName("AuthoriationToken")]
+        [JsonPropertyName("AuthorizationToken")]
         public XboxAuthResponse? AuthorizationToken { get; set; }
 
         [JsonPropertyName("WebPage")]
