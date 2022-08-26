@@ -1,15 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging;
-using Microsoft.Web.WebView2.Core;
+﻿using Microsoft.Web.WebView2.Core;
+using Org.BouncyCastle.Math;
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text.Json;
-using System.Threading;
 using System.Windows.Forms;
 using XboxAuthNet.OAuth;
+using XboxAuthNet.Utils;
 using XboxAuthNet.XboxLive;
+using XboxAuthNet.XboxLive.Entity;
 
 namespace XboxAuthNetTest
 {
@@ -20,7 +19,9 @@ namespace XboxAuthNetTest
         public Form1()
         {
             httpClient = new HttpClient();
-            oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient);
+            //oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient);
+            //oauth = new MicrosoftOAuth("00000000441cc96b", XboxAuth.XboxScope, httpClient);
+            oauth = new MicrosoftOAuth("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
             InitializeComponent();
         }
 
@@ -156,6 +157,66 @@ namespace XboxAuthNetTest
             }
         }
 
+        private async void btnXboxSisu_Click(object sender, EventArgs e)
+        {
+            button2.Enabled = false;
+            button1.Enabled = false;
+            btnXboxSisu.Enabled = false;
+
+            var relyingParty = txtXboxRelyingParty.Text;
+
+            try
+            {
+                var keyPairGenerator = KeyPairGeneratorFactory.CreateAsymmetricKeyPairFromPemString(
+                    "-----BEGIN EC PRIVATE KEY-----" +
+                    "MHcCAQEEIBmQFwiEgUsjIsFT2DUursdHKcr/Vmx6C2vuS7fBIMzLoAoGCCqGSM49" +
+                    "AwEHoUQDQgAEUeVH3ZwR4BYEUCCsRohY31SvwrJDztJzbSScHtZGybV/k+OkGvUv" +
+                    "SS3ZRNHdNJiJc4PFLJLFRj254lyHax66BA==" +
+                    "-----END EC PRIVATE KEY-----");
+
+                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
+                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
+                var xsts = await sisu.SisuAuth(textBox1.Text, XboxGameTitles.MinecraftJava, deviceToken.Token, relyingParty);
+                showResponse(xsts.AuthorizationToken);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private async void btnXboxLiveFull_Click(object sender, EventArgs e)
+        {
+            button2.Enabled = false;
+            button1.Enabled = false;
+            btnXboxSisu.Enabled = false;
+
+            var relyingParty = txtXboxRelyingParty.Text;
+
+            try
+            {
+                var keyPairGenerator = KeyPairGeneratorFactory.CreateAsymmetricKeyPairFromPemString(
+                    "-----BEGIN EC PRIVATE KEY-----" +
+                    "MHcCAQEEIBmQFwiEgUsjIsFT2DUursdHKcr/Vmx6C2vuS7fBIMzLoAoGCCqGSM49" +
+                    "AwEHoUQDQgAEUeVH3ZwR4BYEUCCsRohY31SvwrJDztJzbSScHtZGybV/k+OkGvUv" +
+                    "SS3ZRNHdNJiJc4PFLJLFRj254lyHax66BA==" +
+                    "-----END EC PRIVATE KEY-----");
+
+                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
+                var userToken = await sisu.RequestUserToken(textBox1.Text, true);
+                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Nintendo, "0.0.0");
+                var titleToken = await sisu.RequestTitleToken(textBox1.Text, deviceToken.Token);
+
+                var xbox = new XboxAuth(httpClient);
+                var xsts = await xbox.ExchangeTokensForXstsIdentity(userToken.Token, deviceToken.Token, titleToken.Token, relyingParty, null);
+                showResponse(xsts);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
         private void btnMSSignout_Click(object sender, EventArgs e)
         {
             webView21.Source = new Uri(MicrosoftOAuth.GetSignOutUrl());
@@ -165,6 +226,19 @@ namespace XboxAuthNetTest
         private void log(string msg)
         {
             richTextBox1.AppendText(msg + "\n");
+        }
+
+        private static byte[] base64url(string input)
+        {
+            string incoming = input
+                .Replace('_', '/').Replace('-', '+');
+            switch (input.Length % 4)
+            {
+                case 2: incoming += "=="; break;
+                case 3: incoming += "="; break;
+            }
+            byte[] bytes = Convert.FromBase64String(incoming);
+            return bytes;
         }
     }
 }

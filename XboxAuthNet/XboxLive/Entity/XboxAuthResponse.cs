@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.XboxLive
+namespace XboxAuthNet.XboxLive.Entity
 {
     public class XboxAuthResponse
     {
@@ -13,6 +8,8 @@ namespace XboxAuthNet.XboxLive
         public string? UserXUID => XuiClaims?.XboxUserId;
         public string? UserHash => XuiClaims?.UserHash;
 
+        [JsonPropertyName("DisplayClaims")]
+        [JsonConverter(typeof(XboxAuthXuiClaimsJsonConverter))]
         public XboxAuthXuiClaims? XuiClaims { get; set; }
 
         [JsonPropertyName("IssueInstant")]

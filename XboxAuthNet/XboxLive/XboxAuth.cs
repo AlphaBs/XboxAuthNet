@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using XboxAuthNet.XboxLive.Entity;
 
 //var rpsRes = exchanger.ExchangeRpsTicketForUserToken(AccessToken);
 //var xstsRes = exchanger.ExchangeTokensForXSTSIdentity(rpsRes.Token, null, null, XSTSRelyingParty, null);
@@ -28,55 +27,8 @@ namespace XboxAuthNet.XboxLive
 
         private async Task<XboxAuthResponse> xboxRequest(HttpRequestMessage req, string contractVersion)
         {
-            req.Headers.Add("User-Agent", HttpUtil.UserAgent);
-            req.Headers.Add("Accept", "application/json");
-            req.Headers.Add("Accept-Encoding", "gzip");
-            req.Headers.Add("Accept-Language", "en-US");
             req.Headers.Add("x-xbl-contract-version", contractVersion);
-
-            var res = await httpClient.SendAsync(req)
-                .ConfigureAwait(false);
-            return await handleXboxResponse(res);
-        }
-
-        internal async Task<XboxAuthResponse> handleXboxResponse(HttpResponseMessage res)
-        {
-            var resBody = await res.Content.ReadAsStringAsync()
-                .ConfigureAwait(false);
-
-            try
-            {
-                res.EnsureSuccessStatusCode();
-
-                using var jsonDocument = JsonDocument.Parse(resBody);
-                var root = jsonDocument.RootElement;
-                var xboxResponse = root.Deserialize<XboxAuthResponse>()
-                    ?? throw new JsonException();
-
-                if (root.TryGetProperty("DisplayClaims", out var displayClaimsProp) &&
-                    displayClaimsProp.ValueKind == JsonValueKind.Object &&
-                    displayClaimsProp.TryGetProperty("xui", out var xuiProp) &&
-                    xuiProp.ValueKind == JsonValueKind.Array &&
-                    xuiProp.EnumerateArray().Any())
-                {
-                    xboxResponse.XuiClaims = xuiProp.EnumerateArray().First().Deserialize<XboxAuthXuiClaims>();
-                }
-
-                return xboxResponse;
-            }
-            catch (Exception ex) when (
-                ex is JsonException ||
-                ex is HttpRequestException)
-            {
-                try
-                {
-                    throw XboxAuthException.FromResponseBody(resBody, (int)res.StatusCode);
-                }
-                catch (FormatException)
-                {
-                    throw new XboxAuthException($"{(int)res.StatusCode}: {res.ReasonPhrase}", (int)res.StatusCode);
-                }
-            }
+            return await XboxRequest.Send<XboxAuthResponse>(httpClient, req);
         }
 
         public async Task<XboxAuthResponse> ExchangeRpsTicketForUserToken(string rps)

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using XboxAuthNet.XboxLive.Entity;
 
 namespace XboxAuthNet.XboxLive
 {
@@ -24,6 +20,7 @@ namespace XboxAuthNet.XboxLive
 
         public int StatusCode { get; private set; }
 
+        // https://github.com/microsoft/xbox-live-api/blob/730f579d41b64df5b57b52e629d12f23c6fb64ac/Source/Shared/errors_legacy.h#L924
         public string? Error { get; private set; }
 
         public string? ErrorMessage { get; private set; }
@@ -34,56 +31,16 @@ namespace XboxAuthNet.XboxLive
         {
             try
             {
-                using var doc = JsonDocument.Parse(responseBody);
-                var root = doc.RootElement;
+                var errRes = JsonSerializer.Deserialize<XboxErrorResponse>(responseBody);
 
-                string? error = null;
-                string? errorMessage = null;
-                string? redirect = null;
-
-                if (root.TryGetProperty("XErr", out var errProp))
-                {
-                    if (errProp.ValueKind == JsonValueKind.Number)
-                        error = errProp.GetUInt32().ToString();
-                    if (errProp.ValueKind == JsonValueKind.String)
-                        error = errProp.GetString();
-                }
-                if (root.TryGetProperty("Message", out var messageProp) &&
-                    messageProp.ValueKind == JsonValueKind.String)
-                    errorMessage = messageProp.GetString();
-                if (root.TryGetProperty("Redirect", out var redirectProp) &&
-                    redirectProp.ValueKind == JsonValueKind.String)
-                    redirect = redirectProp.GetString();
-
-                if (string.IsNullOrEmpty(error) && string.IsNullOrEmpty(errorMessage))
+                if (string.IsNullOrEmpty(errRes?.XErr) && string.IsNullOrEmpty(errRes?.Message))
                     throw new FormatException();
 
-                return new XboxAuthException(tryConvertToHexErrorCode(error), errorMessage, redirect, statusCode);
+                return new XboxAuthException(errRes?.XErr, errRes?.Message, errRes?.Redirect, statusCode);
             }
             catch (JsonException)
             {
                 throw new FormatException();
-            }
-        }
-
-        private static string? tryConvertToHexErrorCode(string? errorCode)
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(errorCode))
-                {
-                    var errorInt = long.Parse(errorCode);
-                    errorCode = errorInt.ToString("x");
-                }
-                return errorCode;
-            }
-            catch (FormatException)
-            {
-                return errorCode;
-            }
-            catch (OverflowException)
-            {
-                return errorCode;
             }
         }
     }

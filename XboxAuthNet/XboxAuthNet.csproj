@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/AlphaBs/XboxAuthNet</RepositoryUrl>
     <Authors>ksi123456ab</Authors>
     <PackageTags>xbox live login auth authentication</PackageTags>
-    <Version>2.1.0</Version>
+    <Version>2.2.0-beta1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +24,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.0" />
   </ItemGroup>
