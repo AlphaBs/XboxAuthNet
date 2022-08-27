@@ -15,6 +15,9 @@ namespace XboxAuthNet.XboxLive
     // https://github.com/PrismarineJS/prismarine-auth/blob/master/src/TokenManagers/XboxTokenManager.js
     public class XboxSecureAuth
     {
+        public const string AzureTokenPrefix = "d=";
+        public const string XboxTokenPrefix = "t=";
+
         private static SecureRandom random = new SecureRandom();
 
         private static IAsymmetricCipherKeyPairGenerator initializeKeyGenerator()
@@ -57,11 +60,11 @@ namespace XboxAuthNet.XboxLive
             _signer = signer;
         }
 
-        public Task<XboxSisuResponse> SisuAuth(string accessToken, string clientId, string deviceToken, string relyingParty)
+        public Task<XboxSisuResponse> SisuAuth(string accessToken, string clientId, string deviceToken, string relyingParty, string? tokenPrefix="t=")
         {
             return signAndRequest<XboxSisuResponse>(SisuAuthorize, new
             {
-                AccessToken = "t=" + accessToken,
+                AccessToken = tokenPrefix + accessToken,
                 AppId = clientId,
                 DeviceToken = deviceToken,
                 Sandbox = "RETAIL",
@@ -72,9 +75,8 @@ namespace XboxAuthNet.XboxLive
             }, "");
         }
 
-        public Task<XboxAuthResponse> RequestUserToken(string accessToken, bool azure)
+        public Task<XboxAuthResponse> RequestUserToken(string accessToken, string? tokenPrefix="t=")
         {
-            var pre = azure ? "d=" : "t=";
             return signAndRequest<XboxAuthResponse>("https://user.auth.xboxlive.com/user/authenticate", new
             {
                 RelyingParty = "http://auth.xboxlive.com",
@@ -83,7 +85,7 @@ namespace XboxAuthNet.XboxLive
                 {
                     AuthMethod = "RPS",
                     SiteName = "user.auth.xboxlive.com",
-                    RpsTicket = pre + accessToken
+                    RpsTicket = tokenPrefix + accessToken
                 }
             }, "");
         }
