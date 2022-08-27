@@ -38,7 +38,7 @@ namespace XboxAuthNetTest
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox6 = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnXboxLive = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -139,15 +139,15 @@ namespace XboxAuthNetTest
             this.textBox6.Size = new System.Drawing.Size(147, 23);
             this.textBox6.TabIndex = 8;
             // 
-            // button2
+            // btnXboxLive
             // 
-            this.button2.Location = new System.Drawing.Point(794, 65);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(171, 34);
-            this.button2.TabIndex = 9;
-            this.button2.Text = "XboxLive";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnXboxLive.Location = new System.Drawing.Point(794, 65);
+            this.btnXboxLive.Name = "btnXboxLive";
+            this.btnXboxLive.Size = new System.Drawing.Size(171, 34);
+            this.btnXboxLive.TabIndex = 9;
+            this.btnXboxLive.Text = "XboxLive";
+            this.btnXboxLive.UseVisualStyleBackColor = true;
+            this.btnXboxLive.Click += new System.EventHandler(this.btnXboxLive_Click);
             // 
             // label1
             // 
@@ -385,7 +385,7 @@ namespace XboxAuthNetTest
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btnXboxLive);
             this.Controls.Add(this.textBox6);
             this.Controls.Add(this.textBox5);
             this.Controls.Add(this.richTextBox1);
@@ -415,7 +415,7 @@ namespace XboxAuthNetTest
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox6;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnXboxLive;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
