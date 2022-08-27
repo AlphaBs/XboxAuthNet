@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive;
 using XboxAuthNet.XboxLive.Entity;
@@ -55,7 +56,7 @@ namespace XboxAuthNet.Test
                 "asidjfoawiejf",
                 HttpStatusCode.BadRequest,
                 "400: Bad Request", null, null, null
-            }
+            },
         };
 
         [Test, Combinatorial]
@@ -73,6 +74,27 @@ namespace XboxAuthNet.Test
             Assert.AreEqual(expectedError, ex!.Error);
             Assert.AreEqual(expectedErrorMessage, ex!.ErrorMessage);
             Assert.AreEqual(expectedRedirect, ex!.Redirect);
+        }
+
+        [Test]
+        [TestCase("2148916236", "XSTS error=\"account_age_verification_required\"")]
+        [TestCase(null, "XSTS error=\"account_age_verification_required\"")]
+        [TestCase("2148916236", null)]
+        public void TestHeaderError(string? xerr, string? wwwAuth)
+        {
+            var msg = new HttpResponseMessage();
+            if (xerr != null)
+                msg.Headers.Add("X-Err", xerr);
+            if (wwwAuth != null)
+                msg.Headers.Add("WWW-Authenticate", wwwAuth);
+            msg.StatusCode = HttpStatusCode.Unauthorized;
+
+            var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await XboxRequest.HandleResponse<XboxAuthResponse>(msg));
+            Assert.NotNull(ex);
+            //Assert.AreEqual(, ex!.Message);
+            Assert.AreEqual(xerr, ex!.Error);
+            Assert.AreEqual(wwwAuth, ex!.ErrorMessage);
+            Assert.AreEqual(null, ex!.Redirect);
         }
 
         [Test]

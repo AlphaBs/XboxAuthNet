@@ -105,6 +105,84 @@ namespace XboxAuthNetTest
             }
         }
 
+        private async void btnXboxLive_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Enabled = false;
+                var relyingParty = txtXboxRelyingParty.Text;
+
+                var xbox = new XboxAuth(httpClient);
+                var ex = await xbox.ExchangeRpsTicketForUserToken(textBox1.Text);
+                var res = await xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
+                showResponse(res);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                this.Enabled = true;
+            }
+        }
+
+        private async void btnXboxLiveFull_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Enabled = false;
+                var relyingParty = txtXboxRelyingParty.Text;
+                var keyPairGenerator = KeyPairGeneratorFactory.CreateDefaultAsymmetricKeyPair();
+
+                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
+                var userToken = await sisu.RequestUserToken(textBox1.Text, XboxSecureAuth.XboxTokenPrefix);
+                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Nintendo, "0.0.0");
+                var titleToken = await sisu.RequestTitleToken(textBox1.Text, deviceToken.Token);
+
+                var xbox = new XboxAuth(httpClient);
+                var xsts = await xbox.ExchangeTokensForXstsIdentity(userToken.Token, deviceToken.Token, titleToken.Token, relyingParty, null);
+                showResponse(xsts);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                this.Enabled = true;
+            }
+        }
+
+        private async void btnXboxSisu_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Enabled = false;
+                var relyingParty = txtXboxRelyingParty.Text;
+                var keyPairGenerator = KeyPairGeneratorFactory.CreateDefaultAsymmetricKeyPair();
+
+                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
+                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
+                var xsts = await sisu.SisuAuth(textBox1.Text, XboxGameTitles.MinecraftJava, deviceToken.Token, relyingParty);
+                showResponse(xsts.AuthorizationToken);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                this.Enabled = true;
+            }
+        }
+
+        private void btnMSSignout_Click(object sender, EventArgs e)
+        {
+            webView21.Source = new Uri(MicrosoftOAuth.GetSignOutUrl());
+            writeSession(null);
+        }
+
         private void showResponse(MicrosoftOAuthResponse res)
         {
             if (res == null)
@@ -132,113 +210,13 @@ namespace XboxAuthNetTest
 
             writeSession(res);
             MessageBox.Show("SUCCESS");
-            button2.Enabled = true;
+            btnXboxLive.Enabled = true;
             button1.Enabled = false;
-        }
-
-        private async void button2_Click(object sender, EventArgs e)
-        {
-            button2.Enabled = false;
-            button1.Enabled = false;
-
-            var relyingParty = txtXboxRelyingParty.Text;
-            //var relyingParty = "rp://api.minecraftservices.com/";
-
-            try
-            {
-                var xbox = new XboxAuth(httpClient);
-                var ex = await xbox.ExchangeRpsTicketForUserToken(textBox1.Text);
-                var res = await xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
-                showResponse(res);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private async void btnXboxSisu_Click(object sender, EventArgs e)
-        {
-            button2.Enabled = false;
-            button1.Enabled = false;
-            btnXboxSisu.Enabled = false;
-
-            var relyingParty = txtXboxRelyingParty.Text;
-
-            try
-            {
-                var keyPairGenerator = KeyPairGeneratorFactory.CreateAsymmetricKeyPairFromPemString(
-                    "-----BEGIN EC PRIVATE KEY-----" +
-                    "MHcCAQEEIBmQFwiEgUsjIsFT2DUursdHKcr/Vmx6C2vuS7fBIMzLoAoGCCqGSM49" +
-                    "AwEHoUQDQgAEUeVH3ZwR4BYEUCCsRohY31SvwrJDztJzbSScHtZGybV/k+OkGvUv" +
-                    "SS3ZRNHdNJiJc4PFLJLFRj254lyHax66BA==" +
-                    "-----END EC PRIVATE KEY-----");
-
-                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
-                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
-                var xsts = await sisu.SisuAuth(textBox1.Text, XboxGameTitles.MinecraftJava, deviceToken.Token, relyingParty);
-                showResponse(xsts.AuthorizationToken);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private async void btnXboxLiveFull_Click(object sender, EventArgs e)
-        {
-            button2.Enabled = false;
-            button1.Enabled = false;
-            btnXboxSisu.Enabled = false;
-
-            var relyingParty = txtXboxRelyingParty.Text;
-
-            try
-            {
-                var keyPairGenerator = KeyPairGeneratorFactory.CreateAsymmetricKeyPairFromPemString(
-                    "-----BEGIN EC PRIVATE KEY-----" +
-                    "MHcCAQEEIBmQFwiEgUsjIsFT2DUursdHKcr/Vmx6C2vuS7fBIMzLoAoGCCqGSM49" +
-                    "AwEHoUQDQgAEUeVH3ZwR4BYEUCCsRohY31SvwrJDztJzbSScHtZGybV/k+OkGvUv" +
-                    "SS3ZRNHdNJiJc4PFLJLFRj254lyHax66BA==" +
-                    "-----END EC PRIVATE KEY-----");
-
-                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
-                var userToken = await sisu.RequestUserToken(textBox1.Text, true);
-                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Nintendo, "0.0.0");
-                var titleToken = await sisu.RequestTitleToken(textBox1.Text, deviceToken.Token);
-
-                var xbox = new XboxAuth(httpClient);
-                var xsts = await xbox.ExchangeTokensForXstsIdentity(userToken.Token, deviceToken.Token, titleToken.Token, relyingParty, null);
-                showResponse(xsts);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private void btnMSSignout_Click(object sender, EventArgs e)
-        {
-            webView21.Source = new Uri(MicrosoftOAuth.GetSignOutUrl());
-            writeSession(null);
         }
 
         private void log(string msg)
         {
             richTextBox1.AppendText(msg + "\n");
-        }
-
-        private static byte[] base64url(string input)
-        {
-            string incoming = input
-                .Replace('_', '/').Replace('-', '+');
-            switch (input.Length % 4)
-            {
-                case 2: incoming += "=="; break;
-                case 3: incoming += "="; break;
-            }
-            byte[] bytes = Convert.FromBase64String(incoming);
-            return bytes;
         }
     }
 }
