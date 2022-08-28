@@ -31,14 +31,14 @@ namespace XboxAuthNet.OAuth
         public string ClientId { get; }
         public string Scope { get; }
 
-        protected Dictionary<string, string?> createQueriesForAuth(string scope, string redirectUrl = OAuthDesktop)
+        protected Dictionary<string, string?> createQueriesForAuth(string redirectUrl = OAuthDesktop)
         {
             return new Dictionary<string, string?>()
             {
                 { "client_id", ClientId },
                 { "grant_type", "authorization_code" },
                 { "redirect_uri", redirectUrl },
-                { "scope", scope }
+                { "scope", Scope }
             };
         }
 
@@ -85,22 +85,36 @@ namespace XboxAuthNet.OAuth
 
         public string CreateUrlForOAuth()
         {
-            return CreateUrlForOAuth(null, null);
+            return CreateUrlForOAuth(new MicrosoftOAuthParameters());
         }
 
-        public string CreateUrlForOAuth(string? redirect, string? state)
+        public string CreateUrlForOAuth(MicrosoftOAuthParameters param)
         {
-            var url = OAuthAuthorize;
-            var query = createQueriesForAuth(Scope);
-            query["response_type"] = "code";
+            if (string.IsNullOrEmpty(param.ResponseType))
+                param.ResponseType = "code";
 
-            if (!string.IsNullOrEmpty(redirect))
-                query["redirect_uri"] = redirect;
+            var query = createQueriesForAuth();
 
-            if (!string.IsNullOrEmpty(state))
-                query["state"] = state;
+            if (!string.IsNullOrEmpty(param.RedirectUri))
+                query["redirect_uri"] = param.RedirectUri;
+            if (!string.IsNullOrEmpty(param.ResponseMode))
+                query["response_mode"] = param.ResponseMode;
+            if (!string.IsNullOrEmpty(param.ResponseType))
+                query["response_type"] = param.ResponseType;
+            if (!string.IsNullOrEmpty(param.State))
+                query["state"] = param.State;
+            if (!string.IsNullOrEmpty(param.Prompt))
+                query["prompt"] = param.Prompt;
+            if (!string.IsNullOrEmpty(param.LoginHint))
+                query["login_hint"] = param.LoginHint;
+            if (!string.IsNullOrEmpty(param.DomainHint))
+                query["domain_hint"] = param.DomainHint;
+            if (!string.IsNullOrEmpty(param.CodeChallenge))
+                query["code_challenge"] = param.CodeChallenge;
+            if (!string.IsNullOrEmpty(param.CodeChallengeMethod))
+                query["code_challenge_method"] = param.CodeChallengeMethod;
             
-            return url + "?" + HttpUtil.GetQueryString(query);
+            return OAuthAuthorize + "?" + HttpUtil.GetQueryString(query);
         }
 
         public bool CheckLoginSuccess(string url, out MicrosoftOAuthCode authCode)
@@ -133,7 +147,7 @@ namespace XboxAuthNet.OAuth
             if (authCode == null || !authCode.IsSuccess)
                 throw new InvalidOperationException("AuthCode.IsSuccess was not true. Create AuthCode first.");
 
-            var query = createQueriesForAuth(Scope);
+            var query = createQueriesForAuth();
             query["code"] = authCode.Code ?? "";
 
             return await microsoftOAuthRequest(new HttpRequestMessage
@@ -146,7 +160,7 @@ namespace XboxAuthNet.OAuth
 
         public async Task<MicrosoftOAuthResponse> RefreshToken(string refreshToken)
         {
-            var query = createQueriesForAuth(Scope);
+            var query = createQueriesForAuth();
             query["refresh_token"] = refreshToken;
             query["grant_type"] = "refresh_token";
 
