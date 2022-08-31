@@ -60,7 +60,7 @@ namespace XboxAuthNet.XboxLive
             _signer = signer;
         }
 
-        public Task<XboxSisuResponse> SisuAuth(string accessToken, string clientId, string deviceToken, string relyingParty, string? tokenPrefix="t=")
+        public Task<XboxSisuResponse> SisuAuth(string accessToken, string clientId, string deviceToken, string relyingParty, string? tokenPrefix=XboxTokenPrefix)
         {
             return signAndRequest<XboxSisuResponse>(SisuAuthorize, new
             {
@@ -113,7 +113,7 @@ namespace XboxAuthNet.XboxLive
             }, "");
         }
 
-        public Task<XboxAuthResponse> RequestTitleToken(string accessToken, string deviceToken)
+        public Task<XboxAuthResponse> RequestTitleToken(string accessToken, string deviceToken, string tokenPrefix = XboxTokenPrefix)
         {
             return signAndRequest<XboxAuthResponse>(TitleAuth, new
             {
@@ -121,7 +121,7 @@ namespace XboxAuthNet.XboxLive
                 {
                     AuthMethod = "RPS",
                     DeviceToken = deviceToken,
-                    RpsTicket = "t=" + accessToken,
+                    RpsTicket = tokenPrefix + accessToken,
                     SiteName = "user.auth.xboxlive.com",
                     ProofKey = _signer.ProofKey,
                 },
