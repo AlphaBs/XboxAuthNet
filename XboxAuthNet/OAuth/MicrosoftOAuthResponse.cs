@@ -13,6 +13,9 @@ namespace XboxAuthNet.OAuth
 
         [JsonPropertyName("expires_in")]
         public int ExpireIn { get; set; }
+        
+        [JsonPropertyName("expires_on")]
+        public DateTimeOffset ExpiresOn { get; set; }
 
         [JsonPropertyName("scope")]
         public string? Scope { get; set; }
@@ -29,5 +32,11 @@ namespace XboxAuthNet.OAuth
 
         [JsonPropertyName("user_id")]
         public string? UserId { get; set; }
+        
+        [JsonPropertyName("id_token")]
+        public string? IdToken { get; set; }
+        
+        [JsonPropertyName("user_data")]
+        public MicrosoftUserPayload? UserData { get; set; }
     }
 }
