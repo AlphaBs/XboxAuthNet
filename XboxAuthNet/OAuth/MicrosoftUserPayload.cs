@@ -11,6 +11,8 @@ namespace XboxAuthNet.OAuth
     {
         [JsonPropertyName("iss")]
         public string? Issuer { get; set; }
+        [JsonPropertyName("sub")]
+        public string? Subject { get; set; }
         [JsonPropertyName("oid")]
         public string? UserId { get; set; }
         [JsonPropertyName("aud")]
