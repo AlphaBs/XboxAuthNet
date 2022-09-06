@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.Json.Serialization;
+using XboxAuthNet.Jwt;
 
 namespace XboxAuthNet.OAuth
 {
@@ -44,7 +46,7 @@ namespace XboxAuthNet.OAuth
             if (string.IsNullOrEmpty(IdToken))
                 return null;
 
-            return JwtDecoder.DecodePayload<MicrosoftUserPayload>(IdToken);
+            return JwtDecoder.DecodePayload<MicrosoftUserPayload>(IdToken!);
         }
     }
 }
