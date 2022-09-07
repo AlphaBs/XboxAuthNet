@@ -46,5 +46,8 @@
         /// code_challenge_method
         /// </summary>
         public string? CodeChallengeMethod { get; set; }
+
+        public string? Scope { get; set; }
+        public string? Nonce { get; set; }
     }
 }
