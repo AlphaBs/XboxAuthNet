@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/AlphaBs/XboxAuthNet</RepositoryUrl>
     <Authors>ksi123456ab</Authors>
     <PackageTags>xbox live login auth authentication</PackageTags>
-    <Version>2.2.0-beta8</Version>
+    <Version>2.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
