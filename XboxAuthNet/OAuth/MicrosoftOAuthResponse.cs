@@ -38,9 +38,6 @@ namespace XboxAuthNet.OAuth
         [JsonPropertyName("id_token")]
         public string? IdToken { get; set; }
         
-        [JsonPropertyName("user_data")]
-        public MicrosoftUserPayload? UserData { get; set; }
-        
         public MicrosoftUserPayload? DecodeIdTokenPayload()
         {
             if (string.IsNullOrEmpty(IdToken))
