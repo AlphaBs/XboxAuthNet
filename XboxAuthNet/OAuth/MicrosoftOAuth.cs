@@ -66,6 +66,8 @@ namespace XboxAuthNet.OAuth
                 if (resObj == null)
                     throw new MicrosoftOAuthException("Response was null", (int)res.StatusCode);
 
+                if (resObj.ExpiresOn == default)
+                    resObj.ExpiresOn = DateTimeOffset.Now.AddSeconds(resObj.ExpireIn);
                 return resObj;
             }
             catch (Exception ex) when (
@@ -135,6 +137,8 @@ namespace XboxAuthNet.OAuth
             authCode = new MicrosoftOAuthCode
             {
                 Code = query["code"],
+                IdToken = query["id_token"],
+                State = query["state"],
                 Error = query["error"],
                 ErrorDescription = HttpUtility.UrlDecode(query["error_description"])
             };
@@ -150,12 +154,16 @@ namespace XboxAuthNet.OAuth
             var query = createQueriesForAuth();
             query["code"] = authCode.Code ?? "";
 
-            return await microsoftOAuthRequest(new HttpRequestMessage
+            var res = await microsoftOAuthRequest(new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(OAuthToken),
                 Content = new FormUrlEncodedContent(query)
             }).ConfigureAwait(false);
+            
+            if (string.IsNullOrEmpty(res.IdToken))
+                res.IdToken = authCode.IdToken;
+            return res;
         }
 
         public async Task<MicrosoftOAuthResponse> RefreshToken(string refreshToken)
