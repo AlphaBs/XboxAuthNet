@@ -7,6 +7,12 @@ namespace XboxAuthNet.XboxLive.Entity
     {
         [JsonPropertyName("gtg")]
         public string? Gamertag { get; set; }
+        [JsonPropertyName("mgt")]
+        public string? ModernGamertag { get; set; }
+        [JsonPropertyName("umg")]
+        public string? UniqueModernGamertag { get; set; }
+        [JsonPropertyName("mgs")]
+        public int ModernGamertagSuffix { get; set; }
 
         [JsonPropertyName("xid")]
         public string? XboxUserId { get; set; }
