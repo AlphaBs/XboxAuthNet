@@ -12,7 +12,7 @@ namespace XboxAuthNet.XboxLive.Entity
         [JsonPropertyName("umg")]
         public string? UniqueModernGamertag { get; set; }
         [JsonPropertyName("mgs")]
-        public int ModernGamertagSuffix { get; set; }
+        public string? ModernGamertagSuffix { get; set; }
 
         [JsonPropertyName("xid")]
         public string? XboxUserId { get; set; }
