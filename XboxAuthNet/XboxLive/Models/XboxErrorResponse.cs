@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.XboxLive.Entity
+namespace XboxAuthNet.XboxLive.Models
 {
     public class XboxErrorResponse
     {

@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive.Entity;
+using XboxAuthNet.XboxLive.Models;
 
 //var rpsRes = exchanger.ExchangeRpsTicketForUserToken(AccessToken);
 //var xstsRes = exchanger.ExchangeTokensForXSTSIdentity(rpsRes.Token, null, null, XSTSRelyingParty, null);
