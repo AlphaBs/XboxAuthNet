@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using XboxAuthNet.Jwt;
 
-namespace XboxAuthNet.OAuth
+namespace XboxAuthNet.OAuth.Models
 {
     public class MicrosoftOAuthResponse
     {
@@ -15,7 +15,7 @@ namespace XboxAuthNet.OAuth
 
         [JsonPropertyName("expires_in")]
         public int ExpireIn { get; set; }
-        
+
         [JsonPropertyName("expires_on")]
         public DateTimeOffset ExpiresOn { get; set; }
 
@@ -34,10 +34,10 @@ namespace XboxAuthNet.OAuth
 
         [JsonPropertyName("user_id")]
         public string? UserId { get; set; }
-        
+
         [JsonPropertyName("id_token")]
         public string? IdToken { get; set; }
-        
+
         public MicrosoftUserPayload? DecodeIdTokenPayload()
         {
             if (string.IsNullOrEmpty(IdToken))

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using XboxAuthNet.OAuth.Models;
 
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
 // https://docs.microsoft.com/en-us/advertising/guides/authentication-oauth
@@ -11,7 +13,7 @@ using System.Web;
 
 namespace XboxAuthNet.OAuth
 {
-    public class MicrosoftOAuth
+    public class MicrosoftOAuthCodeApiClient
     {
         const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
         const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
@@ -21,7 +23,7 @@ namespace XboxAuthNet.OAuth
 
         protected readonly HttpClient httpClient;
 
-        public MicrosoftOAuth(string clientId, string scope, HttpClient client)
+        public MicrosoftOAuthCodeApiClient(string clientId, string scope, HttpClient client)
         {
             this.ClientId = clientId;
             this.Scope = scope;
@@ -42,15 +44,16 @@ namespace XboxAuthNet.OAuth
             };
         }
 
-        private async Task<MicrosoftOAuthResponse> microsoftOAuthRequest(HttpRequestMessage req)
+        private async Task<MicrosoftOAuthResponse> microsoftOAuthRequest(HttpRequestMessage req, 
+            CancellationToken cancellationToken)
         {
             req.Headers.Add("User-Agent", HttpUtil.UserAgent);
             req.Headers.Add("Accept-Encoding", "gzip");
             req.Headers.Add("Accept-Language", "en-US");
 
-            var res = await httpClient.SendAsync(req)
+            var res = await httpClient.SendAsync(req, cancellationToken)
                 .ConfigureAwait(false);
-
+            
             return await handleMicrosoftOAuthResponse(res);
         }
 
@@ -85,68 +88,28 @@ namespace XboxAuthNet.OAuth
             }
         }
 
-        public string CreateUrlForOAuth()
-        {
-            return CreateUrlForOAuth(new MicrosoftOAuthParameters());
-        }
+        public string CreateUrlForOAuth() => CreateUrlForOAuth(null);
 
-        public string CreateUrlForOAuth(MicrosoftOAuthParameters param)
+        public string CreateUrlForOAuth(MicrosoftOAuthParameters? param)
         {
+            if (param == null)
+                param = new MicrosoftOAuthParameters();
+
             if (string.IsNullOrEmpty(param.ResponseType))
                 param.ResponseType = "code";
 
             var query = createQueriesForAuth();
+            var paramQuery = param.ToQueryDictionary();
 
-            if (!string.IsNullOrEmpty(param.RedirectUri))
-                query["redirect_uri"] = param.RedirectUri;
-            if (!string.IsNullOrEmpty(param.ResponseMode))
-                query["response_mode"] = param.ResponseMode;
-            if (!string.IsNullOrEmpty(param.ResponseType))
-                query["response_type"] = param.ResponseType;
-            if (!string.IsNullOrEmpty(param.State))
-                query["state"] = param.State;
-            if (!string.IsNullOrEmpty(param.Prompt))
-                query["prompt"] = param.Prompt;
-            if (!string.IsNullOrEmpty(param.LoginHint))
-                query["login_hint"] = param.LoginHint;
-            if (!string.IsNullOrEmpty(param.DomainHint))
-                query["domain_hint"] = param.DomainHint;
-            if (!string.IsNullOrEmpty(param.CodeChallenge))
-                query["code_challenge"] = param.CodeChallenge;
-            if (!string.IsNullOrEmpty(param.CodeChallengeMethod))
-                query["code_challenge_method"] = param.CodeChallengeMethod;
-            
+            // overwrite `paramQuery`
+            foreach (var kv in paramQuery)
+                query[kv.Key] = kv.Value;
+
             return OAuthAuthorize + "?" + HttpUtil.GetQueryString(query);
         }
 
-        public bool CheckLoginSuccess(string url, out MicrosoftOAuthCode authCode)
-        {
-            var uri = new Uri(url);
-            return CheckLoginSuccess(uri, out authCode);
-        }
-
-        public bool CheckLoginSuccess(Uri uri, out MicrosoftOAuthCode authCode)
-        {
-            var result = CheckOAuthCodeResult(uri, out authCode);
-            return result && authCode.IsSuccess;
-        }
-
-        public bool CheckOAuthCodeResult(Uri uri, out MicrosoftOAuthCode authCode)
-        {
-            var query = HttpUtility.ParseQueryString(uri.Query);
-            authCode = new MicrosoftOAuthCode
-            {
-                Code = query["code"],
-                IdToken = query["id_token"],
-                State = query["state"],
-                Error = query["error"],
-                ErrorDescription = HttpUtility.UrlDecode(query["error_description"])
-            };
-
-            return !authCode.IsEmpty;
-        }
-
-        public async Task<MicrosoftOAuthResponse> GetTokens(MicrosoftOAuthCode authCode)
+        public async Task<MicrosoftOAuthResponse> GetTokens(MicrosoftOAuthCode authCode, 
+            CancellationToken cancellationToken)
         {
             if (authCode == null || !authCode.IsSuccess)
                 throw new InvalidOperationException("AuthCode.IsSuccess was not true. Create AuthCode first.");
@@ -158,15 +121,16 @@ namespace XboxAuthNet.OAuth
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(OAuthToken),
-                Content = new FormUrlEncodedContent(query)
-            }).ConfigureAwait(false);
-            
+                Content = new FormUrlEncodedContent(query!)
+            }, cancellationToken).ConfigureAwait(false);
+
             if (string.IsNullOrEmpty(res.IdToken))
                 res.IdToken = authCode.IdToken;
             return res;
         }
 
-        public async Task<MicrosoftOAuthResponse> RefreshToken(string refreshToken)
+        public async Task<MicrosoftOAuthResponse> RefreshToken(string refreshToken, 
+            CancellationToken cancellationToken)
         {
             var query = createQueriesForAuth();
             query["refresh_token"] = refreshToken;
@@ -176,11 +140,11 @@ namespace XboxAuthNet.OAuth
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(OAuthToken),
-                Content = new FormUrlEncodedContent(query)
-            }).ConfigureAwait(false);
+                Content = new FormUrlEncodedContent(query!)
+            }, cancellationToken).ConfigureAwait(false);
         }
 
-        public static string GetSignOutUrl()
+        public string CreateUrlForSignout()
         {
             return "https://login.microsoftonline.com/consumer/oauth2/v2.0/logout";
         }
