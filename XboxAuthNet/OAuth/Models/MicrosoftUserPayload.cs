@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.OAuth
+namespace XboxAuthNet.OAuth.Models
 {
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#payload-claims
     public class MicrosoftUserPayload

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.OAuth
+namespace XboxAuthNet.OAuth.Models
 {
     public class MicrosoftOAuthException : Exception
     {

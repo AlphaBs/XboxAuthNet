@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace XboxAuthNet.OAuth
+namespace XboxAuthNet.OAuth.Models
 {
     public class MicrosoftOAuthPromptModes
     {
