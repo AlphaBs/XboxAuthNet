@@ -4,11 +4,13 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using XboxAuthNet.OAuth;
+using XboxAuthNet.OAuth.Models;
 using XboxAuthNet.Utils;
 using XboxAuthNet.XboxLive;
-using XboxAuthNet.XboxLive.Entity;
+using XboxAuthNet.XboxLive.Models;
 
 namespace XboxAuthNetTest
 {
@@ -19,13 +21,14 @@ namespace XboxAuthNetTest
         public Form1()
         {
             httpClient = new HttpClient();
-            //oauth = new MicrosoftOAuth("00000000402B5328", XboxAuth.XboxScope, httpClient);
-            //oauth = new MicrosoftOAuth("00000000441cc96b", XboxAuth.XboxScope, httpClient);
-            oauth = new MicrosoftOAuth("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
+            //var apiClient = new MicrosoftOAuthCodeApiClient("00000000402B5328", XboxAuth.XboxScope, httpClient);
+            var apiClient = new MicrosoftOAuthCodeApiClient("00000000441cc96b", XboxAuth.XboxScope, httpClient);
+            //var apiClient = new MicrosoftOAuthCodeApiClient("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
+            oauth = MicrosoftOAuthCodeFlow.CreateDefault(apiClient);
             InitializeComponent();
         }
 
-        MicrosoftOAuth oauth;
+        MicrosoftOAuthCodeFlow oauth;
 
         string sessionFilePath = "auth.json";
 
@@ -62,46 +65,22 @@ namespace XboxAuthNetTest
                 MicrosoftOAuthResponse res = readSession();
                 if (!string.IsNullOrEmpty(res?.RefreshToken))
                 {
-                    res = await oauth.RefreshToken(res?.RefreshToken);
+                    res = await oauth.AuthenticateSilently(res?.RefreshToken);
                     log("refresh login success");
                     loginSuccess(res);
                     return;
                 }
 
-                var url = oauth.CreateUrlForOAuth();
-                log("CreateUrlForOAuth(): " + url);
-                webView21.Source = new Uri(url);
+                log("get tokens with webview2");
+                res = await oauth.Authenticate();
+                loginSuccess(res);
+                log("webview2 login success");
+                return;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
                 button1.Enabled = true;
-            }
-        }
-
-        private async void webView21_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
-        {
-            log("nav " + e.Uri + ", " + e.IsRedirected);
-
-            if (e.IsRedirected && oauth.CheckOAuthCodeResult(new Uri(e.Uri), out var authCode)) // login success
-            {
-                if (!authCode.IsSuccess)
-                {
-                    MessageBox.Show($"{authCode.Error}\n{authCode.ErrorDescription}");
-                    return;
-                }
-
-                try
-                {
-                    log("browser login succses");
-
-                    var res = await oauth.GetTokens(authCode); // get token
-                    loginSuccess(res);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
             }
         }
 
@@ -177,9 +156,9 @@ namespace XboxAuthNetTest
             }
         }
 
-        private void btnMSSignout_Click(object sender, EventArgs e)
+        private async void btnMSSignout_Click(object sender, EventArgs e)
         {
-            webView21.Source = new Uri(MicrosoftOAuth.GetSignOutUrl());
+            await oauth.Signout();
             writeSession(null);
         }
 

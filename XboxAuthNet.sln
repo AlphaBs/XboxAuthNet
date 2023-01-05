@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XboxAuthNet", "XboxAuthNet\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XboxAuthNetTest", "XboxAuthNetTest\XboxAuthNetTest.csproj", "{28C61D4B-5585-4692-8A18-756DFD67DAD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XboxAuthNet.Test", "XboxAuthNet.Test\XboxAuthNet.Test.csproj", "{83173F09-1FE6-4819-8BC8-C17B1B246069}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XboxAuthNet.Test", "XboxAuthNet.Test\XboxAuthNet.Test.csproj", "{83173F09-1FE6-4819-8BC8-C17B1B246069}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

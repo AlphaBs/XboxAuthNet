@@ -29,7 +29,6 @@ namespace XboxAuthNetTest
         /// </summary>
         private void InitializeComponent()
         {
-            this.webView21 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
@@ -63,25 +62,11 @@ namespace XboxAuthNetTest
             this.btnMSSignout = new System.Windows.Forms.Button();
             this.btnXboxSisu = new System.Windows.Forms.Button();
             this.btnXboxLiveFull = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.webView21)).BeginInit();
             this.SuspendLayout();
-            // 
-            // webView21
-            // 
-            this.webView21.AllowExternalDrop = true;
-            this.webView21.CreationProperties = null;
-            this.webView21.DefaultBackgroundColor = System.Drawing.Color.White;
-            this.webView21.Location = new System.Drawing.Point(12, 12);
-            this.webView21.Name = "webView21";
-            this.webView21.Size = new System.Drawing.Size(550, 426);
-            this.webView21.Source = new System.Uri("https://google.com", System.UriKind.Absolute);
-            this.webView21.TabIndex = 0;
-            this.webView21.ZoomFactor = 1D;
-            this.webView21.NavigationStarting += new System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs>(this.webView21_NavigationStarting);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(568, 65);
+            this.button1.Location = new System.Drawing.Point(6, 61);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(139, 34);
             this.button1.TabIndex = 1;
@@ -91,35 +76,35 @@ namespace XboxAuthNetTest
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(641, 105);
+            this.textBox1.Location = new System.Drawing.Point(79, 101);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(147, 23);
             this.textBox1.TabIndex = 2;
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(641, 134);
+            this.textBox2.Location = new System.Drawing.Point(79, 130);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(147, 23);
             this.textBox2.TabIndex = 3;
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(641, 163);
+            this.textBox3.Location = new System.Drawing.Point(79, 159);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(147, 23);
             this.textBox3.TabIndex = 4;
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(641, 192);
+            this.textBox4.Location = new System.Drawing.Point(79, 188);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(147, 23);
             this.textBox4.TabIndex = 5;
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(568, 279);
+            this.richTextBox1.Location = new System.Drawing.Point(6, 275);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(220, 159);
             this.richTextBox1.TabIndex = 6;
@@ -127,21 +112,21 @@ namespace XboxAuthNetTest
             // 
             // textBox5
             // 
-            this.textBox5.Location = new System.Drawing.Point(641, 221);
+            this.textBox5.Location = new System.Drawing.Point(79, 217);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(147, 23);
             this.textBox5.TabIndex = 7;
             // 
             // textBox6
             // 
-            this.textBox6.Location = new System.Drawing.Point(641, 250);
+            this.textBox6.Location = new System.Drawing.Point(79, 246);
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(147, 23);
             this.textBox6.TabIndex = 8;
             // 
             // btnXboxLive
             // 
-            this.btnXboxLive.Location = new System.Drawing.Point(794, 65);
+            this.btnXboxLive.Location = new System.Drawing.Point(232, 61);
             this.btnXboxLive.Name = "btnXboxLive";
             this.btnXboxLive.Size = new System.Drawing.Size(171, 34);
             this.btnXboxLive.TabIndex = 9;
@@ -152,7 +137,7 @@ namespace XboxAuthNetTest
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(563, 108);
+            this.label1.Location = new System.Drawing.Point(1, 104);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(75, 15);
             this.label1.TabIndex = 10;
@@ -161,7 +146,7 @@ namespace XboxAuthNetTest
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(589, 137);
+            this.label2.Location = new System.Drawing.Point(27, 133);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(49, 15);
             this.label2.TabIndex = 11;
@@ -170,7 +155,7 @@ namespace XboxAuthNetTest
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(560, 166);
+            this.label3.Location = new System.Drawing.Point(-2, 162);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(78, 15);
             this.label3.TabIndex = 12;
@@ -179,7 +164,7 @@ namespace XboxAuthNetTest
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(598, 195);
+            this.label4.Location = new System.Drawing.Point(36, 191);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(40, 15);
             this.label4.TabIndex = 13;
@@ -188,7 +173,7 @@ namespace XboxAuthNetTest
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(574, 224);
+            this.label5.Location = new System.Drawing.Point(12, 220);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(64, 15);
             this.label5.TabIndex = 14;
@@ -197,7 +182,7 @@ namespace XboxAuthNetTest
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(598, 253);
+            this.label6.Location = new System.Drawing.Point(36, 249);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(40, 15);
             this.label6.TabIndex = 15;
@@ -206,7 +191,7 @@ namespace XboxAuthNetTest
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(809, 361);
+            this.label7.Location = new System.Drawing.Point(247, 357);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(144, 75);
             this.label7.TabIndex = 16;
@@ -215,21 +200,21 @@ namespace XboxAuthNetTest
             // 
             // txtXboxAccessToken
             // 
-            this.txtXboxAccessToken.Location = new System.Drawing.Point(794, 199);
+            this.txtXboxAccessToken.Location = new System.Drawing.Point(232, 195);
             this.txtXboxAccessToken.Name = "txtXboxAccessToken";
             this.txtXboxAccessToken.Size = new System.Drawing.Size(171, 23);
             this.txtXboxAccessToken.TabIndex = 17;
             // 
             // txtXboxExpire
             // 
-            this.txtXboxExpire.Location = new System.Drawing.Point(794, 243);
+            this.txtXboxExpire.Location = new System.Drawing.Point(232, 239);
             this.txtXboxExpire.Name = "txtXboxExpire";
             this.txtXboxExpire.Size = new System.Drawing.Size(171, 23);
             this.txtXboxExpire.TabIndex = 18;
             // 
             // txtXboxUserXUID
             // 
-            this.txtXboxUserXUID.Location = new System.Drawing.Point(794, 287);
+            this.txtXboxUserXUID.Location = new System.Drawing.Point(232, 283);
             this.txtXboxUserXUID.Name = "txtXboxUserXUID";
             this.txtXboxUserXUID.Size = new System.Drawing.Size(171, 23);
             this.txtXboxUserXUID.TabIndex = 19;
@@ -237,7 +222,7 @@ namespace XboxAuthNetTest
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(794, 181);
+            this.label8.Location = new System.Drawing.Point(232, 177);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(77, 15);
             this.label8.TabIndex = 20;
@@ -246,7 +231,7 @@ namespace XboxAuthNetTest
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(794, 225);
+            this.label9.Location = new System.Drawing.Point(232, 221);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(66, 15);
             this.label9.TabIndex = 21;
@@ -255,7 +240,7 @@ namespace XboxAuthNetTest
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(794, 269);
+            this.label10.Location = new System.Drawing.Point(232, 265);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(68, 15);
             this.label10.TabIndex = 22;
@@ -264,7 +249,7 @@ namespace XboxAuthNetTest
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(794, 312);
+            this.label11.Location = new System.Drawing.Point(232, 308);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(68, 15);
             this.label11.TabIndex = 24;
@@ -272,21 +257,21 @@ namespace XboxAuthNetTest
             // 
             // txtXboxUserHash
             // 
-            this.txtXboxUserHash.Location = new System.Drawing.Point(794, 330);
+            this.txtXboxUserHash.Location = new System.Drawing.Point(232, 326);
             this.txtXboxUserHash.Name = "txtXboxUserHash";
             this.txtXboxUserHash.Size = new System.Drawing.Size(171, 23);
             this.txtXboxUserHash.TabIndex = 23;
             // 
             // txtMSClientId
             // 
-            this.txtMSClientId.Location = new System.Drawing.Point(630, 10);
+            this.txtMSClientId.Location = new System.Drawing.Point(68, 6);
             this.txtMSClientId.Name = "txtMSClientId";
             this.txtMSClientId.Size = new System.Drawing.Size(158, 23);
             this.txtMSClientId.TabIndex = 25;
             // 
             // txtMSScope
             // 
-            this.txtMSScope.Location = new System.Drawing.Point(630, 35);
+            this.txtMSScope.Location = new System.Drawing.Point(68, 31);
             this.txtMSScope.Name = "txtMSScope";
             this.txtMSScope.Size = new System.Drawing.Size(158, 23);
             this.txtMSScope.TabIndex = 26;
@@ -294,7 +279,7 @@ namespace XboxAuthNetTest
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(574, 13);
+            this.label12.Location = new System.Drawing.Point(12, 9);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(50, 15);
             this.label12.TabIndex = 27;
@@ -303,7 +288,7 @@ namespace XboxAuthNetTest
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(574, 38);
+            this.label13.Location = new System.Drawing.Point(12, 34);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(40, 15);
             this.label13.TabIndex = 28;
@@ -312,7 +297,7 @@ namespace XboxAuthNetTest
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(794, 13);
+            this.label14.Location = new System.Drawing.Point(232, 9);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(73, 15);
             this.label14.TabIndex = 29;
@@ -320,7 +305,7 @@ namespace XboxAuthNetTest
             // 
             // txtXboxRelyingParty
             // 
-            this.txtXboxRelyingParty.Location = new System.Drawing.Point(794, 36);
+            this.txtXboxRelyingParty.Location = new System.Drawing.Point(232, 32);
             this.txtXboxRelyingParty.Name = "txtXboxRelyingParty";
             this.txtXboxRelyingParty.Size = new System.Drawing.Size(171, 23);
             this.txtXboxRelyingParty.TabIndex = 30;
@@ -328,7 +313,7 @@ namespace XboxAuthNetTest
             // 
             // btnMSSignout
             // 
-            this.btnMSSignout.Location = new System.Drawing.Point(713, 64);
+            this.btnMSSignout.Location = new System.Drawing.Point(151, 60);
             this.btnMSSignout.Name = "btnMSSignout";
             this.btnMSSignout.Size = new System.Drawing.Size(75, 35);
             this.btnMSSignout.TabIndex = 31;
@@ -338,7 +323,7 @@ namespace XboxAuthNetTest
             // 
             // btnXboxSisu
             // 
-            this.btnXboxSisu.Location = new System.Drawing.Point(794, 136);
+            this.btnXboxSisu.Location = new System.Drawing.Point(232, 132);
             this.btnXboxSisu.Name = "btnXboxSisu";
             this.btnXboxSisu.Size = new System.Drawing.Size(171, 34);
             this.btnXboxSisu.TabIndex = 32;
@@ -348,7 +333,7 @@ namespace XboxAuthNetTest
             // 
             // btnXboxLiveFull
             // 
-            this.btnXboxLiveFull.Location = new System.Drawing.Point(794, 101);
+            this.btnXboxLiveFull.Location = new System.Drawing.Point(232, 97);
             this.btnXboxLiveFull.Name = "btnXboxLiveFull";
             this.btnXboxLiveFull.Size = new System.Drawing.Size(171, 34);
             this.btnXboxLiveFull.TabIndex = 33;
@@ -360,7 +345,7 @@ namespace XboxAuthNetTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(977, 450);
+            this.ClientSize = new System.Drawing.Size(417, 450);
             this.Controls.Add(this.btnXboxLiveFull);
             this.Controls.Add(this.btnXboxSisu);
             this.Controls.Add(this.btnMSSignout);
@@ -394,19 +379,15 @@ namespace XboxAuthNetTest
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.webView21);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.webView21)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private Microsoft.Web.WebView2.WinForms.WebView2 webView21;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;

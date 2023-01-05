@@ -2,18 +2,19 @@
 using System.Net;
 using System.Net.Http;
 using XboxAuthNet.OAuth;
+using XboxAuthNet.OAuth.Models;
 
 namespace XboxAuthNet.Test
 {
     [TestFixture]
-    public class TestMicrosoftOAuth
+    public class TestMicrosoftOAuthCodeFlow
     {
-        private MicrosoftOAuth? microsoft;
+        private MicrosoftOAuthCodeApiClient? microsoft;
 
         [SetUp]
         public void SetUp()
         {
-            microsoft = new MicrosoftOAuth("", "", new HttpClient());
+            microsoft = new MicrosoftOAuthCodeApiClient("", "", new HttpClient());
         }
 
         static object[] TestExceptionCases =
