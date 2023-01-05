@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using XboxAuthNet.XboxLive.Entity;
+using XboxAuthNet.XboxLive.Models;
 
 namespace XboxAuthNet.XboxLive
 {

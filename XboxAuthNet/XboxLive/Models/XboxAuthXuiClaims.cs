@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.XboxLive.Entity
+namespace XboxAuthNet.XboxLive.Models
 {
     // https://github.com/OpenXbox/xbox-webapi-csharp/blob/master/XboxWebApi/Authentication/Model/XboxUserInformation.cs
     public class XboxAuthXuiClaims

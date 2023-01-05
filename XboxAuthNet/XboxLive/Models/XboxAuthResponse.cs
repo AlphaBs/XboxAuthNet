@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.XboxLive.Entity
+namespace XboxAuthNet.XboxLive.Models
 {
     public class XboxAuthResponse
     {
@@ -28,6 +28,9 @@ namespace XboxAuthNet.XboxLive.Entity
         /// <returns></returns>
         public bool Validate()
         {
+            if (string.IsNullOrEmpty(ExpireOn))
+                return false;
+
             if (DateTime.Parse(ExpireOn) < DateTime.Now)
                 return false;
 

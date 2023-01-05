@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive.Entity;
+using XboxAuthNet.XboxLive.Models;
 
 namespace XboxAuthNet.XboxLive
 {
