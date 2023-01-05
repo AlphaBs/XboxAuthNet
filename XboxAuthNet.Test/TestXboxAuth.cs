@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive;
 using XboxAuthNet.XboxLive.Entity;
+using XboxAuthNet.XboxLive.Models;
 
 namespace XboxAuthNet.Test
 {
@@ -91,8 +92,7 @@ namespace XboxAuthNet.Test
 
             var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await XboxRequest.HandleResponse<XboxAuthResponse>(msg));
             Assert.NotNull(ex);
-            //Assert.AreEqual(, ex!.Message);
-            Assert.AreEqual(xerr, ex!.Error);
+            Assert.AreEqual(ErrorUtils.TryConvertToHexErrorCode(xerr), ex!.Error);
             Assert.AreEqual(wwwAuth, ex!.ErrorMessage);
             Assert.AreEqual(null, ex!.Redirect);
         }
