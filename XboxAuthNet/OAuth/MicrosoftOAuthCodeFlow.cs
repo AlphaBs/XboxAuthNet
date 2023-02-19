@@ -7,33 +7,11 @@ namespace XboxAuthNet.OAuth
 {
     public class MicrosoftOAuthCodeFlow
     {
-        public static MicrosoftOAuthCodeFlow CreateDefault(MicrosoftOAuthCodeApiClient client, object? parent = null)
-        {
-            IWebUI? ui = null;
-            var uiOptions = new WebUIOptions
-            {
-                ParentObject = parent,
-                SynchronizationContext = SynchronizationContext.Current
-            };
-
-#if ENABLE_WEBVIEW2
-            ui = new XboxAuthNet.Platforms.WinForm.WebView2WebUI(uiOptions);
-#endif
-
-            if (ui == null)
-            {
-                throw new PlatformNotSupportedException();
-            }
-
-            var urlChecker = new MicrosoftOAuthUriChecker();
-            return new MicrosoftOAuthCodeFlow(client, ui, urlChecker);
-        }
-
         private readonly MicrosoftOAuthCodeApiClient _client;
         private readonly IWebUI _ui;
         private readonly IMicrosoftOAuthUriChecker _uriChecker;
 
-        public MicrosoftOAuthCodeFlow(
+        internal MicrosoftOAuthCodeFlow(
             MicrosoftOAuthCodeApiClient client,
             IWebUI ui,
             IMicrosoftOAuthUriChecker urlChecker)

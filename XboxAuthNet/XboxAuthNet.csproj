@@ -5,6 +5,8 @@
         <TargetFrameworkNetFramework>net472</TargetFrameworkNetFramework>
         <TargetFrameworkNet5Win>net5.0-windows</TargetFrameworkNet5Win>
         <TargetFrameworks>$(TargetFrameworkNet5Win);$(TargetFrameworkNetStandard);$(TargetFrameworkNetFramework)</TargetFrameworks>
+
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -18,7 +20,7 @@
         <RepositoryUrl>https://github.com/AlphaBs/XboxAuthNet</RepositoryUrl>
         <Authors>ksi123456ab</Authors>
         <PackageTags>xbox live login auth authentication</PackageTags>
-        <Version>3.0.0-beta.1</Version>
+        <Version>3.0.0-beta.2</Version>
     </PropertyGroup>
 
     <ItemGroup>
