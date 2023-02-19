@@ -83,7 +83,7 @@ namespace XboxAuthNet.Platforms.WinForm
 
                 // Cleanup
                 _tasks.Dispose();
-                _tasks = null;
+                _tasks = null!;
             }
         }
 
