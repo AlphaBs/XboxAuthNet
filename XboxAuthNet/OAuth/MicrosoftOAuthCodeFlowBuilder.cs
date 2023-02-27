@@ -24,6 +24,13 @@ namespace XboxAuthNet.OAuth
             return this;
         }
 
+        public MicrosoftOAuthCodeFlowBuilder WithUITitle(string title)
+        {
+            uiOptions ??= createDefaultWebUIOptions();
+            uiOptions.Title = title;
+            return this;
+        }
+
         public MicrosoftOAuthCodeFlowBuilder WithUIOptions(WebUIOptions options)
         {
             this.uiOptions = options;
