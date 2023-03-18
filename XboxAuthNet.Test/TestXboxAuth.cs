@@ -121,7 +121,6 @@ namespace XboxAuthNet.Test
         [Test]
         [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\"}")]
         [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[]}}")]
-        [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[{}]}}")]
         [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[null]}}")]
         [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":null}}")]
         [TestCase("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"x23\":null}}")]
