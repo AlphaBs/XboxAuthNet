@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive.Entity;
 using XboxAuthNet.XboxLive.Models;
+using XboxAuthNet.XboxLive.Pop;
 
 namespace XboxAuthNet.XboxLive
 {
@@ -19,31 +20,11 @@ namespace XboxAuthNet.XboxLive
         public const string AzureTokenPrefix = "d=";
         public const string XboxTokenPrefix = "t=";
 
-        private static SecureRandom random = new SecureRandom();
-
-        private static IAsymmetricCipherKeyPairGenerator initializeKeyGenerator()
-        {
-            var curve = ECNamedCurveTable.GetByName("prime256v1");
-            var ec = new ECKeyPairGenerator();
-            var ecrandom = new ECKeyGenerationParameters(new ECDomainParameters(curve), random);
-            ec.Init(ecrandom);
-            return ec;
-        }
-
         public static XboxSecureAuth Create(HttpClient httpClient)
         {
-            var keyGenerator = initializeKeyGenerator();
-            return CreateFromKeyGenerator(httpClient, keyGenerator);
-        }
-
-        public static XboxSecureAuth CreateFromKeyGenerator(HttpClient httpClient, IAsymmetricCipherKeyPairGenerator keyGenerator)
-        {
-            var keyPair = keyGenerator.GenerateKeyPair();
             return new XboxSecureAuth(
                 httpClient, 
-                new ECXboxSisuRequestSigner(
-                    (ECPublicKeyParameters)keyPair.Public, 
-                    (ECPrivateKeyParameters)keyPair.Private));
+                new XboxSisuRequestSigner(new DefaultECSigner()));
         }
 
         const string SisuAuthorize = "https://sisu.xboxlive.com/authorize";
@@ -144,7 +125,7 @@ namespace XboxAuthNet.XboxLive
 
             if (token == null)
                 token = "";
-            var signature = _signer.GenerateSignature(uri, token, bodyStr);
+            var signature = _signer.SignRequest(uri, token, bodyStr);
             reqMessage.Headers.Add("Signature", signature);
             reqMessage.Headers.Add("x-xbl-contract-version", "2");
 
