@@ -1,14 +1,8 @@
-﻿using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using XboxAuthNet.XboxLive.Entity;
 using XboxAuthNet.XboxLive.Models;
 using XboxAuthNet.XboxLive.Pop;
 
