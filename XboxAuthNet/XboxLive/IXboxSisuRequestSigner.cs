@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Crypto;
-
-namespace XboxAuthNet.XboxLive
+﻿namespace XboxAuthNet.XboxLive
 {
     public interface IXboxSisuRequestSigner
     {
