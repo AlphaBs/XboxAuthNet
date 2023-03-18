@@ -11,8 +11,11 @@
 
     <PropertyGroup>
         <LangVersion>8.0</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>3.0.0-beta.2</Version>
+
         <Description>Xbox Live authentication for .NET</Description>
         <Copyright>MIT</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -20,7 +23,6 @@
         <RepositoryUrl>https://github.com/AlphaBs/XboxAuthNet</RepositoryUrl>
         <Authors>ksi123456ab</Authors>
         <PackageTags>xbox live login auth authentication</PackageTags>
-        <Version>3.0.0-beta.2</Version>
     </PropertyGroup>
 
     <ItemGroup>

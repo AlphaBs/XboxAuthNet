@@ -1,49 +1,21 @@
-﻿using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
 using System;
 using System.Text;
+using XboxAuthNet.XboxLive.Pop;
 
 namespace XboxAuthNet.XboxLive
 {
-    public class ECXboxSisuRequestSigner : IXboxSisuRequestSigner
+    public class XboxSisuRequestSigner : IXboxSisuRequestSigner
     {
-        private readonly ECPublicKeyParameters _publicKey;
-        private readonly ECPrivateKeyParameters _privateKey;
+        private readonly IPopCryptoProvider _signer;
 
-        public ECXboxSisuRequestSigner(
-            ECPublicKeyParameters publicKey, 
-            ECPrivateKeyParameters privateKey)
+        public XboxSisuRequestSigner(IPopCryptoProvider signer)
         {
-            this._publicKey = publicKey;
-            this._privateKey = privateKey;
+            this._signer = signer;
         }
 
-        private object? _proofKey;
+        public object ProofKey => _signer.ProofKey;
 
-        public object ProofKey
-        {
-            get
-            {
-                if (_proofKey == null)
-                    _proofKey = createNewProofKey();
-                return _proofKey;
-            }
-        }
-
-        private object createNewProofKey()
-        {
-            return new
-            {
-                kty = "EC",
-                x = base64url(_publicKey.Q.AffineXCoord.ToBigInteger().ToByteArray()),
-                y = base64url(_publicKey.Q.AffineYCoord.ToBigInteger().ToByteArray()),
-                crv = "P-256",
-                alg = "ES256",
-                use = "sig"
-            };
-        }
-
-        public string GenerateSignature(string reqUri, string token, string body)
+        public string SignRequest(string reqUri, string token, string body)
         {
             var timestamp = getWindowsTimestamp();
             var data = generatePayload(timestamp, reqUri, token, body);
@@ -87,10 +59,7 @@ namespace XboxAuthNet.XboxLive
 
         private byte[] sign(ulong windowsTimestamp, byte[] bytes)
         {
-            var signer = SignerUtilities.GetSigner("SHA256WITHPLAIN-ECDSA");
-            signer.Init(true, _privateKey);
-            signer.BlockUpdate(bytes, 0, bytes.Length);
-            var signature = signer.GenerateSignature();
+            var signature = _signer.Sign(bytes);
 
             var policyVersion = BitConverter.GetBytes((int)1);
             if (BitConverter.IsLittleEndian)
@@ -113,12 +82,6 @@ namespace XboxAuthNet.XboxLive
             var unixTimestamp = (ulong)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             ulong windowsTimestamp = (unixTimestamp + 11644473600u) * 10000000u;
             return windowsTimestamp;
-        }
-
-        private string base64url(byte[] bytes)
-        {
-            return Convert.ToBase64String(bytes)
-                .TrimEnd(new char[] { '=' }).Replace('+', '-').Replace('/', '_');
         }
     }
 }
