@@ -1,5 +1,4 @@
 ﻿using Microsoft.Web.WebView2.Core;
-using Org.BouncyCastle.Math;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -24,7 +23,11 @@ namespace XboxAuthNetTest
             //var apiClient = new MicrosoftOAuthCodeApiClient("00000000402B5328", XboxAuth.XboxScope, httpClient);
             var apiClient = new MicrosoftOAuthCodeApiClient("00000000441cc96b", XboxAuth.XboxScope, httpClient);
             //var apiClient = new MicrosoftOAuthCodeApiClient("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
-            oauth = MicrosoftOAuthCodeFlow.CreateDefault(apiClient);
+
+            oauth = new MicrosoftOAuthCodeFlowBuilder(apiClient)
+                .WithUIParent(this)
+                .Build();
+
             InitializeComponent();
         }
 
@@ -112,9 +115,8 @@ namespace XboxAuthNetTest
             {
                 this.Enabled = false;
                 var relyingParty = txtXboxRelyingParty.Text;
-                var keyPairGenerator = KeyPairGeneratorFactory.CreateDefaultAsymmetricKeyPair();
 
-                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
+                var sisu = XboxSecureAuth.Create(httpClient);
                 var userToken = await sisu.RequestUserToken(textBox1.Text, XboxSecureAuth.XboxTokenPrefix);
                 var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Nintendo, "0.0.0");
                 var titleToken = await sisu.RequestTitleToken(textBox1.Text, deviceToken.Token);
@@ -139,9 +141,8 @@ namespace XboxAuthNetTest
             {
                 this.Enabled = false;
                 var relyingParty = txtXboxRelyingParty.Text;
-                var keyPairGenerator = KeyPairGeneratorFactory.CreateDefaultAsymmetricKeyPair();
 
-                var sisu = XboxSecureAuth.CreateFromKeyGenerator(httpClient, keyPairGenerator);
+                var sisu = XboxSecureAuth.Create(httpClient);
                 var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
                 var xsts = await sisu.SisuAuth(textBox1.Text, XboxGameTitles.MinecraftJava, deviceToken.Token, relyingParty);
                 showResponse(xsts.AuthorizationToken);

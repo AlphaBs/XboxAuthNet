@@ -13,7 +13,7 @@ namespace XboxAuthNet.XboxLive.Pop
 
         public DefaultECSigner()
         {
-            ECCurve ecCurve = ECCurve.CreateFromFriendlyName(ECCurve.NamedCurves.nistP256.Oid.FriendlyName);
+            var ecCurve = ECCurve.NamedCurves.nistP256;
             _signer = ECDsa.Create(ecCurve);
         }
 

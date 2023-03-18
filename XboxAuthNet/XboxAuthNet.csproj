@@ -14,7 +14,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>3.0.0-beta.2</Version>
+        <Version>3.0.0</Version>
 
         <Description>Xbox Live authentication for .NET</Description>
         <Copyright>MIT</Copyright>
@@ -34,7 +34,6 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
         <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
         <PackageReference Include="System.Text.Json" Version="6.0.0" />
     </ItemGroup>
