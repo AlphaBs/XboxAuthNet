@@ -45,5 +45,16 @@ namespace XboxAuthNet.OAuth.Models
 
             return JwtDecoder.DecodePayload<MicrosoftUserPayload>(IdToken!);
         }
+
+        public bool Validate()
+        {
+            if (string.IsNullOrEmpty(AccessToken))
+                return false;
+            
+            if (DateTime.UtcNow > ExpiresOn)
+                return false;
+
+            return true;
+        }
     }
 }
