@@ -10,6 +10,7 @@ using XboxAuthNet.OAuth.Models;
 using XboxAuthNet.Utils;
 using XboxAuthNet.XboxLive;
 using XboxAuthNet.XboxLive.Models;
+using System.Threading;
 
 namespace XboxAuthNetTest
 {
@@ -69,7 +70,7 @@ namespace XboxAuthNetTest
                 if (!string.IsNullOrEmpty(res?.RefreshToken))
                 {
                     res = await oauth.AuthenticateSilently(res?.RefreshToken);
-                    log("refresh login success");
+                    log("refresh login success"); 
                     loginSuccess(res);
                     return;
                 }

@@ -21,8 +21,10 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/AlphaBs/XboxAuthNet</PackageProjectUrl>
         <RepositoryUrl>https://github.com/AlphaBs/XboxAuthNet</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <Authors>ksi123456ab</Authors>
         <PackageTags>xbox live login auth authentication</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -36,6 +38,8 @@
         </PackageReference>
         <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
         <PackageReference Include="System.Text.Json" Version="6.0.0" />
+
+        <None Include="../../README.md" Pack="true" PackagePath="/"/>
     </ItemGroup>
 
     <PropertyGroup>
