@@ -70,7 +70,7 @@ namespace XboxAuthNet.OAuth
                     throw new MicrosoftOAuthException("Response was null", (int)res.StatusCode);
 
                 if (resObj.ExpiresOn == default)
-                    resObj.ExpiresOn = DateTimeOffset.Now.AddSeconds(resObj.ExpireIn);
+                    resObj.ExpiresOn = DateTimeOffset.UtcNow.AddSeconds(resObj.ExpireIn);
                 return resObj;
             }
             catch (Exception ex) when (
