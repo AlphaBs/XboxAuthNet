@@ -18,7 +18,7 @@ namespace XboxAuthNet.XboxLive
         {
             return new XboxSecureAuth(
                 httpClient, 
-                new XboxSisuRequestSigner(new DefaultECSigner()));
+                new XboxSisuRequestSigner(new ECDCertificatePopCryptoProvider()));
         }
 
         const string SisuAuthorize = "https://sisu.xboxlive.com/authorize";

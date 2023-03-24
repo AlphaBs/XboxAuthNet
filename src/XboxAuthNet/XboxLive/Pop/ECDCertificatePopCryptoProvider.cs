@@ -3,15 +3,15 @@ using XboxAuthNet.Utils;
 
 namespace XboxAuthNet.XboxLive.Pop
 {
-    // https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/blob/9895855ac4fcf52893fbc2b06ee20ea3eda1549a/tests/Microsoft.Identity.Test.Common/Core/Helpers/ECDCertificatePopCryptoProvider.cs#L11
-    public class DefaultECSigner : IPopCryptoProvider
+    // https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/blob/main/tests/Microsoft.Identity.Test.Common/Core/Helpers/ECDCertificatePopCryptoProvider.cs#L47
+    public class ECDCertificatePopCryptoProvider : IPopCryptoProvider
     {
         private object? _proofKey;
         public object ProofKey => _proofKey ??= generateNewProofKey();
 
         private ECDsa _signer;
 
-        public DefaultECSigner()
+        public ECDCertificatePopCryptoProvider()
         {
             var ecCurve = ECCurve.NamedCurves.nistP256;
             _signer = ECDsa.Create(ecCurve);
