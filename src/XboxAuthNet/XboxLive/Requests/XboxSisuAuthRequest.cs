@@ -7,9 +7,9 @@ namespace XboxAuthNet.XboxLive.Requests
 {
     public class XboxSisuAuthRequest : AbstractXboxSignedAuthRequest
     {
-        public string? TokenPrefix { get; set; } = XboxTokenPrefix;
+        public string? TokenPrefix { get; set; } = XboxAuthConstants.XboxTokenPrefix;
         public string? AccessToken { get; set; }
-        public string? RelyingParty { get; set; } = XboxLiveRelyingParty;
+        public string? RelyingParty { get; set; } = XboxAuthConstants.XboxLiveRelyingParty;
         public string? ClientId { get; set; }
         public string? DeviceToken { get; set; }
 

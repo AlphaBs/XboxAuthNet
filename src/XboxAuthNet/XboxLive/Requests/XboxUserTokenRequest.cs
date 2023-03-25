@@ -12,7 +12,7 @@ namespace XboxAuthNet.XboxLive.Requests
         public XboxUserTokenRequest()
         {
             ContractVersion = "0";
-            RelyingParty = XboxAuthRelyingParty;
+            RelyingParty = XboxAuthConstants.XboxAuthRelyingParty;
         }
 
         public string? AccessToken { get; set; }

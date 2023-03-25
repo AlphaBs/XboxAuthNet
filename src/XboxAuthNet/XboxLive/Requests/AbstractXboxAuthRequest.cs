@@ -7,11 +7,6 @@ namespace XboxAuthNet.XboxLive.Requests
 {
     public abstract class AbstractXboxAuthRequest
     {
-        public const string XboxLiveRelyingParty = "http://xboxlive.com";
-        public const string XboxAuthRelyingParty = "http://auth.xboxlive.com";
-        public const string AzureTokenPrefix = "d=";
-        public const string XboxTokenPrefix = "t=";
-
         public AbstractXboxAuthRequest()
         {
             ResponseHandler = new XboxAuthResponseHandler();

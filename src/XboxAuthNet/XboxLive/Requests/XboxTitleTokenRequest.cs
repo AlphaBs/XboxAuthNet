@@ -9,8 +9,8 @@ namespace XboxAuthNet.XboxLive.Requests
     {
         public string? AccessToken { get; set; }
         public string? DeviceToken { get; set; }
-        public string? TokenPrefix { get; set; } = XboxTokenPrefix;
-        public string? RelyingParty { get; set; } = XboxAuthRelyingParty;
+        public string? TokenPrefix { get; set; } = XboxAuthConstants.XboxTokenPrefix;
+        public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
 
         protected override string RequestUrl => "https://title.auth.xboxlive.com/title/authenticate";
         protected override object BuildBody()

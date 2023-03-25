@@ -11,7 +11,7 @@ namespace XboxAuthNet.XboxLive.Requests
         public string? SerialNumber { get; set; }
         public string? DeviceType { get; set; }
         public string? DeviceVersion { get; set; }
-        public string? RelyingParty { get; set; } = XboxAuthRelyingParty;
+        public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
 
         protected override string RequestUrl => "https://device.auth.xboxlive.com/device/authenticate";
         protected override object BuildBody()
