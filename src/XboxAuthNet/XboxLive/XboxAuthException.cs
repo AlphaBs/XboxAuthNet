@@ -56,7 +56,7 @@ namespace XboxAuthNet.XboxLive
             if (string.IsNullOrEmpty(xerr) && string.IsNullOrEmpty(message))
                 throw new FormatException();
 
-            return new XboxAuthException(ErrorUtils.TryConvertToHexErrorCode(xerr), message, null, statusCode);
+            return new XboxAuthException(ErrorHelper.TryConvertToHexErrorCode(xerr), message, null, statusCode);
         }
     }
 }

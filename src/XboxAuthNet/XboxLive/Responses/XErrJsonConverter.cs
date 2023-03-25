@@ -15,7 +15,7 @@ namespace XboxAuthNet.XboxLive.Responses
                 value = reader.GetInt64().ToString();
             else
                 throw new JsonException();
-            return ErrorUtils.TryConvertToHexErrorCode(value);
+            return ErrorHelper.TryConvertToHexErrorCode(value);
         }
 
         public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)

@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using XboxAuthNet.Utils;
 
 namespace XboxAuthNet.XboxLive.Crypto
 {
@@ -23,8 +22,8 @@ namespace XboxAuthNet.XboxLive.Crypto
             return new
             {
                 kty = "EC",
-                x = parameters.Q.X != null ? Base64UrlHelpers.Encode(parameters.Q.X) : null,
-                y = parameters.Q.Y != null ? Base64UrlHelpers.Encode(parameters.Q.Y) : null,
+                x = parameters.Q.X != null ? Base64UrlHelper.Encode(parameters.Q.X) : null,
+                y = parameters.Q.Y != null ? Base64UrlHelper.Encode(parameters.Q.Y) : null,
                 crv = "P-256",
                 alg = "ES256",
                 use = "sig"

@@ -7,10 +7,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace XboxAuthNet.Utils
+namespace XboxAuthNet
 {
     // Based on https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/pull/1698/files
-    internal static class Base64UrlHelpers
+    internal static class Base64UrlHelper
     {
         private const char base64PadCharacter = '=';
 #if NET45

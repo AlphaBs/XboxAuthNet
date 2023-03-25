@@ -47,7 +47,7 @@ namespace XboxAuthNet.OAuth
         private async Task<MicrosoftOAuthResponse> microsoftOAuthRequest(HttpRequestMessage req, 
             CancellationToken cancellationToken)
         {
-            req.Headers.Add("User-Agent", HttpUtil.UserAgent);
+            req.Headers.Add("User-Agent", HttpHelper.UserAgent);
             req.Headers.Add("Accept-Encoding", "gzip");
             req.Headers.Add("Accept-Language", "en-US");
 
@@ -105,7 +105,7 @@ namespace XboxAuthNet.OAuth
             foreach (var kv in paramQuery)
                 query[kv.Key] = kv.Value;
 
-            return OAuthAuthorize + "?" + HttpUtil.GetQueryString(query);
+            return OAuthAuthorize + "?" + HttpHelper.GetQueryString(query);
         }
 
         public async Task<MicrosoftOAuthResponse> GetTokens(MicrosoftOAuthCode authCode, 

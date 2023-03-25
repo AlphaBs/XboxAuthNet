@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace XboxAuthNet
 {
-    public class HttpUtil
+    public class HttpHelper
     {
         public const string UserAgent = "Mozilla/5.0 (XboxReplay; XboxLiveAuth/3.0) " +
                                         "AppleWebKit/537.36 (KHTML, like Gecko) " +

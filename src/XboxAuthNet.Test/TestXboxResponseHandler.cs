@@ -90,7 +90,7 @@ namespace XboxAuthNet.Test
 
             var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await responseHandler.HandleResponse<XboxAuthResponse>(msg));
             Assert.NotNull(ex);
-            Assert.AreEqual(ErrorUtils.TryConvertToHexErrorCode(xerr), ex!.Error);
+            Assert.AreEqual(ErrorHelper.TryConvertToHexErrorCode(xerr), ex!.Error);
             Assert.AreEqual(wwwAuth, ex!.ErrorMessage);
             Assert.AreEqual(null, ex!.Redirect);
         }
