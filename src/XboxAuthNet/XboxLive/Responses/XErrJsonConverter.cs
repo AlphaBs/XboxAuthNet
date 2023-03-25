@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.XboxLive.Models
+namespace XboxAuthNet.XboxLive.Responses
 {
     public class XErrJsonConverter : JsonConverter<string>
     {

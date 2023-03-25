@@ -1,4 +1,4 @@
-namespace XboxAuthNet.XboxLive.Pop
+namespace XboxAuthNet.XboxLive.Crypto
 {
     public interface IPopCryptoProvider
     {

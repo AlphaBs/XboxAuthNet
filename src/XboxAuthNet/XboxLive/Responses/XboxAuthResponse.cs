@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.XboxLive.Models
+namespace XboxAuthNet.XboxLive.Responses
 {
     public class XboxAuthResponse
     {

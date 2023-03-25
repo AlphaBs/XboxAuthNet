@@ -1,14 +1,13 @@
 using System;
 using System.Text;
-using XboxAuthNet.XboxLive.Pop;
 
-namespace XboxAuthNet.XboxLive
+namespace XboxAuthNet.XboxLive.Crypto
 {
-    public class XboxSisuRequestSigner : IXboxSisuRequestSigner
+    public class XboxRequestSigner : IXboxRequestSigner
     {
         private readonly IPopCryptoProvider _signer;
 
-        public XboxSisuRequestSigner(IPopCryptoProvider signer)
+        public XboxRequestSigner(IPopCryptoProvider signer)
         {
             this._signer = signer;
         }

@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using XboxAuthNet.Utils;
 
-namespace XboxAuthNet.XboxLive.Pop
+namespace XboxAuthNet.XboxLive.Crypto
 {
     // https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/blob/main/tests/Microsoft.Identity.Test.Common/Core/Helpers/ECDCertificatePopCryptoProvider.cs#L47
     public class ECDCertificatePopCryptoProvider : IPopCryptoProvider
