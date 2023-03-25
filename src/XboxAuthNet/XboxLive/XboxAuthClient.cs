@@ -54,6 +54,19 @@ namespace XboxAuthNet.XboxLive
         public Task<XboxAuthResponse> RequestTitleToken(XboxTitleTokenRequest request) =>
             request.Send(_httpClient);
 
+        public Task<XboxAuthResponse> RequestXsts(string userToken) =>
+            RequestXsts(new XboxXstsRequest
+            {
+                UserToken = userToken
+            });
+
+        public Task<XboxAuthResponse> RequestXsts(string userToken, string relyingParty) =>
+            RequestXsts(new XboxXstsRequest
+            {
+                UserToken = userToken,
+                RelyingParty = relyingParty
+            });
+
         public Task<XboxAuthResponse> RequestXsts(XboxXstsRequest request) =>
             request.Send(_httpClient);
 
