@@ -6,8 +6,8 @@ namespace XboxAuthNet.Test
     {
         public static async Task Main(string[] args)
         {
-            var test = new TestXboxSecureAuth();
-            await test.TestRequestSignerINFINITELY();
+            var test = new TestXboxCrypto();
+            await test.TestSignedRequestINFINITELY();
         }
     }
 }
