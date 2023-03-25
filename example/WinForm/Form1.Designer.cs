@@ -1,5 +1,5 @@
 ﻿
-namespace XboxAuthNetTest
+namespace XboxAuthNetWinForm
 {
     partial class Form1
     {
