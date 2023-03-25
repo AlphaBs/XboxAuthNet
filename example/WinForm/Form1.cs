@@ -1,5 +1,4 @@
-﻿using Microsoft.Web.WebView2.Core;
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -7,12 +6,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using XboxAuthNet.OAuth;
 using XboxAuthNet.OAuth.Models;
-using XboxAuthNet.Utils;
 using XboxAuthNet.XboxLive;
-using XboxAuthNet.XboxLive.Models;
-using System.Threading;
+using XboxAuthNet.XboxLive.Requests;
+using XboxAuthNet.XboxLive.Responses;
 
-namespace XboxAuthNetTest
+namespace XboxAuthNetWinForm
 {
     public partial class Form1 : Form
     {
@@ -21,25 +19,36 @@ namespace XboxAuthNetTest
         public Form1()
         {
             httpClient = new HttpClient();
+            InitializeComponent();
+        }
+
+        MicrosoftOAuthCodeFlow oauth;
+        XboxAuthClient xboxAuthClient;
+        string sessionFilePath = "auth.json";
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            initializeOAuth();
+            initializeXboxAuthClient();
+
+            var res = readSession();
+            showResponse(res);
+        }
+
+        private void initializeOAuth()
+        {
             //var apiClient = new MicrosoftOAuthCodeApiClient("00000000402B5328", XboxAuth.XboxScope, httpClient);
-            var apiClient = new MicrosoftOAuthCodeApiClient("00000000441cc96b", XboxAuth.XboxScope, httpClient);
+            var apiClient = new MicrosoftOAuthCodeApiClient("00000000441cc96b", XboxAuthClient.XboxScope, httpClient);
             //var apiClient = new MicrosoftOAuthCodeApiClient("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
 
             oauth = new MicrosoftOAuthCodeFlowBuilder(apiClient)
                 .WithUIParent(this)
                 .Build();
-
-            InitializeComponent();
         }
 
-        MicrosoftOAuthCodeFlow oauth;
-
-        string sessionFilePath = "auth.json";
-
-        private void Form1_Load(object sender, EventArgs e)
+        private void initializeXboxAuthClient()
         {
-            var res = readSession();
-            showResponse(res);
+            xboxAuthClient = new XboxAuthClient(httpClient);
         }
 
         private MicrosoftOAuthResponse readSession()
@@ -95,10 +104,10 @@ namespace XboxAuthNetTest
                 this.Enabled = false;
                 var relyingParty = txtXboxRelyingParty.Text;
 
-                var xbox = new XboxAuth(httpClient);
-                var ex = await xbox.ExchangeRpsTicketForUserToken(textBox1.Text);
-                var res = await xbox.ExchangeTokensForXstsIdentity(ex.Token, null, null, relyingParty, null);
-                showResponse(res);
+                var userToken = await xboxAuthClient.RequestUserToken(textBox1.Text);
+                var xsts = await xboxAuthClient.RequestXsts(userToken.Token, relyingParty);
+
+                showResponse(xsts);
             }
             catch (Exception ex)
             {
@@ -115,15 +124,30 @@ namespace XboxAuthNetTest
             try
             {
                 this.Enabled = false;
-                var relyingParty = txtXboxRelyingParty.Text;
 
-                var sisu = XboxSecureAuth.Create(httpClient);
-                var userToken = await sisu.RequestUserToken(textBox1.Text, XboxSecureAuth.XboxTokenPrefix);
-                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Nintendo, "0.0.0");
-                var titleToken = await sisu.RequestTitleToken(textBox1.Text, deviceToken.Token);
+                var userToken = await xboxAuthClient.RequestSignedUserToken(new XboxSignedUserTokenRequest
+                {
+                    AccessToken = textBox1.Text,
+                    TokenPrefix = AbstractXboxAuthRequest.XboxTokenPrefix
+                });
+                var deviceToken = await xboxAuthClient.RequestDeviceToken(new XboxDeviceTokenRequest
+                {
+                    DeviceType = XboxDeviceTypes.Nintendo,
+                    DeviceVersion = "0.0.0"
+                });
+                var titleToken = await xboxAuthClient.RequestTitleToken(new XboxTitleTokenRequest
+                {
+                    AccessToken = textBox1.Text,
+                    DeviceToken = deviceToken.Token
+                });
+                var xsts = await xboxAuthClient.RequestXsts(new XboxXstsRequest
+                {
+                    UserToken = userToken.Token,
+                    DeviceToken = deviceToken.Token,
+                    TitleToken = titleToken.Token,
+                    RelyingParty = txtXboxRelyingParty.Text
+                });
 
-                var xbox = new XboxAuth(httpClient);
-                var xsts = await xbox.ExchangeTokensForXstsIdentity(userToken.Token, deviceToken.Token, titleToken.Token, relyingParty, null);
                 showResponse(xsts);
             }
             catch (Exception ex)
@@ -141,12 +165,17 @@ namespace XboxAuthNetTest
             try
             {
                 this.Enabled = false;
-                var relyingParty = txtXboxRelyingParty.Text;
 
-                var sisu = XboxSecureAuth.Create(httpClient);
-                var deviceToken = await sisu.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
-                var xsts = await sisu.SisuAuth(textBox1.Text, XboxGameTitles.MinecraftJava, deviceToken.Token, relyingParty);
-                showResponse(xsts.AuthorizationToken);
+                var deviceToken = await xboxAuthClient.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
+                var sisuResult = await xboxAuthClient.SisuAuth(new XboxSisuAuthRequest
+                {
+                    AccessToken = textBox1.Text,
+                    ClientId = XboxGameTitles.MinecraftJava,
+                    DeviceToken = deviceToken.Token,
+                    RelyingParty = txtXboxRelyingParty.Text
+                });
+
+                showResponse(sisuResult.AuthorizationToken);
             }
             catch (Exception ex)
             {
