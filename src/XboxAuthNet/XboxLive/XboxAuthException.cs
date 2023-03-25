@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using XboxAuthNet.XboxLive.Models;
+using XboxAuthNet.XboxLive.Responses;
 
 namespace XboxAuthNet.XboxLive
 {
@@ -20,9 +20,7 @@ namespace XboxAuthNet.XboxLive
         }
 
         public int StatusCode { get; private set; }
-
-        // https://github.com/microsoft/xbox-live-api/blob/730f579d41b64df5b57b52e629d12f23c6fb64ac/Source/Shared/errors_legacy.h#L924
-        public string? Error { get; private set; }
+        public string? Error { get; private set; } // refer ErrorCodes.cs
 
         public string? ErrorMessage { get; private set; }
 
