@@ -97,15 +97,15 @@ namespace XboxAuthNetWinForm
             }
         }
 
+        // Xbox Basic Authentication
         private async void btnXboxLive_Click(object sender, EventArgs e)
         {
             try
             {
                 this.Enabled = false;
-                var relyingParty = txtXboxRelyingParty.Text;
 
                 var userToken = await xboxAuthClient.RequestUserToken(textBox1.Text);
-                var xsts = await xboxAuthClient.RequestXsts(userToken.Token, relyingParty);
+                var xsts = await xboxAuthClient.RequestXsts(userToken.Token, txtXboxRelyingParty.Text);
 
                 showResponse(xsts);
             }
@@ -119,6 +119,7 @@ namespace XboxAuthNetWinForm
             }
         }
 
+        // Xbox Full Authentication
         private async void btnXboxLiveFull_Click(object sender, EventArgs e)
         {
             try
@@ -128,7 +129,7 @@ namespace XboxAuthNetWinForm
                 var userToken = await xboxAuthClient.RequestSignedUserToken(new XboxSignedUserTokenRequest
                 {
                     AccessToken = textBox1.Text,
-                    TokenPrefix = AbstractXboxAuthRequest.XboxTokenPrefix
+                    TokenPrefix = XboxAuthConstants.XboxTokenPrefix
                 });
                 var deviceToken = await xboxAuthClient.RequestDeviceToken(new XboxDeviceTokenRequest
                 {
@@ -160,6 +161,7 @@ namespace XboxAuthNetWinForm
             }
         }
 
+        // Xbox Sisu Authentication
         private async void btnXboxSisu_Click(object sender, EventArgs e)
         {
             try

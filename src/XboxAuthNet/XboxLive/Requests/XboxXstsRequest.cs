@@ -11,7 +11,7 @@ namespace XboxAuthNet.XboxLive.Requests
 
         public XboxXstsRequest()
         {
-            RelyingParty = XboxLiveRelyingParty;
+            RelyingParty = XboxAuthConstants.XboxLiveRelyingParty;
             ContractVersion = "1";
         }
 

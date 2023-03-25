@@ -7,8 +7,8 @@ namespace XboxAuthNet.XboxLive.Requests
 {
     public class XboxSignedUserTokenRequest : AbstractXboxSignedAuthRequest
     {
-        public string? RelyingParty { get; set; } = XboxAuthRelyingParty;
-        public string? TokenPrefix { get; set; } = XboxTokenPrefix;
+        public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
+        public string? TokenPrefix { get; set; } = XboxAuthConstants.XboxTokenPrefix;
         public string? AccessToken { get; set; }
 
         protected override string RequestUrl => "https://user.auth.xboxlive.com/user/authenticate";
