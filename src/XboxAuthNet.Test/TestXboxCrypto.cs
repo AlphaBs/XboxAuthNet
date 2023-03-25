@@ -2,25 +2,21 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive;
-using XboxAuthNet.XboxLive.Pop;
 
 namespace XboxAuthNet.Test
 {
-    public class TestXboxSecureAuth
+    public class TestXboxCrypto
     {
-        public async Task TestRequestSignerINFINITELY()
+        public async Task TestSignedRequestINFINITELY()
         {
             var httpClient = new HttpClient();
-            var auth = new XboxSecureAuth(
-                httpClient, 
-                new XboxSisuRequestSigner(
-                    new DefaultECSigner()));
+            var client = new XboxAuthClient(httpClient);
 
             while (true)
             {
                 try
                 {
-                    var result = await auth.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
+                    var result = await client.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
                     Console.WriteLine(result.Token);
                 }
                 catch (Exception ex)

@@ -3,19 +3,19 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive;
-using XboxAuthNet.XboxLive.Models;
+using XboxAuthNet.XboxLive.Responses;
 
 namespace XboxAuthNet.Test
 {
     [TestFixture]
-    public class TestXboxAuth
+    public class TestXboxResponseHandler
     {
-        private XboxAuth? xbox;
+        private XboxAuthResponseHandler responseHandler = null!;
 
         [SetUp]
         public void SetUp()
         {
-            xbox = new XboxAuth(new HttpClient());
+            responseHandler = new XboxAuthResponseHandler();
         }
 
         static object[] TestExceptionCases =
@@ -67,7 +67,7 @@ namespace XboxAuthNet.Test
             res.Content = new StringContent(resBody);
             res.StatusCode = statusCode;
 
-            var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await XboxRequest.HandleResponse<XboxAuthResponse>(res));
+            var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await responseHandler.HandleResponse<XboxAuthResponse>(res));
             Assert.NotNull(ex);
             Assert.AreEqual(expectedMessage, ex!.Message);
             Assert.AreEqual(expectedError, ex!.Error);
@@ -88,7 +88,7 @@ namespace XboxAuthNet.Test
                 msg.Headers.Add("WWW-Authenticate", wwwAuth);
             msg.StatusCode = HttpStatusCode.Unauthorized;
 
-            var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await XboxRequest.HandleResponse<XboxAuthResponse>(msg));
+            var ex = Assert.ThrowsAsync<XboxAuthException>(async () => await responseHandler.HandleResponse<XboxAuthResponse>(msg));
             Assert.NotNull(ex);
             Assert.AreEqual(ErrorUtils.TryConvertToHexErrorCode(xerr), ex!.Error);
             Assert.AreEqual(wwwAuth, ex!.ErrorMessage);
@@ -102,7 +102,7 @@ namespace XboxAuthNet.Test
             res.Content = new StringContent("{\"IssueInstant\":\"2022-07-29T08:25:28.392348Z\",\"NotAfter\":\"2022-07-30T00:25:28.392348Z\",\"Token\":\"jwt\",\"DisplayClaims\":{\"xui\":[{\"gtg\":\"gtg\",\"xid\":\"xid\",\"uhs\":\"uhs\",\"usr\":\"usr\",\"utr\":\"utr\",\"prv\":\"prv\",\"agg\":\"Adult\"}]}}");
             res.StatusCode = HttpStatusCode.OK;
 
-            var result = await XboxRequest.HandleResponse<XboxAuthResponse>(res);
+            var result = await responseHandler.HandleResponse<XboxAuthResponse>(res);
             Assert.AreEqual("jwt", result.Token);
             Assert.AreEqual("gtg", result.XuiClaims?.Gamertag);
             Assert.AreEqual("xid", result.XuiClaims?.XboxUserId);
@@ -129,7 +129,7 @@ namespace XboxAuthNet.Test
             res.Content = new StringContent(tc);
             res.StatusCode = HttpStatusCode.OK;
 
-            var result = await XboxRequest.HandleResponse<XboxAuthResponse>(res);
+            var result = await responseHandler.HandleResponse<XboxAuthResponse>(res);
             Assert.AreEqual("jwt", result.Token);
             Assert.IsNull(result.XuiClaims);
         }
