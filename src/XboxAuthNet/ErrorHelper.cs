@@ -2,7 +2,7 @@
 
 namespace XboxAuthNet
 {
-    internal static class ErrorUtils
+    internal static class ErrorHelper
     {
         public static string? ConvertToHexErrorCode(string? errorCode)
         {

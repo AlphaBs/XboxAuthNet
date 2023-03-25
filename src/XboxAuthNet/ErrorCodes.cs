@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace XboxAuthNet
+﻿namespace XboxAuthNet
 {
+    // https://github.com/microsoft/xbox-live-api/blob/f1a347b91f5f5dae62c35623719ecf8b9ba68746/Source/Shared/errors_legacy.h#L875
     public class ErrorCodes
     {
         /// <summary>

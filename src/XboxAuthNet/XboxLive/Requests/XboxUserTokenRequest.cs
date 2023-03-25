@@ -27,7 +27,7 @@ namespace XboxAuthNet.XboxLive.Requests
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(UserAuthenticateUrl),
-                Content = HttpUtil.CreateJsonContent(new
+                Content = HttpHelper.CreateJsonContent(new
                 {
                     RelyingParty = RelyingParty,
                     TokenType = "JWT",

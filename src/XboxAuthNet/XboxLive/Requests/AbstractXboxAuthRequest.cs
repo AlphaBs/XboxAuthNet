@@ -23,7 +23,7 @@ namespace XboxAuthNet.XboxLive.Requests
         protected void AddDefaultHeaders(HttpRequestMessage request)
         {
             request.Headers.Add("Accept", "application/json");
-            request.Headers.TryAddWithoutValidation("User-Agent", HttpUtil.UserAgent);
+            request.Headers.TryAddWithoutValidation("User-Agent", HttpHelper.UserAgent);
             request.Headers.Add("Accept-Language", "en-US");
             request.Headers.Add("Cache-Control", "no-store, must-revalidate, no-cache");
             request.Headers.Add("x-xbl-contract-version", ContractVersion ?? "");
