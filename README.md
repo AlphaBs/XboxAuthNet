@@ -1,89 +1,132 @@
 # XboxAuthNet
-Xbox Live authentication
 
-Ported from [xboxlive-auth](https://github.com/XboxReplay/xboxlive-auth)
+Microsoft OAuth 2.0 and Xbox Authentication
 
+## Features
 
-### Install
-Nuget Package: XboxAuthNet  
-or download dlls from [release](https://github.com/AlphaBs/XboxAuthNet/releases)
+- [Microsoft OAuth Code Flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
+- Xbox Authentication
+- Xbox Sisu Authentication with Proof-of-Possession
 
-### Sample program
-[XboxAuthNetTest](https://github.com/AlphaBs/XboxAuthNet/tree/main/XboxAuthNetTest)
+## Install
 
-### Usage
-**Microsoft OAuth: Getting new tokens**
+![Install nuget package XboxAuthNet](https://img.shields.io/nuget/v/XboxAuthNet?label=XboxAuthNet&style=flat-square)
+
+[XboxAuthNet](https://www.nuget.org/packages/XboxAuthNet)
+
+## Usage: Microsoft OAuth
+
+Currently only [auth code flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow) is supported. 
 
 ```csharp
-MicrosoftOAuth oauth = new MicrosoftOAuth("CLIENT_ID", "SCOPE");
-string url = oauth.CreateUrl(); // show url into webbrowser
+// Initialize API client
+var httpClient = new HttpClient();
+var apiClient = new MicrosoftOAuthCodeApiClient("<CLIENT-ID>", "<SCOPES>", httpClient); // replace "SCOPES" to XboxAuth.XboxScope for Xbox Authentication
 
-// execute below codes when the url of webbrowser is changed (ex: NavigationStarting event)
-// redirectUrl: new url of webbrowser
-if (oauth.CheckLoginSuccess(redirectUrl))
+// Authenticate with auth code flow
+var codeFlow = new MicrosoftOAuthCodeFlowBuilder(apiClient)
+    .Build();
+MicrosoftOAuthResponse result = await codeFlow.Authenticate();
+
+// `result.AccessToken` can be used on Xbox Authentication
+// store `result` variable to refresh token later.
+// `MicrosoftOAuthResponse` can be serialized (like json)
+Console.WriteLine(result.AccessToken);
+Console.WriteLine(result.RefreshToken);
+```
+
+### Refresh Microsoft OAuth Token
+```csharp
+if (!result.Validate())
 {
-  MicrosoftOAuthResponse response;
-  if (oauth.TryGetTokens(out response)
-  {
-    // success to get MicrosoftOAuth token
-    // cache AccessToken, RefreshToken and ExpireIn to use next time
-    
-    // response.AccessToken
-    // response.ExpireIn
-    // response.RefreshToken
-    // response.Scope
-    // response.TokenType
-    // response.UserId
-  }
-  else
-  {
-    // failed to login
-  }
+    var newResult = await apiClient.RefreshToken(result.RefreshToken, CancellationToken.None);
+    Console.WriteLine(newResult.AccessToken);
+    Console.WriteLine(newResult.RefreshToken);
 }
 ```
 
-**Microsoft OAuth: Validating & Refreshing tokens**
+## Usage: Xbox Authentication
+
+There are three Xbox authentication methods. You can find a description of each method [here](https://github.com/AlphaBs/XboxAuthNet/wiki/).
+
+### Xbox Basic Authentication
 
 ```csharp
-MicrosoftOAuth oauth = new MicrosoftOAuth("CLIENT_ID", "SCOPE");
-MicrosoftOAuthResponse response = ~~~; // read from cache
+var httpClient = new HttpClient();
+var xboxAuthClient = new XboxAuthClient(httpClient);
 
-if (oauth.TryGetTokens(out response, response.RefreshToken)
-{
-  // success
-  // response.AccessToken
-}
-else
-{
-  // failed to refresh tokens
-}
+var userToken = await xboxAuthClient.RequestUserToken("<microsoft_oauth2_access_token>");
+var xsts = await xboxAuthClient.RequestXsts(userToken.Token, "<relying_party>");
+
+Console.WriteLine(xsts.Token);
 ```
 
-**XboxLive Login**
-
+### Xbox Full Authentication
 ```csharp
-XboxAuth xbox = new XboxAuth();
-var rps = xbox.ExchangeRpsTicketForUserToken("Microsoft OAuth AccessToken");
-var xsts = xbox.ExchangeTokensForXSTSIdentity(
-  rps.Token, // userToken
-  null, // deviceToken
-  null, // titleToken
-  "relyingParty", // relyingParty 
-  null); // optionalDisplayClaims
+var httpClient = new HttpClient();
+var xboxAuthClient = new XboxAuthClient(httpClient);
 
-if (xsts.IsSuccess)
+var userToken = await xboxAuthClient.RequestSignedUserToken(new XboxSignedUserTokenRequest
 {
-  // success
-  // xsts.Token: XSTS Token
-  // xsts.UserHash: UserHash (uhs)
-  // xsts.UserXUID
-  // xsts.IssueInstant
-  // xsts.ExpireOn
-}
-else
+    AccessToken = "<microsoft_oauth2_access_token>",
+    TokenPrefix = AbstractXboxAuthRequest.XboxTokenPrefix
+});
+var deviceToken = await xboxAuthClient.RequestDeviceToken(new XboxDeviceTokenRequest
 {
-  // fail
-  // xsts.Error
-  // xsts.Message
-}
+    DeviceType = XboxDeviceTypes.Nintendo,
+    DeviceVersion = "0.0.0"
+});
+var titleToken = await xboxAuthClient.RequestTitleToken(new XboxTitleTokenRequest
+{
+    AccessToken = "<microsoft_oauth2_access_token>",
+    DeviceToken = deviceToken.Token
+});
+var xsts = await xboxAuthClient.RequestXsts(new XboxXstsRequest
+{
+    UserToken = userToken.Token,
+    DeviceToken = deviceToken.Token,
+    TitleToken = titleToken.Token,
+    RelyingParty = "<relying_party>"
+});
+
+Console.WriteLine(xsts.Token);
 ```
+
+### Xbox Sisu Authentication
+```csharp
+var httpClient = new HttpClient();
+var xboxAuthClient = new XboxAuthClient(httpClient);
+
+var deviceToken = await xboxAuthClient.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
+var sisuResult = await xboxAuthClient.SisuAuth(new XboxSisuAuthRequest
+{
+    AccessToken = "<microsoft_oauth2_access_token>",
+    ClientId = XboxGameTitles.MinecraftJava,
+    DeviceToken = deviceToken.Token,
+    RelyingParty = "<relying_party>"
+});
+
+Console.WriteLine(xsts.Token);
+```
+
+## Example
+
+[Example project](/example/WinForm)
+
+## References
+
+These documents explain how Microsoft OAuth 2.0 works.
+
+[Microsoft OAuth 2.0](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
+
+[Desktop application calling a web api](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/scenarios#desktop-application-calling-a-web-api-in-the-name-of-the-signed-in-user) (XboxAuthNet implements [interactive authentication](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-interactively))
+
+This project was made possible thanks to the contributions of various open-source projects. not used any document from [NDA developer program](https://learn.microsoft.com/en-us/gaming/gdk/_content/gc/getstarted/gc-getstarted-toc)
+
+[MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet)
+
+[xbox-live-api](https://github.com/microsoft/xbox-live-api)
+
+[xboxlive-auth](https://github.com/XboxReplay/xboxlive-auth)
+
+[prismarine-auth](https://github.com/PrismarineJS/prismarine-auth)
