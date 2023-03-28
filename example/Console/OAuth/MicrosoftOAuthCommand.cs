@@ -79,17 +79,5 @@ namespace XboxAuthNetConsole.OAuth
 
             return await _client.ApiClient.RefreshToken(refreshToken, cancellationToken);
         }
-
-        private void printResponse(MicrosoftOAuthResponse response)
-        {
-            Console.WriteLine("Microsoft OAuth Login Success");
-            Console.WriteLine($"AccessToken: {response.AccessToken}");
-            Console.WriteLine($"RefreshToken: {response.RefreshToken}");
-            Console.WriteLine($"ExpiresOn: {response.ExpiresOn}");
-            Console.WriteLine($"IdToken: {response.IdToken}");
-            Console.WriteLine($"Scope: {response.Scope}");
-            Console.WriteLine($"TokenType: {response.TokenType}");
-            Console.WriteLine($"UserId: {response.UserId}");
-        }
     }
 }
