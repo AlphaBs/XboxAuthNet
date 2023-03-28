@@ -1,4 +1,5 @@
 using CommandLine;
+using XboxAuthNet.XboxLive;
 
 namespace XboxAuthNetConsole.Options
 {
@@ -21,14 +22,19 @@ namespace XboxAuthNetConsole.Options
         [Option('t', "accessToken")]
         public string? AccessToken { get; set; }
 
+        [Option("tokenPrefix", Default=XboxAuthConstants.XboxTokenPrefix)]
         public string? TokenPrefix { get; set; }
 
+        [Option("relyingParty", Default=XboxAuthConstants.XboxLiveRelyingParty)]
         public string? RelyingParty { get; set; }
 
+        [Option("clientId")]
         public string? ClientId { get; set; }
 
+        [Option("deviceType", Default=XboxDeviceTypes.Nintendo)]
         public string? DeviceType { get; set; }
 
+        [Option("deviceVersion", Default="0.0.0")]
         public string? DeviceVersion { get; set; }
     }   
 }
