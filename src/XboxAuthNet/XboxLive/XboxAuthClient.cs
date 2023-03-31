@@ -9,8 +9,6 @@ namespace XboxAuthNet.XboxLive
     // https://github.com/PrismarineJS/prismarine-auth/blob/master/src/TokenManagers/XboxTokenManager.js
     public class XboxAuthClient
     {
-        public const string XboxScope = "service::user.auth.xboxlive.com::MBI_SSL";
-
         private readonly HttpClient _httpClient;
 
         public XboxAuthClient(HttpClient httpClient) => 
