@@ -21,7 +21,7 @@ namespace XboxAuthNet.XboxLive.Requests
         protected override HttpRequestMessage BuildRequest()
         {
             if (string.IsNullOrEmpty(AccessToken))
-                throw new InvalidOperationException("Rps was null");
+                throw new InvalidOperationException("AccessToken was null");
 
             var req = new HttpRequestMessage
             {
