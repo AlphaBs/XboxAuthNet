@@ -56,22 +56,11 @@ namespace XboxAuthNet.OAuth
             return this;
         }
 
-        private WebUIOptions createDefaultWebUIOptions() => new WebUIOptions
+        public MicrosoftOAuthCodeFlow Build()
         {
-            ParentObject = null,
-            SynchronizationContext = SynchronizationContext.Current
-        };
-
-        private IWebUI? createDefaultWebUIForPlatform()
-        {
-            IWebUI? ui = null;
-            this.uiOptions ??= createDefaultWebUIOptions();
-
-#if ENABLE_WEBVIEW2
-            ui = new XboxAuthNet.Platforms.WinForm.WebView2WebUI(uiOptions);
-#endif
-
-            return ui;
+            uriChecker ??= createDefaultUriChecker();
+            webUI ??= createDefaultWebUIForPlatform();
+            return new MicrosoftOAuthCodeFlow(_apiClient, webUI, uriChecker);
         }
 
         private IMicrosoftOAuthUriChecker createDefaultUriChecker()
@@ -79,24 +68,16 @@ namespace XboxAuthNet.OAuth
             return new MicrosoftOAuthUriChecker();
         }
 
-        public MicrosoftOAuthCodeFlow Build()
+        private IWebUI createDefaultWebUIForPlatform()
         {
-            if (uriChecker == null)
-            {
-                uriChecker = createDefaultUriChecker();
-            }
-
-            if (webUI == null)
-            {
-                webUI = createDefaultWebUIForPlatform();
-
-                if (webUI == null)
-                {
-                    throw new InvalidOperationException("Set WebUI instance");
-                }
-            }
-
-            return new MicrosoftOAuthCodeFlow(_apiClient, webUI, uriChecker);
+            this.uiOptions ??= createDefaultWebUIOptions();
+            return PlatformManager.CurrentPlatform.CreateWebUI(uiOptions);
         }
+
+        private WebUIOptions createDefaultWebUIOptions() => new WebUIOptions
+        {
+            ParentObject = null,
+            SynchronizationContext = SynchronizationContext.Current
+        };
     }
 }
