@@ -4,12 +4,12 @@ namespace XboxAuthNetConsole
 {
     public class XboxAuthObjectPrinter : IObjectPrinter
     {
-        public bool CanPrint(object obj)
+        public bool CanPrint(object? obj)
         {
             return (obj is XboxAuthResponse) || (obj is XboxSisuResponse);
         }
 
-        public void Print(TextWriter writeTo, object obj)
+        public void Print(TextWriter writeTo, object? obj)
         {
             switch (obj)
             {

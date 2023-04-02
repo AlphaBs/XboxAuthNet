@@ -6,7 +6,8 @@ namespace XboxAuthNetConsole.Options
     {
         Auto,
         Interactive,
-        Silent
+        Silent,
+        Signout
     }
 
     [Verb("oauth")]
@@ -17,6 +18,12 @@ namespace XboxAuthNetConsole.Options
 
         [Option("cache", Default=true)]
         public bool Cache { get; set; } = true;
+
+        [Option("clientId")]
+        public string? ClientId { get; set; }
+
+        [Option("scopes")]
+        public string? Scopes { get; set; }
 
         [Option('t', "accessToken")]
         public string? AccessToken { get; set; }

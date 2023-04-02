@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using XboxAuthNetConsole.Options;
 using XboxAuthNetConsole.Cache;
+using XboxAuthNetConsole.Printer;
 using XboxAuthNet.XboxLive;
 using XboxAuthNet.XboxLive.Requests;
 using XboxAuthNet.XboxLive.Responses;
@@ -8,16 +10,13 @@ namespace XboxAuthNetConsole
 {
     public class XboxAuthCommand : ICommand
     {
-        private readonly XboxAuthClient _authClient;
         private readonly XboxAuthOptions _options;
         private readonly SessionCache _sessionCache;
 
         public XboxAuthCommand(
-            XboxAuthClient authClient,
             XboxAuthOptions options,
             SessionCache sessionCache)
         {
-            this._authClient = authClient;
             this._options = options;
             this._sessionCache = sessionCache;
         }
@@ -29,41 +28,73 @@ namespace XboxAuthNetConsole
 
         public async Task Execute(CancellationToken cancellationToken)
         {
+            if (_options == null)
+                throw new InvalidOperationException("_options was null");
+
+            loadSessionCaches();
+
+            _options.AccessToken = _sessionCache.MicrosoftOAuth?.AccessToken;
+            if (string.IsNullOrEmpty(_options.AccessToken))
+                throw new InvalidOperationException(
+                    "No Microsoft OAuth access token was specified.\n" +
+                    "Specify '--accessToken' or run Microsoft OAuth first");
+
+            var authClient = initializeAuthClient();
             switch (_options.Mode)
             {
                 case XboxAuthLoginMode.Basic:
-                    await basicAuth();
+                    await basicAuth(authClient);
                     printResponse();
                     break;
                 case XboxAuthLoginMode.Full:
-                    await fullAuth();
+                    await fullAuth(authClient);
                     printResponse();
                     break;
                 case XboxAuthLoginMode.Sisu:
-                    var sisuResponse = await sisuAuth();
-                    Program.Instance.Printer.Print(sisuResponse);
+                    var sisuResponse = await sisuAuth(authClient);
+                    ConsolePrinter.Print(sisuResponse);
                     break;
                 default:
-                    return;
+                    throw new InvalidOperationException("Unknown login mode: " + _options.Mode.ToString());
             }
 
             if (_options.Cache)
             {
-                if (userToken != null)
-                    _sessionCache.XboxUserToken = userToken;
-                if (titleToken != null)
-                    _sessionCache.XboxTitleToken = titleToken;
-                if (deviceToken != null)
-                    _sessionCache.XboxDeviceToken = deviceToken;
-                if (xstsToken != null)
-                    _sessionCache.XboxXstsToken = xstsToken;
+                saveSessionCaches();
             }
         }
 
-        private async Task basicAuth()
+        private XboxAuthClient initializeAuthClient()
         {
-            userToken = await _authClient.RequestUserToken(_options.AccessToken);
-            xstsToken = await _authClient.RequestXsts(new XboxXstsRequest
+            return new XboxAuthClient(HttpHelper.SharedHttpClient);
+        }
+
+        private void loadSessionCaches()
+        {
+            userToken = _sessionCache.XboxUserToken;
+            deviceToken = _sessionCache.XboxDeviceToken;
+            titleToken = _sessionCache.XboxTitleToken;
+            xstsToken = _sessionCache.XboxXstsToken;
+        }
+
+        private void saveSessionCaches()
+        {
+            if (userToken != null)
+                _sessionCache.XboxUserToken = userToken;
+            if (titleToken != null)
+                _sessionCache.XboxTitleToken = titleToken;
+            if (deviceToken != null)
+                _sessionCache.XboxDeviceToken = deviceToken;
+            if (xstsToken != null)
+                _sessionCache.XboxXstsToken = xstsToken;
+        }
+
+        private async Task basicAuth(XboxAuthClient authClient)
+        {
+            Debug.Assert(_options.AccessToken != null);
+
+            userToken = await authClient.RequestUserToken(_options.AccessToken);
+            xstsToken = await authClient.RequestXsts(new XboxXstsRequest
             {
                 UserToken = userToken.Token,
                 RelyingParty = _options.RelyingParty,
@@ -73,14 +104,16 @@ namespace XboxAuthNetConsole
             });
         }
 
-        private async Task fullAuth()
+        private async Task fullAuth(XboxAuthClient authClient)
         {
-            userToken = await _authClient.RequestSignedUserToken(new XboxSignedUserTokenRequest
+            Debug.Assert(_options.AccessToken != null);
+
+            userToken = await authClient.RequestSignedUserToken(new XboxSignedUserTokenRequest
             {
                 AccessToken = _options.AccessToken,
                 TokenPrefix = _options.TokenPrefix
             });
-            deviceToken = await _authClient.RequestDeviceToken(new XboxDeviceTokenRequest
+            deviceToken = await authClient.RequestDeviceToken(new XboxDeviceTokenRequest
             {
                 DeviceType = _options.DeviceType,
                 DeviceVersion = _options.DeviceVersion
@@ -90,7 +123,7 @@ namespace XboxAuthNetConsole
             //    AccessToken = accessToken,
             //    DeviceToken = deviceToken.Token
             //});
-            xstsToken = await _authClient.RequestXsts(new XboxXstsRequest
+            xstsToken = await authClient.RequestXsts(new XboxXstsRequest
             {
                 UserToken = userToken.Token,
                 DeviceToken = deviceToken?.Token,
@@ -99,9 +132,11 @@ namespace XboxAuthNetConsole
             });
         }
 
-        private async Task<XboxSisuResponse> sisuAuth()
+        private async Task<XboxSisuResponse> sisuAuth(XboxAuthClient authClient)
         {
-            var result = await _authClient.SisuAuth(new XboxSisuAuthRequest
+            Debug.Assert(_options.AccessToken != null);
+            
+            var result = await authClient.SisuAuth(new XboxSisuAuthRequest
             {
                 TokenPrefix = _options.TokenPrefix,
                 AccessToken = _options.AccessToken,
@@ -124,13 +159,13 @@ namespace XboxAuthNetConsole
         {
             Console.WriteLine("Xbox Auth Success");
             Console.WriteLine("UserToken: ");
-            printResponse(userToken);
+            ConsolePrinter.Print(userToken);
             Console.WriteLine("DeviceToken: ");
-            printResponse(deviceToken);
+            ConsolePrinter.Print(deviceToken);
             Console.WriteLine("TitleToken: ");
-            printResponse(titleToken);
+            ConsolePrinter.Print(titleToken);
             Console.WriteLine("XstsToken: ");
-            printResponse(xstsToken);
+            ConsolePrinter.Print(xstsToken);
         }
     }
 }
