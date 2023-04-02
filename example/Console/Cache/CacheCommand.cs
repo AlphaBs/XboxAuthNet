@@ -1,12 +1,15 @@
+using XboxAuthNetConsole.Serializer;
+using XboxAuthNetConsole.Printer;
+
 namespace XboxAuthNetConsole.Cache
 {
     public class CacheCommand : ICommand
     {
-        private readonly SessionCacheManager _cacheManager;
+        private readonly ISerializer<SessionCache> _cacheManager;
         private readonly CacheOptions _options;
 
         public CacheCommand(
-            SessionCacheManager cacheManager, 
+            ISerializer<SessionCache> cacheManager, 
             CacheOptions options)
         {
             _cacheManager = cacheManager;
@@ -21,21 +24,40 @@ namespace XboxAuthNetConsole.Cache
             }
             else
             {  
-                printCache();
+                await printCache();
             }
         }
 
-        private void printCache()
+        private async Task printCache()
         {
-            
+            Console.WriteLine("Cached session: ");
+
+            var cache = await _cacheManager.Load();
+            if (cache == null)
+            {
+                Console.WriteLine("Empty cache");
+                return;
+            }
+
+            Console.WriteLine("Microsoft OAuth: ");
+            ConsolePrinter.Print(cache.MicrosoftOAuth);
+            Console.WriteLine("XboxUserToken: ");
+            ConsolePrinter.Print(cache.XboxUserToken);
+            Console.WriteLine("XboxDeviceToken: ");
+            ConsolePrinter.Print(cache.XboxDeviceToken);
+            Console.WriteLine("XboxTitleToken: ");
+            ConsolePrinter.Print(cache.XboxTitleToken);
+            Console.WriteLine("XboxXstsToken: ");
+            ConsolePrinter.Print(cache.XboxXstsToken);
+
         }
 
         private async Task clearCache()
         {
-            await _cacheManager.SaveCache(null);
+            await _cacheManager.Save(null);
             Console.WriteLine("Cache cleared");
 
-            printCache();
+            await printCache();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace XboxAuthNetConsole
 
         }
 
-        public PrinterException(object obj)
+        public PrinterException(object? obj)
          : base("Cannot print this type of object: " + obj?.GetType()?.Name)
         {
 

@@ -38,7 +38,7 @@ namespace XboxAuthNetWinForm
         private void initializeOAuth()
         {
             //var apiClient = new MicrosoftOAuthCodeApiClient("00000000402B5328", XboxAuth.XboxScope, httpClient);
-            var apiClient = new MicrosoftOAuthCodeApiClient("00000000441cc96b", XboxAuthClient.XboxScope, httpClient);
+            var apiClient = new MicrosoftOAuthCodeApiClient("00000000441cc96b", XboxAuthConstants.XboxScope, httpClient);
             //var apiClient = new MicrosoftOAuthCodeApiClient("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
 
             oauth = new MicrosoftOAuthCodeFlowBuilder(apiClient)

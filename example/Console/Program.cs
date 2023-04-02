@@ -1,15 +1,13 @@
 ﻿using XboxAuthNetConsole.Cache;
 using XboxAuthNetConsole.OAuth;
 using XboxAuthNetConsole.Options;
-using XboxAuthNet.XboxLive;
+using XboxAuthNetConsole.Serializer;
 using CommandLine;
 
 namespace XboxAuthNetConsole
 {
     public class Program
     {
-        public static Program Instance = new Program();
-
         public static async Task<int> Main(string[] args)
         {
             var parseResult = Parser.Default.ParseArguments<
@@ -18,49 +16,84 @@ namespace XboxAuthNetConsole
                 CacheOptions
             >(args);
 
-            await Instance.initialize();
-
+            var program = new Program();
             var result = await parseResult.MapResult(
-                    (MicrosoftOAuthOptions opts) => Instance.runMicrosoftOAuthCommand(opts),
-                    (XboxAuthOptions opts) => Instance.runXboxAuthCommand(opts),
-                    (CacheOptions opts) => Instance.runCacheCommand(opts),
+                    (MicrosoftOAuthOptions opts) => program.runMicrosoftOAuthCommand(opts),
+                    (XboxAuthOptions opts) => program.runXboxAuthCommand(opts),
+                    (CacheOptions opts) => program.runCacheCommand(opts),
                     errs => Task.FromResult(-1)
                 );
             return result;
         }
 
-        public IObjectPrinter Printer;
+        private readonly string _settingFilePath = Path.Combine(Environment.CurrentDirectory, "settings.json");
+        private readonly string _sessionCacheFilePath = Path.Combine(Environment.CurrentDirectory, "session.json");
 
+        private ISerializer<SessionCache>? _sessionCacheSerializer;
+        private SessionCache? _sessionCache;
         private CancellationToken cancellationToken;
-        private MicrosoftOAuthClient? oauthClient;
-        private XboxAuthClient? xboxAuthClient;
-        private SessionCacheManager? cacheManager;
-        private SessionCache? sessionCache;
-
-        private async Task initialize()
-        {
-            
-        }
 
         private async Task<int> runMicrosoftOAuthCommand(MicrosoftOAuthOptions opts)
         {
             Console.WriteLine("Microsoft OAuth");
-            var command = new MicrosoftOAuthCommand(oauthClient, opts, sessionCache);
+
+            var settings = await getSettings();
+            opts.ClientId ??= settings?.ClientId;
+            opts.Scopes ??= settings?.Scopes;
+
+            var sessionCache = await getSessionCache();
+            var command = new MicrosoftOAuthCommand(opts, sessionCache);
             return await runCommand(command);
         }
 
         private async Task<int> runXboxAuthCommand(XboxAuthOptions opts)
         {
+            if (string.IsNullOrEmpty(opts.ClientId))
+            {
+                var settings = await getSettings();
+                opts.ClientId = settings.ClientId;
+            }
+
             Console.WriteLine("XboxLive Auth");
-            var command = new XboxAuthCommand(xboxAuthClient, opts, sessionCache);
+            var sessionCache = await getSessionCache();
+            var command = new XboxAuthCommand(opts, sessionCache);
             return await runCommand(command);
         }
 
         private async Task<int> runCacheCommand(CacheOptions opts)
         {
             Console.WriteLine("Cache Manager");
-            var command = new CacheCommand(cacheManager, opts);
+            var sessionCacheSerializer = initializeSessionCacheSerializer();
+            var command = new CacheCommand(sessionCacheSerializer, opts);
             return await runCommand(command);
+        }
+
+        private async Task<Settings> getSettings()
+        {
+            var settingSerializer = new JsonFileSerializer<Settings>(_settingFilePath);
+            var settings = await settingSerializer.Load();
+            if (settings == null)
+                settings = new Settings();
+            return settings;
+        }
+
+        private async Task<SessionCache> getSessionCache()
+        {
+            if (_sessionCacheSerializer == null)
+            {
+                _sessionCacheSerializer = initializeSessionCacheSerializer();
+                _sessionCache = await _sessionCacheSerializer.Load();
+            }
+
+            if (_sessionCache == null)
+                _sessionCache = new SessionCache();
+            
+            return _sessionCache;
+        }
+
+        private ISerializer<SessionCache> initializeSessionCacheSerializer()
+        {
+            return new JsonFileSerializer<SessionCache>(_sessionCacheFilePath);
         }
 
         private async Task<int> runCommand(ICommand command)
@@ -68,12 +101,21 @@ namespace XboxAuthNetConsole
             try
             {
                 await command.Execute(cancellationToken);
+                await finalize();
                 return 0;
             }
             catch (Exception ex)
             {   
                 Console.WriteLine(ex.ToString());
                 return -1;
+            }
+        }
+
+        private async Task finalize()
+        {
+            if (_sessionCacheSerializer != null)
+            {
+                await _sessionCacheSerializer.Save(_sessionCache);
             }
         }
     }

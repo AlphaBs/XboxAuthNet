@@ -4,12 +4,12 @@ namespace XboxAuthNetConsole
 {
     public class OAuthObjectPrinter : IObjectPrinter
     {
-        public bool CanPrint(object obj)
+        public bool CanPrint(object? obj)
         {
             return obj is MicrosoftOAuthResponse;
         }
 
-        public void Print(TextWriter writeTo, object obj)
+        public void Print(TextWriter writeTo, object? obj)
         {
             var oauthResponse = obj as MicrosoftOAuthResponse;
             if (oauthResponse == null)
