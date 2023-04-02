@@ -23,14 +23,17 @@ namespace XboxAuthNet.XboxLive.Requests
             if (string.IsNullOrEmpty(RelyingParty))
                 throw new InvalidOperationException("RelyingParty was null");
 
+            var id = this.Id ?? nextUUID();
+            var serialNumber = this.SerialNumber ?? nextUUID();
+
             return new
             {
                 Properties = new
                 {
                     AuthMethod = "ProofOfPossession",
-                    Id = "{" + Id ?? nextUUID() + "}",
+                    Id = "{" + id + "}",
                     DeviceType = DeviceType,
-                    SerialNumber = "{" + SerialNumber ?? nextUUID() + "}",
+                    SerialNumber = "{" + serialNumber + "}",
                     Version = DeviceVersion,
                     ProofKey = Signer.ProofKey
                 },
