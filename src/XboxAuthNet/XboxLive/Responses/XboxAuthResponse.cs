@@ -5,10 +5,6 @@ namespace XboxAuthNet.XboxLive.Responses
 {
     public class XboxAuthResponse
     {
-        // for backward compatibility
-        public string? UserXUID => XuiClaims?.XboxUserId;
-        public string? UserHash => XuiClaims?.UserHash;
-
         [JsonPropertyName("DisplayClaims")]
         [JsonConverter(typeof(XboxAuthXuiClaimsJsonConverter))]
         public XboxAuthXuiClaims? XuiClaims { get; set; }
@@ -31,7 +27,7 @@ namespace XboxAuthNet.XboxLive.Responses
             if (string.IsNullOrEmpty(ExpireOn))
                 return false;
 
-            if (DateTime.Parse(ExpireOn) < DateTime.Now)
+            if (DateTime.Parse(ExpireOn) < DateTime.UtcNow)
                 return false;
 
             if (string.IsNullOrEmpty(Token))

@@ -92,8 +92,7 @@ namespace XboxAuthNet.OAuth
 
         public string CreateUrlForOAuth(MicrosoftOAuthParameters? param)
         {
-            if (param == null)
-                param = new MicrosoftOAuthParameters();
+            param ??= new MicrosoftOAuthParameters();
 
             if (string.IsNullOrEmpty(param.ResponseType))
                 param.ResponseType = "code";
