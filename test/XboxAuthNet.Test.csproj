@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\XboxAuthNet\XboxAuthNet.csproj" />
+    <ProjectReference Include="../src/XboxAuthNet.csproj" />
   </ItemGroup>
 
 </Project>
