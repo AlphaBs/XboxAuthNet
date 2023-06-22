@@ -1,4 +1,4 @@
-using XboxAuthNet.OAuth.Models;
+using XboxAuthNet.OAuth;
 
 namespace XboxAuthNetConsole
 {
@@ -26,7 +26,6 @@ namespace XboxAuthNetConsole
             writeTo.WriteLine($"IdToken: {response.IdToken}");
             writeTo.WriteLine($"Scope: {response.Scope}");
             writeTo.WriteLine($"TokenType: {response.TokenType}");
-            writeTo.WriteLine($"UserId: {response.UserId}");
         }
     }
 }

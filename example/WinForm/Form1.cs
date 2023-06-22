@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using XboxAuthNet.OAuth;
-using XboxAuthNet.OAuth.Models;
+using XboxAuthNet.OAuth.CodeFlow;
 using XboxAuthNet.XboxLive;
 using XboxAuthNet.XboxLive.Requests;
 using XboxAuthNet.XboxLive.Responses;
@@ -22,7 +22,7 @@ namespace XboxAuthNetWinForm
             InitializeComponent();
         }
 
-        MicrosoftOAuthCodeFlow oauth;
+        CodeFlowAuthenticator oauth;
         XboxAuthClient xboxAuthClient;
         string sessionFilePath = "auth.json";
 
@@ -38,10 +38,10 @@ namespace XboxAuthNetWinForm
         private void initializeOAuth()
         {
             //var apiClient = new MicrosoftOAuthCodeApiClient("00000000402B5328", XboxAuth.XboxScope, httpClient);
-            var apiClient = new MicrosoftOAuthCodeApiClient("00000000441cc96b", XboxAuthConstants.XboxScope, httpClient);
+            var apiClient = new CodeFlowLiveApiClient("00000000441cc96b", XboxAuthConstants.XboxScope, httpClient);
             //var apiClient = new MicrosoftOAuthCodeApiClient("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
 
-            oauth = new MicrosoftOAuthCodeFlowBuilder(apiClient)
+            oauth = new CodeFlowBuilder(apiClient)
                 .WithUIParent(this)
                 .Build();
         }
@@ -85,7 +85,7 @@ namespace XboxAuthNetWinForm
                 }
 
                 log("get tokens with webview2");
-                res = await oauth.Authenticate();
+                res = await oauth.AuthenticateInteractively();
                 loginSuccess(res);
                 log("webview2 login success");
                 return;
@@ -205,15 +205,14 @@ namespace XboxAuthNetWinForm
             textBox3.Text = res.RefreshToken;
             textBox4.Text = res.Scope;
             textBox5.Text = res.TokenType;
-            textBox6.Text = res.UserId;
         }
 
         private void showResponse(XboxAuthResponse res)
         {
             txtXboxAccessToken.Text = res.Token;
             txtXboxExpire.Text = res.ExpireOn;
-            txtXboxUserXUID.Text = res.UserXUID;
-            txtXboxUserHash.Text = res.UserHash;
+            txtXboxUserXUID.Text = res.XuiClaims.XboxUserId;
+            txtXboxUserHash.Text = res.XuiClaims.UserHash;
         }
 
         private void loginSuccess(MicrosoftOAuthResponse res)

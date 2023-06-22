@@ -1,4 +1,4 @@
-using XboxAuthNet.OAuth.Models;
+using XboxAuthNet.OAuth;
 using XboxAuthNet.XboxLive.Responses;
 
 namespace XboxAuthNetConsole.Cache

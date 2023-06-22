@@ -7,7 +7,8 @@ namespace XboxAuthNetConsole.Options
         Auto,
         Interactive,
         Silent,
-        Signout
+        Signout,
+        CreateUrl
     }
 
     [Verb("oauth")]

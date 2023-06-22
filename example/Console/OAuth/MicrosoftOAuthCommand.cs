@@ -1,8 +1,9 @@
 using XboxAuthNet.OAuth;
-using XboxAuthNet.OAuth.Models;
+using XboxAuthNet.OAuth.CodeFlow;
 using XboxAuthNetConsole.Options;
 using XboxAuthNetConsole.Cache;
 using XboxAuthNetConsole.Printer;
+using XboxAuthNet.XboxLive;
 
 namespace XboxAuthNetConsole.OAuth
 {
@@ -38,6 +39,9 @@ namespace XboxAuthNetConsole.OAuth
                 case MicrosoftOAuthMode.Signout:
                     response = await signout(cancellationToken);
                     break;
+                case MicrosoftOAuthMode.CreateUrl:
+                    //ConsolePrinter.Print(createUrl());
+                    return;
                 default:
                     throw new InvalidOperationException("Unknown login mode: " + _options.Mode.ToString());
             }
@@ -64,11 +68,14 @@ namespace XboxAuthNetConsole.OAuth
         {
             Console.WriteLine("Start Microsoft OAuth interactive login");
             var codeFlow = initializeCodeFlow();
-            return await codeFlow.Authenticate(new MicrosoftOAuthParameters
-            {
-                LoginHint = _options.LoginHint,
-                Prompt = _options.Prompt
-            }, cancellationToken);
+            return await codeFlow.AuthenticateInteractively(
+                code => 
+                {
+                    code.LoginHint = _options.LoginHint;
+                    code.Prompt = _options.Prompt;
+                },
+                token => {},
+                cancellationToken);
         }
 
         private async Task<MicrosoftOAuthResponse> silentAuth(CancellationToken cancellationToken)
@@ -87,30 +94,32 @@ namespace XboxAuthNetConsole.OAuth
                     "Specify '--refreshToken' or login as interactive mode first.", -1);
             }
 
-            var apiClient = initializeApiClient();
-            return await apiClient.RefreshToken(refreshToken, cancellationToken);
+            var codeFlow = initializeCodeFlow();
+            return await codeFlow.AuthenticateSilently(refreshToken, cancellationToken);
         }
 
         private async Task<MicrosoftOAuthResponse> signout(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var codeFlow = initializeCodeFlow();
+            await codeFlow.Signout(cancellationToken);
+            return new MicrosoftOAuthResponse();
         }
 
-        private MicrosoftOAuthCodeFlow initializeCodeFlow()
+        private CodeFlowAuthenticator initializeCodeFlow()
         {
             var apiClient = initializeApiClient();
-            return new MicrosoftOAuthCodeFlowBuilder(apiClient)
+            return new CodeFlowBuilder(apiClient)
                 .Build();
         }
 
-        private MicrosoftOAuthCodeApiClient initializeApiClient()
+        private ICodeFlowApiClient initializeApiClient()
         {
             if (string.IsNullOrEmpty(_options.ClientId))
                 throw new InvalidOperationException("ClientId was null. Specify '--clientId' option or set value of settings.json file");
             if (string.IsNullOrEmpty(_options.Scopes))
                 throw new InvalidOperationException("Scopes was null. Specify '--scopes' option or set value of settings.json file");
                 
-            return new MicrosoftOAuthCodeApiClient(_options.ClientId, _options.Scopes, HttpHelper.SharedHttpClient);
+            return new CodeFlowLiveApiClient(_options.ClientId, _options.Scopes, HttpHelper.SharedHttpClient);
         }
     }
 }
