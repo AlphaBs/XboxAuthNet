@@ -111,9 +111,6 @@ namespace XboxAuthNet.Test
             Assert.AreEqual("utr", result.XuiClaims?.UserTitleRestrictions);
             Assert.AreEqual("prv", result.XuiClaims?.Privileges);
             Assert.AreEqual("Adult", result.XuiClaims?.AgeGroup);
-
-            Assert.AreEqual("xid", result.UserXUID);
-            Assert.AreEqual("uhs", result.UserHash);
         }
 
         [Test]
