@@ -1,9 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.OAuth.CodeFlow;
+namespace XboxAuthNet.OAuth.CodeFlow.Parameters;
 
-public class CodeFlowQuery
+public class CodeFlowParameter
 {
+    public string? Tenant { get; set; }
+
     [JsonPropertyName("client_id")]
     public string? ClientId { get; set; }
 

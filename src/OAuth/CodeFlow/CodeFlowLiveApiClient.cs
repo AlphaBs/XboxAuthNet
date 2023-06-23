@@ -1,8 +1,4 @@
-﻿using System.Text.Json;
-
-// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
-// https://docs.microsoft.com/en-us/advertising/guides/authentication-oauth
-// https://docs.microsoft.com/en-us/advertising/shopping-content/code-example-authentication-oauth
+﻿using XboxAuthNet.OAuth.CodeFlow.Parameters;
 
 namespace XboxAuthNet.OAuth.CodeFlow;
 
@@ -24,28 +20,35 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
     public string ClientId { get; }
     public string Scope { get; }
 
-    public string CreateAuthorizeCodeUrl(CodeFlowAuthorizationQuery query)
+    public string CreateAuthorizeCodeUrl(CodeFlowAuthorizationParameter parameter)
     {
-        if (string.IsNullOrEmpty(query.ClientId))
-            query.ClientId = ClientId;
-        if (string.IsNullOrEmpty(query.Scope))
-            query.Scope = Scope;
-        return OAuthAuthorize + "?" + HttpHelper.GetQueryString(query.ToQueryDictionary());
+        setCommonParameters(parameter);
+        var query = parameter.ToQueryDictionary();
+        return OAuthAuthorize + "?" + HttpHelper.GetQueryString(query);
     }
 
     public string CreateSignoutUrl() =>
-        "https://login.microsoftonline.com/consumer/oauth2/v2.0/logout";
+        CreateSignoutUrl("consumer");
 
-    public async Task<MicrosoftOAuthResponse> RequestToken(
-        CodeFlowQuery query, 
+    public string CreateSignoutUrl(string tenant) =>
+        $"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/logout";
+
+    public Task<MicrosoftOAuthResponse> GetAccessToken(
+        CodeFlowAccessTokenParameter parameter, 
+        CancellationToken cancellationToken) =>
+        requestToken(parameter, cancellationToken);
+
+    public Task<MicrosoftOAuthResponse> RefreshToken(
+        CodeFlowRefreshTokenParameter parameter,
+        CancellationToken cancellationToken) =>
+        requestToken(parameter, cancellationToken);
+
+    private async Task<MicrosoftOAuthResponse> requestToken(
+        CodeFlowParameter parameter, 
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(query.ClientId))
-            query.ClientId = ClientId;
-        if (string.IsNullOrEmpty(query.Scope))
-            query.Scope = Scope;
-
-        var queryDict = query.ToQueryDictionary();
+        setCommonParameters(parameter);
+        var queryDict = parameter.ToQueryDictionary();
         return await microsoftOAuthRequest(new HttpRequestMessage
         {
             Method = HttpMethod.Post,
@@ -70,5 +73,15 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
         var statusCode = (int)res.StatusCode;
         var reasonPhrase = res.ReasonPhrase;
         return MicrosoftOAuthResponse.FromHttpResponse(resBody, statusCode, reasonPhrase);
+    }
+
+    private void setCommonParameters(CodeFlowParameter parameter)
+    {
+        parameter.Tenant = "consumer";
+        
+        if (string.IsNullOrEmpty(parameter.ClientId))
+            parameter.ClientId = ClientId;
+        if (string.IsNullOrEmpty(parameter.Scope))
+            parameter.Scope = Scope;
     }
 }
