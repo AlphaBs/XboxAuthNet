@@ -38,9 +38,13 @@ namespace XboxAuthNetWinForm
         private void initializeOAuth()
         {
             //var apiClient = new MicrosoftOAuthCodeApiClient("00000000402B5328", XboxAuth.XboxScope, httpClient);
-            var apiClient = new CodeFlowLiveApiClient("00000000441cc96b", XboxAuthConstants.XboxScope, httpClient);
+            //var apiClient = new CodeFlowLiveApiClient("00000000441cc96b", XboxAuthConstants.XboxScope, httpClient);
             //var apiClient = new MicrosoftOAuthCodeApiClient("499c8d36-be2a-4231-9ebd-ef291b7bb64c", XboxAuth.XboxScope, httpClient);
 
+            txtMSClientId.Text = XboxGameTitles.MinecraftJava;
+            txtMSScope.Text = XboxAuthConstants.XboxScope;
+
+            var apiClient = new CodeFlowLiveApiClient(txtMSClientId.Text, txtMSScope.Text, new HttpClient());
             oauth = new CodeFlowBuilder(apiClient)
                 .WithUIParent(this)
                 .Build();
@@ -136,16 +140,16 @@ namespace XboxAuthNetWinForm
                     DeviceType = XboxDeviceTypes.Nintendo,
                     DeviceVersion = "0.0.0"
                 });
-                var titleToken = await xboxAuthClient.RequestTitleToken(new XboxTitleTokenRequest
-                {
-                    AccessToken = textBox1.Text,
-                    DeviceToken = deviceToken.Token
-                });
+                //var titleToken = await xboxAuthClient.RequestTitleToken(new XboxTitleTokenRequest
+                //{
+                //    AccessToken = textBox1.Text,
+                //    DeviceToken = deviceToken.Token
+                //});
                 var xsts = await xboxAuthClient.RequestXsts(new XboxXstsRequest
                 {
                     UserToken = userToken.Token,
                     DeviceToken = deviceToken.Token,
-                    TitleToken = titleToken.Token,
+                    //TitleToken = titleToken.Token,
                     RelyingParty = txtXboxRelyingParty.Text
                 });
 
@@ -172,9 +176,9 @@ namespace XboxAuthNetWinForm
                 var sisuResult = await xboxAuthClient.SisuAuth(new XboxSisuAuthRequest
                 {
                     AccessToken = textBox1.Text,
-                    ClientId = XboxGameTitles.MinecraftJava,
+                    ClientId = txtMSClientId.Text,
                     DeviceToken = deviceToken.Token,
-                    RelyingParty = txtXboxRelyingParty.Text
+                    RelyingParty = txtXboxRelyingParty.Text,
                 });
 
                 showResponse(sisuResult.AuthorizationToken);
