@@ -2,10 +2,11 @@ namespace XboxAuthNet.OAuth.CodeFlow;
 
 public class CodeFlowQueryFactory
 {
-    const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
+    public const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
 
     public CodeFlowAuthorizationQuery CreateAuthorizeCodeQuery() => new ()
     {
+        RedirectUri = OAuthDesktop,
         ResponseType = "code",
         ResponseMode = "query",
         Prompt = "select_account"

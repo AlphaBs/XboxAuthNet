@@ -31,10 +31,7 @@ public class CodeFlowAuthenticator
     {
         var codeQuery = _queryFactory.CreateAuthorizeCodeQuery();
         codeQueryInvoker(codeQuery);
-
-        var tokenQuery = _queryFactory.CreateAccessTokenQuery();
-        tokenQueryInvoker(tokenQuery);
-
+        
         var uri = _client.CreateAuthorizeCodeUrl(codeQuery);
         var authCode = await _ui.DisplayDialogAndInterceptUri(
             new Uri(uri), _uriChecker, cancellationToken);
@@ -44,8 +41,10 @@ public class CodeFlowAuthenticator
             throw new AuthCodeException(authCode.Error, authCode.ErrorDescription);
         }
 
-        if (string.IsNullOrEmpty(tokenQuery.Code))
-            tokenQuery.Code = authCode.Code;
+        var tokenQuery = _queryFactory.CreateAccessTokenQuery();
+        tokenQuery.RedirectUrl = codeQuery.RedirectUri;
+        tokenQuery.Code = authCode.Code;
+        tokenQueryInvoker(tokenQuery);
 
         return await _client.RequestToken(
             tokenQuery, 

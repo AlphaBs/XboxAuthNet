@@ -9,7 +9,7 @@ public class CodeFlowAccessTokenQuery : CodeFlowQuery
     [JsonPropertyName("code")]
     public string? Code { get; set; }
 
-    [JsonPropertyName("redirect_url")]
+    [JsonPropertyName("redirect_uri")]
     public string? RedirectUrl { get; set; }
 
     [JsonPropertyName("grant_type")]
