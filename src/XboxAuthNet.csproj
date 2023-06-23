@@ -32,15 +32,15 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>XboxAuthNet.Test</_Parameter1>
         </AssemblyAttribute>
-        <PackageReference Include="ConfigureAwait.Fody" Version="3.3.1" PrivateAssets="All" />
-        <PackageReference Include="Fody" Version="6.6.2">
+        <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2" PrivateAssets="All" />
+        <PackageReference Include="Fody" Version="6.7.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
-        <PackageReference Include="System.Text.Json" Version="6.0.0" />
+        <PackageReference Include="System.Net.Http.Json" Version="6.0.1" />
+        <PackageReference Include="System.Text.Json" Version="6.0.8" />
 
-        <None Include="../README.md" Pack="true" PackagePath="/"/>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -60,7 +60,7 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNetFramework)'">
         <Compile Include="Platforms/WinForm/**/*" />
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1210.39" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
         <Reference Include="System.Web" />
     </ItemGroup>
 
@@ -71,6 +71,6 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNet5Win)'">
         <Compile Include="Platforms/WinForm/**/*" />
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1210.39" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
     </ItemGroup>
 </Project>
