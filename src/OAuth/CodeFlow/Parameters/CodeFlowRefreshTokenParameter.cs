@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.OAuth.CodeFlow;
+namespace XboxAuthNet.OAuth.CodeFlow.Parameters;
 
-public class CodeFlowRefreshTokenQuery : CodeFlowQuery
+public class CodeFlowRefreshTokenParameter : CodeFlowParameter
 {
     [JsonPropertyName("grant_type")]
     public string? GrantType { get; set; }

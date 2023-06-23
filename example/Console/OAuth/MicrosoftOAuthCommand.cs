@@ -68,14 +68,11 @@ namespace XboxAuthNetConsole.OAuth
         {
             Console.WriteLine("Start Microsoft OAuth interactive login");
             var codeFlow = initializeCodeFlow();
-            return await codeFlow.AuthenticateInteractively(
-                code => 
-                {
-                    code.LoginHint = _options.LoginHint;
-                    code.Prompt = _options.Prompt;
-                },
-                token => {},
-                cancellationToken);
+            return await codeFlow.AuthenticateInteractively(new ()
+            {
+                LoginHint = _options.LoginHint,
+                Prompt = _options.Prompt
+            }, cancellationToken);
         }
 
         private async Task<MicrosoftOAuthResponse> silentAuth(CancellationToken cancellationToken)

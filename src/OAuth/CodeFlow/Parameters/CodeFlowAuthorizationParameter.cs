@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.OAuth.CodeFlow;
+namespace XboxAuthNet.OAuth.CodeFlow.Parameters;
 
-public class CodeFlowAuthorizationQuery : CodeFlowQuery
+public class CodeFlowAuthorizationParameter : CodeFlowParameter
 {
     /// <summary>
     /// response_type: id_token, token, code

@@ -1,10 +1,11 @@
 using System.Text.Json.Serialization;
 
-namespace XboxAuthNet.OAuth.CodeFlow;
+namespace XboxAuthNet.OAuth.CodeFlow.Parameters;
 
-public class CodeFlowAccessTokenQuery : CodeFlowQuery
+public class CodeFlowAccessTokenParameter : CodeFlowParameter
 {
     public const string DefaultClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+
 
     [JsonPropertyName("code")]
     public string? Code { get; set; }
@@ -26,7 +27,4 @@ public class CodeFlowAccessTokenQuery : CodeFlowQuery
 
     [JsonPropertyName("client_assertion")]
     public string? CilentAssertion { get; set; }
-
-    [JsonPropertyName("refresh_token")]
-    public string? RefreshToken { get; set; }
 }
