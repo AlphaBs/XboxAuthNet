@@ -24,8 +24,14 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
     public string ClientId { get; }
     public string Scope { get; }
 
-    public string CreateAuthorizeCodeUrl(CodeFlowAuthorizationQuery query) =>
-        OAuthAuthorize + "?" + HttpHelper.GetQueryString(query.ToQueryDictionary());
+    public string CreateAuthorizeCodeUrl(CodeFlowAuthorizationQuery query)
+    {
+        if (string.IsNullOrEmpty(query.ClientId))
+            query.ClientId = ClientId;
+        if (string.IsNullOrEmpty(query.Scope))
+            query.Scope = Scope;
+        return OAuthAuthorize + "?" + HttpHelper.GetQueryString(query.ToQueryDictionary());
+    }
 
     public string CreateSignoutUrl() =>
         "https://login.microsoftonline.com/consumer/oauth2/v2.0/logout";

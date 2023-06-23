@@ -15,7 +15,7 @@ public class CodeFlowQuery
     public Dictionary<string, string?> ToQueryDictionary()
     {
         var query = new Dictionary<string, string?>();
-        var props = GetType().GetProperties(System.Reflection.BindingFlags.Public);
+        var props = GetType().GetProperties();
         foreach (var prop in props)
         {
             var value = prop.GetMethod?.Invoke(this, null)?.ToString();
