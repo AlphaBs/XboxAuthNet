@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using XboxAuthNet.XboxLive.Crypto;
 using XboxAuthNet.XboxLive.Responses;
 
 namespace XboxAuthNet.XboxLive.Requests
@@ -13,7 +14,7 @@ namespace XboxAuthNet.XboxLive.Requests
         public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
 
         protected override string RequestUrl => "https://title.auth.xboxlive.com/title/authenticate";
-        protected override object BuildBody()
+        protected override object BuildBody(object proofKey)
         {
             if (string.IsNullOrEmpty(AccessToken))
                 throw new InvalidOperationException("AccessToken was null");
@@ -28,16 +29,16 @@ namespace XboxAuthNet.XboxLive.Requests
                     DeviceToken = DeviceToken,
                     RpsTicket = TokenPrefix + AccessToken,
                     SiteName = "user.auth.xboxlive.com",
-                    ProofKey = Signer.ProofKey,
+                    ProofKey = proofKey,
                 },
                 RelyingParty = RelyingParty,
                 TokenType = "JWT"
             };
         }
 
-        public Task<XboxAuthResponse> Send(HttpClient httpClient)
+        public Task<XboxAuthResponse> Send(HttpClient httpClient, IXboxRequestSigner signer)
         {
-            return Send<XboxAuthResponse>(httpClient);
+            return Send<XboxAuthResponse>(httpClient, signer);
         }
     }
 }

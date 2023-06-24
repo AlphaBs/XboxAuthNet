@@ -10,7 +10,7 @@ namespace XboxAuthNet.Test
         public async Task TestSignedRequestINFINITELY()
         {
             var httpClient = new HttpClient();
-            var client = new XboxAuthClient(httpClient);
+            var client = new XboxSignedClient(httpClient);
 
             while (true)
             {

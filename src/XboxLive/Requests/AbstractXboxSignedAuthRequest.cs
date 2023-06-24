@@ -1,41 +1,43 @@
-using System;
 using System.Text;
-using System.Net.Http;
 using System.Text.Json;
 using XboxAuthNet.XboxLive.Crypto;
+using XboxAuthNet.XboxLive.Responses;
 
-namespace XboxAuthNet.XboxLive.Requests
+namespace XboxAuthNet.XboxLive.Requests;
+
+public abstract class AbstractXboxSignedAuthRequest
 {
-    public abstract class AbstractXboxSignedAuthRequest : AbstractXboxAuthRequest
+    public XboxAuthResponseHandler ResponseHandler { get; set; } = new();
+    protected abstract string RequestUrl { get; }
+    protected virtual string Token { get; } = "";
+
+    public async Task<T> Send<T>(HttpClient httpClient, IXboxRequestSigner signer)
     {
-        public AbstractXboxSignedAuthRequest()
-        {
-            ContractVersion = "2";
-            Signer = new XboxRequestSigner(new ECDCertificatePopCryptoProvider());
-        }
-        
-        public IXboxRequestSigner Signer { get; set; }
-        
-        protected abstract string RequestUrl { get; }
-        protected virtual string Token { get; } = "";
-        protected abstract object BuildBody();
+        if (ResponseHandler == null)
+            throw new InvalidOperationException("ResponseHandler was null");
 
-        protected override HttpRequestMessage BuildRequest()
-        {
-            var body = BuildBody();
-            var bodyStr = JsonSerializer.Serialize(body);
-
-            var req = new HttpRequestMessage
-            {
-                RequestUri = new Uri(RequestUrl),
-                Method = HttpMethod.Post,
-                Content = new StringContent(bodyStr, Encoding.UTF8, "application/json")
-            };
-                
-            var signature = Signer.SignRequest(RequestUrl, Token, bodyStr);
-            req.Headers.Add("Signature", signature);
-            AddDefaultHeaders(req);
-            return req;
-        }
+        var request = buildRequest(signer);
+        var response = await httpClient.SendAsync(request);
+        return await ResponseHandler.HandleResponse<T>(response);
     }
+
+    private HttpRequestMessage buildRequest(IXboxRequestSigner signer)
+    {
+        var body = BuildBody(signer.ProofKey);
+        var bodyStr = JsonSerializer.Serialize(body);
+
+        var req = new HttpRequestMessage
+        {
+            RequestUri = new Uri(RequestUrl),
+            Method = HttpMethod.Post,
+            Content = new StringContent(bodyStr, Encoding.UTF8, "application/json")
+        };
+
+        var signature = signer.SignRequest(RequestUrl, Token, bodyStr);
+        req.Headers.Add("Signature", signature);
+        CommonRequestHeaders.AddDefaultHeaders(req);
+        return req;
+    }
+
+    protected abstract object BuildBody(object proofKey);
 }
