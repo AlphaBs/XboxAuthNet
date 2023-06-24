@@ -25,7 +25,6 @@
         <RepositoryType>git</RepositoryType>
         <Authors>ksi123456ab</Authors>
         <PackageTags>xbox live login auth authentication</PackageTags>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,8 +38,6 @@
         </PackageReference>
         <PackageReference Include="System.Net.Http.Json" Version="6.0.1" />
         <PackageReference Include="System.Text.Json" Version="6.0.8" />
-
-        <None Include="../README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 
     <PropertyGroup>
