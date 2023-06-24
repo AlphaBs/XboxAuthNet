@@ -24,6 +24,7 @@ namespace XboxAuthNetWinForm
 
         CodeFlowAuthenticator oauth;
         XboxAuthClient xboxAuthClient;
+        XboxSignedClient xboxSignedClient;
         string sessionFilePath = "auth.json";
 
         private void Form1_Load(object sender, EventArgs e)
@@ -53,6 +54,7 @@ namespace XboxAuthNetWinForm
         private void initializeXboxAuthClient()
         {
             xboxAuthClient = new XboxAuthClient(httpClient);
+            xboxSignedClient = new XboxSignedClient(httpClient);
         }
 
         private MicrosoftOAuthResponse readSession()
@@ -130,12 +132,12 @@ namespace XboxAuthNetWinForm
             {
                 this.Enabled = false;
 
-                var userToken = await xboxAuthClient.RequestSignedUserToken(new XboxSignedUserTokenRequest
+                var userToken = await xboxSignedClient.RequestSignedUserToken(new XboxSignedUserTokenRequest
                 {
                     AccessToken = textBox1.Text,
                     TokenPrefix = XboxAuthConstants.XboxTokenPrefix
                 });
-                var deviceToken = await xboxAuthClient.RequestDeviceToken(new XboxDeviceTokenRequest
+                var deviceToken = await xboxSignedClient.RequestDeviceToken(new XboxDeviceTokenRequest
                 {
                     DeviceType = XboxDeviceTypes.Nintendo,
                     DeviceVersion = "0.0.0"
@@ -172,8 +174,8 @@ namespace XboxAuthNetWinForm
             {
                 this.Enabled = false;
 
-                var deviceToken = await xboxAuthClient.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
-                var sisuResult = await xboxAuthClient.SisuAuth(new XboxSisuAuthRequest
+                var deviceToken = await xboxSignedClient.RequestDeviceToken(XboxDeviceTypes.Win32, "0.0.0");
+                var sisuResult = await xboxSignedClient.SisuAuth(new XboxSisuAuthRequest
                 {
                     AccessToken = textBox1.Text,
                     ClientId = txtMSClientId.Text,

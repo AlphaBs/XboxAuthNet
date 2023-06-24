@@ -47,7 +47,7 @@ namespace XboxAuthNet.XboxLive.Requests
                 }),
             };
 
-            AddDefaultHeaders(req);
+            CommonRequestHeaders.AddDefaultHeaders(req);
             return req;
         }
 

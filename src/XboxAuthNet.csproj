@@ -73,4 +73,9 @@
         <Compile Include="Platforms/WinForm/**/*" />
         <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="XboxLive\Requests\CommonRequestHeaders.cs" />
+      <None Remove="XboxLive\XboxSignedClient.cs" />
+    </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 using XboxAuthNet.XboxLive.Responses;
+using XboxAuthNet.XboxLive.Crypto;
 
 namespace XboxAuthNet.XboxLive.Requests
 {
@@ -14,7 +15,7 @@ namespace XboxAuthNet.XboxLive.Requests
         public string? DeviceToken { get; set; }
 
         protected override string RequestUrl => "https://sisu.xboxlive.com/authorize";
-        protected override object BuildBody()
+        protected override object BuildBody(object proofKey)
         { 
             if (string.IsNullOrEmpty(AccessToken))
                 throw new InvalidOperationException("AccessToken was null");
@@ -30,13 +31,13 @@ namespace XboxAuthNet.XboxLive.Requests
                 UseModernGamertag = true,
                 SiteName = "user.auth.xboxlive.com",
                 RelyingParty = RelyingParty,
-                ProofKey = Signer.ProofKey
+                ProofKey = proofKey
             };
         }
 
-        public Task<XboxSisuResponse> Send(HttpClient httpClient)
+        public Task<XboxSisuResponse> Send(HttpClient httpClient, IXboxRequestSigner signer)
         {
-            return Send<XboxSisuResponse>(httpClient);
+            return Send<XboxSisuResponse>(httpClient, signer);
         }
     }
 }

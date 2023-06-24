@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using XboxAuthNet.XboxLive.Crypto;
 using XboxAuthNet.XboxLive.Responses;
 
 namespace XboxAuthNet.XboxLive.Requests
@@ -14,7 +15,7 @@ namespace XboxAuthNet.XboxLive.Requests
         public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
 
         protected override string RequestUrl => "https://device.auth.xboxlive.com/device/authenticate";
-        protected override object BuildBody()
+        protected override object BuildBody(object proofKey)
         {
             if (string.IsNullOrEmpty(DeviceType))
                 throw new InvalidOperationException("DeviceType was null");
@@ -35,7 +36,7 @@ namespace XboxAuthNet.XboxLive.Requests
                     DeviceType = DeviceType,
                     SerialNumber = "{" + serialNumber + "}",
                     Version = DeviceVersion,
-                    ProofKey = Signer.ProofKey
+                    ProofKey = proofKey
                 },
                 RelyingParty = RelyingParty,
                 TokenType = "JWT"
@@ -47,9 +48,9 @@ namespace XboxAuthNet.XboxLive.Requests
             return Guid.NewGuid().ToString();
         }
 
-        public Task<XboxAuthResponse> Send(HttpClient httpClient)
+        public Task<XboxAuthResponse> Send(HttpClient httpClient, IXboxRequestSigner signer)
         {
-            return Send<XboxAuthResponse>(httpClient);
+            return Send<XboxAuthResponse>(httpClient, signer);
         }
     }
 }
