@@ -4,7 +4,7 @@ using XboxAuthNet.OAuth.CodeFlow;
 namespace XboxAuthNet.Platforms.WinForm;
 
 #if NET5_WIN
-[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+[System.Runtime.Versioning.SupportedOSPlatform("windows7")]
 #endif
 internal class WebView2WebUI : IWebUI
 {
