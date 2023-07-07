@@ -15,7 +15,7 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Version>3.0.1</Version>
+        <Version>3.0.2</Version>
 
         <Description>Xbox Live authentication for .NET</Description>
         <Copyright>MIT</Copyright>
