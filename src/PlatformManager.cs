@@ -13,6 +13,8 @@ public class PlatformManager
         IWebUI? ui = null;
 
 #if ENABLE_WEBVIEW2
+        if (!XboxAuthNet.Platforms.WinForm.WebView2WebUI.IsWebView2Available())
+            throw new Microsoft.Web.WebView2.Core.WebView2RuntimeNotFoundException();
         ui = new XboxAuthNet.Platforms.WinForm.WebView2WebUI(uiOptions);
 #endif
 
