@@ -62,7 +62,7 @@ public class MicrosoftOAuthResponse
         {
             var resObj = JsonSerializer.Deserialize<MicrosoftOAuthResponse>(resBody);
             if (resObj == null)
-                throw new MicrosoftOAuthException("Response was null", statusCode);
+                throw new MicrosoftOAuthException("The response was empty.", statusCode);
 
             if (resObj.ExpiresOn == default)
                 resObj.ExpiresOn = DateTimeOffset.UtcNow.AddSeconds(resObj.ExpireIn);
