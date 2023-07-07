@@ -7,7 +7,6 @@ public class CodeFlowAuthenticator
     private readonly ICodeFlowApiClient _client;
     private readonly ICodeFlowUrlChecker _uriChecker;
     private readonly IWebUI _ui;
-    private readonly CodeFlowParameterFactory _parameterFactory;
 
     internal CodeFlowAuthenticator(
         ICodeFlowApiClient client,
@@ -17,12 +16,11 @@ public class CodeFlowAuthenticator
         _client = client;
         _ui = ui;
         _uriChecker = urlChecker;
-        _parameterFactory = new CodeFlowParameterFactory();
     }
 
     public Task<MicrosoftOAuthResponse> AuthenticateInteractively(CancellationToken cancellationToken = default)
         => AuthenticateInteractively(
-            _parameterFactory.CreateAuthorizationParameter(),
+            new CodeFlowAuthorizationParameter(),
             cancellationToken);
 
     public async Task<MicrosoftOAuthResponse> AuthenticateInteractively(
@@ -38,7 +36,10 @@ public class CodeFlowAuthenticator
             throw new AuthCodeException(authCode.Error, authCode.ErrorDescription);
         }
 
-        var tokenParameter = _parameterFactory.CreateAccessTokenParameter(authCode.Code!);
+        var tokenParameter = new CodeFlowAccessTokenParameter
+        {
+            Code = authCode.Code
+        };
         tokenParameter.RedirectUrl = parameter.RedirectUri;
         return await _client.GetAccessToken(tokenParameter, cancellationToken);
     }
@@ -47,7 +48,10 @@ public class CodeFlowAuthenticator
         string refreshToken,
         CancellationToken cancellationToken = default)
     {
-        var parameter = _parameterFactory.CreateRefreshTokenParameter(refreshToken);
+        var parameter = new CodeFlowRefreshTokenParameter
+        { 
+            RefreshToken = refreshToken 
+        };
         return _client.RefreshToken(parameter, cancellationToken);
     }
 

@@ -4,9 +4,10 @@ namespace XboxAuthNet.OAuth.CodeFlow;
 
 public class CodeFlowLiveApiClient : ICodeFlowApiClient
 {
-    const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
-    const string OAuthErrorPath = "/err.srf";
-    const string OAuthToken = "https://login.live.com/oauth20_token.srf";
+    public const string OAuthDesktop = "https://login.live.com/oauth20_desktop.srf";
+    public const string OAuthAuthorize = "https://login.live.com/oauth20_authorize.srf";
+    public const string OAuthErrorPath = "/err.srf";
+    public const string OAuthToken = "https://login.live.com/oauth20_token.srf";
 
     private readonly HttpClient httpClient;
 
@@ -23,6 +24,15 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
     public string CreateAuthorizeCodeUrl(CodeFlowAuthorizationParameter parameter)
     {
         setCommonParameters(parameter);
+        if (string.IsNullOrEmpty(parameter.RedirectUri))
+            parameter.RedirectUri = OAuthDesktop;
+        if (string.IsNullOrEmpty(parameter.ResponseType))
+            parameter.ResponseType = "code";
+        if (string.IsNullOrEmpty(parameter.ResponseMode))
+            parameter.ResponseMode = "query";
+        if (string.IsNullOrEmpty(parameter.Prompt))
+            parameter.Prompt = "select_account";
+
         var query = parameter.ToQueryDictionary();
         return OAuthAuthorize + "?" + HttpHelper.GetQueryString(query);
     }
@@ -36,12 +46,28 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
     public Task<MicrosoftOAuthResponse> GetAccessToken(
         CodeFlowAccessTokenParameter parameter, 
         CancellationToken cancellationToken) =>
-        requestToken(parameter, cancellationToken);
+        requestToken(setAccessTokenParameters(parameter), cancellationToken);
+
+    private CodeFlowAccessTokenParameter setAccessTokenParameters(CodeFlowAccessTokenParameter parameters)
+    {
+        if (string.IsNullOrEmpty(parameters.RedirectUrl))
+            parameters.RedirectUrl = OAuthDesktop;
+        if (string.IsNullOrEmpty(parameters.GrantType))
+            parameters.GrantType = "authorization_code";
+        return parameters;
+    }
 
     public Task<MicrosoftOAuthResponse> RefreshToken(
         CodeFlowRefreshTokenParameter parameter,
         CancellationToken cancellationToken) =>
-        requestToken(parameter, cancellationToken);
+        requestToken(setRefreshTokenParameters(parameter), cancellationToken);
+
+    private CodeFlowRefreshTokenParameter setRefreshTokenParameters(CodeFlowRefreshTokenParameter parameters)
+    {
+        if (string.IsNullOrEmpty(parameters.GrantType))
+            parameters.GrantType = "refresh_token";
+        return parameters;
+    }
 
     private async Task<MicrosoftOAuthResponse> requestToken(
         CodeFlowParameter parameter, 
