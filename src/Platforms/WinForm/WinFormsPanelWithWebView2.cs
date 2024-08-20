@@ -96,7 +96,7 @@ internal class WinFormsPanelWithWebView2 : Form
             case DialogResult.OK:
                 break;
             case DialogResult.Cancel:
-                throw new AuthCodeException(null, "User canceled authentication. ");
+                throw new OperationCanceledException();
             default:
                 throw new InvalidOperationException(
                     "WebView2 returned an unexpected result: " + uiResult);
