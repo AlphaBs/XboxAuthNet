@@ -3,8 +3,8 @@
     <PropertyGroup>
         <TargetFrameworkNetStandard>netstandard2.0</TargetFrameworkNetStandard>
         <TargetFrameworkNetFramework>net472</TargetFrameworkNetFramework>
-        <TargetFrameworkNet5Win>net5.0-windows</TargetFrameworkNet5Win>
-        <TargetFrameworks>$(TargetFrameworkNet5Win);$(TargetFrameworkNetStandard);$(TargetFrameworkNetFramework)</TargetFrameworks>
+        <TargetFrameworkNetCoreWin>net6.0-windows</TargetFrameworkNetCoreWin>
+        <TargetFrameworks>$(TargetFrameworkNetCoreWin);$(TargetFrameworkNetStandard);$(TargetFrameworkNetFramework)</TargetFrameworks>
 
         <EnableWindowsTargeting>true</EnableWindowsTargeting>
     </PropertyGroup>
@@ -15,7 +15,7 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Version>3.0.2</Version>
+        <Version>3.0.3</Version>
 
         <Description>Xbox Live authentication for .NET</Description>
         <Copyright>MIT</Copyright>
@@ -32,12 +32,12 @@
             <_Parameter1>XboxAuthNet.Test</_Parameter1>
         </AssemblyAttribute>
         <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2" PrivateAssets="All" />
-        <PackageReference Include="Fody" Version="6.7.0">
+        <PackageReference Include="Fody" Version="6.8.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Net.Http.Json" Version="6.0.1" />
-        <PackageReference Include="System.Text.Json" Version="6.0.8" />
+        <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
+        <PackageReference Include="System.Text.Json" Version="8.0.4" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -57,21 +57,22 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNetFramework)'">
         <Compile Include="Platforms/WinForm/**/*" />
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2651.64" />
         <Reference Include="System.Web" />
     </ItemGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNet5Win)'">
+    <PropertyGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNetCoreWin)'">
         <UseWindowsForms>true</UseWindowsForms>
         <DefineConstants>$(DefineConstants);ENABLE_WEBVIEW2;NET5_WIN</DefineConstants>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNet5Win)'">
+    <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNetCoreWin)'">
         <Compile Include="Platforms/WinForm/**/*" />
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2651.64" />
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="GlobalUsings.cs" />
       <None Remove="XboxLive\Requests\CommonRequestHeaders.cs" />
       <None Remove="XboxLive\XboxSignedClient.cs" />
     </ItemGroup>
