@@ -1,6 +1,6 @@
 ﻿namespace XboxAuthNet.OAuth.CodeFlow;
 
-internal class AuthCodeException : Exception
+public class AuthCodeException : Exception
 {
     public AuthCodeException(string? error, string? errorDescription) : base(error ?? errorDescription)
     {
