@@ -15,7 +15,7 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Version>3.0.3</Version>
+        <Version>3.0.4</Version>
 
         <Description>Xbox Live authentication for .NET</Description>
         <Copyright>MIT</Copyright>
@@ -57,7 +57,7 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNetFramework)'">
         <Compile Include="Platforms/WinForm/**/*" />
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2651.64" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
         <Reference Include="System.Web" />
     </ItemGroup>
 
@@ -68,7 +68,7 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNetCoreWin)'">
         <Compile Include="Platforms/WinForm/**/*" />
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2651.64" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
     </ItemGroup>
 
     <ItemGroup>
