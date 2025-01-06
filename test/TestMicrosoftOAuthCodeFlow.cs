@@ -27,7 +27,7 @@ namespace XboxAuthNet.Test
         public void TestExpiresOn(string resBody, int expiresIn)
         {
             var result = MicrosoftOAuthResponse.FromHttpResponse(resBody, 200, null);
-            var expectedExpiresOn = DateTime.UtcNow.AddSeconds(expiresIn);
+            var expectedExpiresOn = DateTimeOffset.UtcNow.AddSeconds(expiresIn);
             var delta = expectedExpiresOn - result.ExpiresOn;
             Assert.True(delta < TimeSpan.FromMilliseconds(100));
         }

@@ -55,6 +55,10 @@ namespace XboxAuthNetConsole
                     var sisuResponse = await sisuAuth(signedClient);
                     ConsolePrinter.Print(sisuResponse);
                     break;
+                case XboxAuthLoginMode.Validate:
+                    var result = xstsToken != null && xstsToken.Validate();
+                    Console.WriteLine("XSTS: " + result);
+                    break;
                 default:
                     throw new InvalidOperationException("Unknown login mode: " + _options.Mode.ToString());
             }

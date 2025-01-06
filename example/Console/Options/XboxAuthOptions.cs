@@ -7,7 +7,8 @@ namespace XboxAuthNetConsole.Options
     {
         Basic,
         Full,
-        Sisu
+        Sisu,
+        Validate
     }
 
     [Verb("xboxauth")]

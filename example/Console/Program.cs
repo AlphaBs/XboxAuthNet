@@ -36,6 +36,7 @@ namespace XboxAuthNetConsole
         private async Task<int> runMicrosoftOAuthCommand(MicrosoftOAuthOptions opts)
         {
             Console.WriteLine("Microsoft OAuth");
+            Console.WriteLine("Currently Microsoft OAuth only works on Windows");
 
             var settings = await getSettings();
             opts.ClientId ??= settings?.ClientId;

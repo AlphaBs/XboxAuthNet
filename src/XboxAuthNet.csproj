@@ -15,7 +15,7 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Version>3.0.4</Version>
+        <Version>3.0.5</Version>
 
         <Description>Xbox Live authentication for .NET</Description>
         <Copyright>MIT</Copyright>
@@ -37,7 +37,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
-        <PackageReference Include="System.Text.Json" Version="8.0.4" />
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -69,11 +69,5 @@
     <ItemGroup Condition="'$(TargetFramework)' == '$(TargetFrameworkNetCoreWin)'">
         <Compile Include="Platforms/WinForm/**/*" />
         <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="GlobalUsings.cs" />
-      <None Remove="XboxLive\Requests\CommonRequestHeaders.cs" />
-      <None Remove="XboxLive\XboxSignedClient.cs" />
     </ItemGroup>
 </Project>

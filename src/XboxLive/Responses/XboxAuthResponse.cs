@@ -27,7 +27,7 @@ namespace XboxAuthNet.XboxLive.Responses
             if (string.IsNullOrEmpty(ExpireOn))
                 return false;
 
-            if (DateTime.Parse(ExpireOn) < DateTime.UtcNow)
+            if (DateTimeOffset.Parse(ExpireOn) < DateTimeOffset.UtcNow)
                 return false;
 
             if (string.IsNullOrEmpty(Token))
