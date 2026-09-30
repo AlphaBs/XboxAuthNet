@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="JwtRegression/**/*.cs" />
     <ProjectReference Include="../src/XboxAuthNet.csproj" />
   </ItemGroup>
 
