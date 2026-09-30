@@ -22,7 +22,7 @@ namespace XboxAuthNet.Jwt
             if (spl.Length != 3)
                 throw new FormatException("invalid jwt");
 
-            string encodedPayload = spl[1];
+            string encodedPayload = spl[1].Replace('-', '+').Replace('_', '/');
             switch (encodedPayload.Length % 4)
             {
                 case 0:
