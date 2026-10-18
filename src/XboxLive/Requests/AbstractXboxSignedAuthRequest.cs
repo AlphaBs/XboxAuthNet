@@ -17,7 +17,6 @@ public abstract class AbstractXboxSignedAuthRequest
         return Send(httpClient, signer, XboxJson.TypeInfo<T>());
     }
 
-    /// <summary>사용자 정의 응답의 생성 메타데이터를 지정한다.</summary>
     public async Task<T> Send<T>(HttpClient httpClient, IXboxRequestSigner signer, JsonTypeInfo<T> responseTypeInfo)
     {
         if (ResponseHandler == null)
@@ -46,7 +45,6 @@ public abstract class AbstractXboxSignedAuthRequest
         return req;
     }
 
-    /// <summary>사용자 정의 요청은 생성 JsonTypeInfo를 사용해 이 메서드를 재정의할 수 있다.</summary>
     protected virtual string SerializeBody(object body)
     {
         return XboxJson.Serialize(body);

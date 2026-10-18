@@ -46,7 +46,7 @@ public class MicrosoftOAuthResponse
     {
         if (string.IsNullOrEmpty(AccessToken))
             return false;
-        
+
         if (DateTimeOffset.UtcNow > ExpiresOn)
             return false;
 

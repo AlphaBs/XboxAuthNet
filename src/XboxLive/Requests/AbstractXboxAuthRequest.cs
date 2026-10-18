@@ -15,7 +15,6 @@ public abstract class AbstractXboxAuthRequest
         return Send(httpClient, XboxJson.TypeInfo<T>());
     }
 
-    /// <summary>사용자 정의 응답의 생성 메타데이터를 지정한다.</summary>
     public async Task<T> Send<T>(HttpClient httpClient, JsonTypeInfo<T> responseTypeInfo)
     {
         if (ResponseHandler == null)

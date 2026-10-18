@@ -5,31 +5,29 @@ using System.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-namespace XboxAuthNet
+namespace XboxAuthNet;
+
+public class HttpHelper
 {
-    public class HttpHelper
+    public const string UserAgent = "Mozilla/5.0 (XboxReplay; XboxLiveAuth/3.0) " +
+                                    "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                                    "Chrome/71.0.3578.98 Safari/537.36";
+
+    public static string GetQueryString(Dictionary<string, string?> queries)
     {
-        public const string UserAgent = "Mozilla/5.0 (XboxReplay; XboxLiveAuth/3.0) " +
-                                        "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                                        "Chrome/71.0.3578.98 Safari/537.36";
+        return string.Join("&",
+            queries.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"));
+    }
 
-        public static string GetQueryString(Dictionary<string, string?> queries)
-        {
-            return string.Join("&",
-                queries.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"));
-        }
+    public static JsonContent CreateJsonContent<T>(T obj)
+    {
+        return CreateJsonContent(obj,
+            (JsonTypeInfo<T>)XboxJson.RequestOptions.GetTypeInfo(typeof(T)));
+    }
 
-        public static JsonContent CreateJsonContent<T>(T obj)
-        {
-            return CreateJsonContent(obj,
-                (JsonTypeInfo<T>)XboxJson.RequestOptions.GetTypeInfo(typeof(T)));
-        }
-
-        /// <summary>사용자 정의 타입도 생성된 메타데이터를 전달해 전송할 수 있다.</summary>
-        public static JsonContent CreateJsonContent<T>(T obj, JsonTypeInfo<T> typeInfo)
-        {
-            return JsonContent.Create(obj, typeInfo,
-                mediaType: new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
-        }
+    public static JsonContent CreateJsonContent<T>(T obj, JsonTypeInfo<T> typeInfo)
+    {
+        return JsonContent.Create(obj, typeInfo,
+            mediaType: new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
     }
 }

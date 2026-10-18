@@ -26,7 +26,6 @@ public class CodeFlowParameter
         return query;
     }
 
-    /// <summary>사용자 정의 매개변수를 추가하려면 이 메서드를 재정의한다.</summary>
     protected virtual void AddQueries(Dictionary<string, string?> query)
     {
         AddQuery(query, "client_id", ClientId);

@@ -1,11 +1,10 @@
-namespace XboxAuthNet.XboxLive.Requests
+namespace XboxAuthNet.XboxLive.Requests;
+
+internal sealed class RpsProperties
 {
-    internal sealed class RpsProperties
-    {
-        public string AuthMethod { get; set; } = "RPS";
+    public string AuthMethod { get; set; } = "RPS";
 
-        public string SiteName { get; set; } = "user.auth.xboxlive.com";
+    public string SiteName { get; set; } = "user.auth.xboxlive.com";
 
-        public string? RpsTicket { get; set; }
-    }
+    public string? RpsTicket { get; set; }
 }

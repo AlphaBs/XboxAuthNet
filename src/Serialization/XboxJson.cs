@@ -19,8 +19,7 @@ internal static class XboxJson
     internal static bool ReflectionEnabled
     {
 #if NET10_0_OR_GREATER
-        // 표준 JSON 기능 스위치는 AOT 게시 시 false로 고정되지만 분석기는 래퍼의 계약을 자동 추론하지 못한다.
-        [UnconditionalSuppressMessage("Trimming", "IL4000", Justification = "System.Text.Json의 리플렉션 기능 스위치가 false일 때만 생성 메타데이터 경로를 사용하며 두 모드 모두 검증한다.")]
+        [UnconditionalSuppressMessage("Trimming", "IL4000", Justification = "Reflection fallback is disabled when dynamic code or the System.Text.Json reflection feature switch is unavailable.")]
 #endif
         get
         {
@@ -34,7 +33,6 @@ internal static class XboxJson
 
     private static JsonSerializerOptions CreateOptions(bool ignoreNull)
     {
-        // JIT 이용자의 기존 사용자 정의 모델은 유지하되, AOT에서는 생성된 메타데이터만 사용한다.
         IJsonTypeInfoResolver resolver = XboxJsonContext.Default;
         if (ReflectionEnabled)
             resolver = JsonTypeInfoResolver.Combine(resolver, new DefaultJsonTypeInfoResolver());

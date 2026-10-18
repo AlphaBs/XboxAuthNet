@@ -4,38 +4,37 @@ using System.Threading.Tasks;
 using XboxAuthNet.XboxLive.Crypto;
 using XboxAuthNet.XboxLive.Responses;
 
-namespace XboxAuthNet.XboxLive.Requests
+namespace XboxAuthNet.XboxLive.Requests;
+
+public class XboxSignedUserTokenRequest : AbstractXboxSignedAuthRequest
 {
-    public class XboxSignedUserTokenRequest : AbstractXboxSignedAuthRequest
+    public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
+    public string? TokenPrefix { get; set; } = XboxAuthConstants.XboxTokenPrefix;
+    public string? AccessToken { get; set; }
+
+    protected override string RequestUrl => "https://user.auth.xboxlive.com/user/authenticate";
+    protected override object BuildBody(object proofKey)
     {
-        public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
-        public string? TokenPrefix { get; set; } = XboxAuthConstants.XboxTokenPrefix;
-        public string? AccessToken { get; set; }
+        if (string.IsNullOrEmpty(AccessToken))
+            throw new InvalidOperationException("AccessToken was null");
+        if (string.IsNullOrEmpty(RelyingParty))
+            throw new InvalidOperationException("RelyingParty was null");
 
-        protected override string RequestUrl => "https://user.auth.xboxlive.com/user/authenticate";
-        protected override object BuildBody(object proofKey)
+        return new XboxUserRequestBody<RpsProperties>
         {
-            if (string.IsNullOrEmpty(AccessToken))
-                throw new InvalidOperationException("AccessToken was null");
-            if (string.IsNullOrEmpty(RelyingParty))
-                throw new InvalidOperationException("RelyingParty was null");
-
-            return new XboxUserRequestBody<RpsProperties>
+            RelyingParty = RelyingParty,
+            TokenType = "JWT",
+            Properties = new RpsProperties
             {
-                RelyingParty = RelyingParty,
-                TokenType = "JWT",
-                Properties = new RpsProperties
-                {
-                    AuthMethod = "RPS",
-                    SiteName = "user.auth.xboxlive.com",
-                    RpsTicket = TokenPrefix + AccessToken
-                } 
-            };
-        }
+                AuthMethod = "RPS",
+                SiteName = "user.auth.xboxlive.com",
+                RpsTicket = TokenPrefix + AccessToken
+            }
+        };
+    }
 
-        public Task<XboxAuthResponse> Send(HttpClient httpClient, IXboxRequestSigner signer)
-        {
-            return Send<XboxAuthResponse>(httpClient, signer);
-        }
+    public Task<XboxAuthResponse> Send(HttpClient httpClient, IXboxRequestSigner signer)
+    {
+        return Send<XboxAuthResponse>(httpClient, signer);
     }
 }
