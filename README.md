@@ -130,13 +130,3 @@ This project was made possible thanks to the contributions of various open-sourc
 [xboxlive-auth](https://github.com/XboxReplay/xboxlive-auth)
 
 [prismarine-auth](https://github.com/PrismarineJS/prismarine-auth)
-
-## Native AOT
-
-- 기존 대상 프레임워크를 유지하고 AOT 분석을 활성화한 `net10.0` 자산을 제공합니다. 내장 요청·응답 모델은 System.Text.Json 소스 생성 메타데이터를 사용합니다.
-- JIT에서 JSON 리플렉션이 활성화된 경우 기존 사용자 정의 모델의 처리는 유지됩니다. Native AOT는 내장 모델의 생성 메타데이터만 기본으로 사용합니다.
-- 사용자 정의 HTTP 본문은 `HttpHelper.CreateJsonContent(value, jsonTypeInfo)`를, 응답은 `XboxAuthResponseHandler.HandleResponse(response, jsonTypeInfo)`를 사용할 수 있습니다.
-- 사용자 정의 서명 요청은 `AbstractXboxSignedAuthRequest.SerializeBody`를 재정의하고 생성 `JsonTypeInfo`로 JSON 문자열을 반환할 수 있습니다. 서명과 전송은 동일한 문자열을 사용합니다.
-- 사용자 정의 proof key는 `JsonElement`·`JsonObject`로 전달하거나 위 직렬화 확장 지점에서 자신의 생성 메타데이터를 사용합니다.
-- OAuth 파생 매개변수는 AOT에서 `AddQueries`를 재정의하고 `base.AddQueries(query)` 호출 후 추가 항목을 넣습니다. 단순한 추가 항목은 `ExtraQueries`로 전달할 수 있으며, 마지막에 기본 항목을 덮어씁니다.
-- 기능 guard의 IL4000 추론 진단 한 곳만 이유를 명시해 억제합니다. 실제 JSON·리플렉션 호출의 IL2026·IL3050 진단은 억제하지 않습니다. 리플렉션 호환 경로는 동적 코드 지원과 표준 JSON 기능 스위치가 모두 활성화된 경우에만 사용합니다.
