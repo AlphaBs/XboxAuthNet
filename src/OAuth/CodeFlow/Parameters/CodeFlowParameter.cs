@@ -39,41 +39,9 @@ public class CodeFlowParameter
     {
         AddQuery(query, "client_id", ClientId);
         AddQuery(query, "scope", Scope);
-
-        if (this is CodeFlowAuthorizationParameter authorization)
-        {
-            AddQuery(query, "response_type", authorization.ResponseType);
-            AddQuery(query, "redirect_uri", authorization.RedirectUri);
-            AddQuery(query, "response_mode", authorization.ResponseMode);
-            AddQuery(query, "state", authorization.State);
-            AddQuery(query, "prompt", authorization.Prompt);
-            AddQuery(query, "login_hint", authorization.LoginHint);
-            AddQuery(query, "domain_hint", authorization.DomainHint);
-            AddQuery(query, "code_challenge", authorization.CodeChallenge);
-            AddQuery(query, "code_challenge_method", authorization.CodeChallengeMethod);
-            AddQuery(query, "nonce", authorization.Nonce);
-        }
-
-        if (this is CodeFlowAccessTokenParameter access)
-        {
-            AddQuery(query, "code", access.Code);
-            AddQuery(query, "redirect_uri", access.RedirectUrl);
-            AddQuery(query, "grant_type", access.GrantType);
-            AddQuery(query, "code_verifier", access.CodeVerifier);
-            AddQuery(query, "client_secret", access.ClientSecret);
-            AddQuery(query, "client_assertion_type", access.ClientAssertionType);
-            AddQuery(query, "client_assertion", access.CilentAssertion);
-        }
-
-        if (this is CodeFlowRefreshTokenParameter refresh)
-        {
-            AddQuery(query, "grant_type", refresh.GrantType);
-            AddQuery(query, "client_secret", refresh.ClientSecret);
-            AddQuery(query, "refresh_token", refresh.RefreshToken);
-        }
     }
 
-    private static void AddQuery(Dictionary<string, string?> query, string name, string? value)
+    protected static void AddQuery(Dictionary<string, string?> query, string name, string? value)
     {
         if (!string.IsNullOrEmpty(value))
             query[name] = value;
