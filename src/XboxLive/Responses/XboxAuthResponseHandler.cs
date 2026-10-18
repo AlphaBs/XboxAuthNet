@@ -2,40 +2,44 @@ using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
-namespace XboxAuthNet.XboxLive.Responses
+namespace XboxAuthNet.XboxLive.Responses;
+
+public class XboxAuthResponseHandler
 {
-    public class XboxAuthResponseHandler
+    public Task<T> HandleResponse<T>(HttpResponseMessage res)
     {
-        public async Task<T> HandleResponse<T>(HttpResponseMessage res)
-        {
-            var resBody = await res.Content.ReadAsStringAsync()
-                .ConfigureAwait(false);
+        return HandleResponse(res, XboxJson.TypeInfo<T>());
+    }
 
+    public async Task<T> HandleResponse<T>(HttpResponseMessage res, JsonTypeInfo<T> typeInfo)
+    {
+        var resBody = await res.Content.ReadAsStringAsync();
+
+        try
+        {
+            res.EnsureSuccessStatusCode();
+            return JsonSerializer.Deserialize(resBody, typeInfo)
+                ?? throw new JsonException();
+        }
+        catch (Exception ex) when (
+            ex is JsonException ||
+            ex is HttpRequestException)
+        {
             try
             {
-                res.EnsureSuccessStatusCode();
-                return JsonSerializer.Deserialize<T>(resBody)
-                    ?? throw new JsonException();
+                throw XboxAuthException.FromResponseBody(resBody, (int)res.StatusCode);
             }
-            catch (Exception ex) when (
-                ex is JsonException ||
-                ex is HttpRequestException)
+            catch (FormatException)
             {
                 try
                 {
-                    throw XboxAuthException.FromResponseBody(resBody, (int)res.StatusCode);
+                    throw XboxAuthException.FromResponseHeaders(res.Headers, (int)res.StatusCode);
                 }
                 catch (FormatException)
                 {
-                    try
-                    {
-                        throw XboxAuthException.FromResponseHeaders(res.Headers, (int)res.StatusCode);
-                    }
-                    catch (FormatException)
-                    {
-                        throw new XboxAuthException($"{(int)res.StatusCode}: {res.ReasonPhrase}", (int)res.StatusCode);
-                    }
+                    throw new XboxAuthException($"{(int)res.StatusCode}: {res.ReasonPhrase}", (int)res.StatusCode);
                 }
             }
         }

@@ -60,4 +60,20 @@ public class CodeFlowAuthorizationParameter : CodeFlowParameter
 
     [JsonPropertyName("nonce")]
     public string? Nonce { get; set; }
+
+    protected override void AddQueries(Dictionary<string, string?> query)
+    {
+        base.AddQueries(query);
+
+        AddQuery(query, "response_type", ResponseType);
+        AddQuery(query, "redirect_uri", RedirectUri);
+        AddQuery(query, "response_mode", ResponseMode);
+        AddQuery(query, "state", State);
+        AddQuery(query, "prompt", Prompt);
+        AddQuery(query, "login_hint", LoginHint);
+        AddQuery(query, "domain_hint", DomainHint);
+        AddQuery(query, "code_challenge", CodeChallenge);
+        AddQuery(query, "code_challenge_method", CodeChallengeMethod);
+        AddQuery(query, "nonce", Nonce);
+    }
 }

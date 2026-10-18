@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization.Metadata;
 using System.Text;
 using System.Text.Json;
 using XboxAuthNet.XboxLive.Crypto;
@@ -11,20 +12,25 @@ public abstract class AbstractXboxSignedAuthRequest
     protected abstract string RequestUrl { get; }
     protected virtual string Token { get; } = "";
 
-    public async Task<T> Send<T>(HttpClient httpClient, IXboxRequestSigner signer)
+    public Task<T> Send<T>(HttpClient httpClient, IXboxRequestSigner signer)
+    {
+        return Send(httpClient, signer, XboxJson.TypeInfo<T>());
+    }
+
+    public async Task<T> Send<T>(HttpClient httpClient, IXboxRequestSigner signer, JsonTypeInfo<T> responseTypeInfo)
     {
         if (ResponseHandler == null)
             throw new InvalidOperationException("ResponseHandler was null");
 
         var request = buildRequest(signer);
         var response = await httpClient.SendAsync(request);
-        return await ResponseHandler.HandleResponse<T>(response);
+        return await ResponseHandler.HandleResponse(response, responseTypeInfo);
     }
 
     private HttpRequestMessage buildRequest(IXboxRequestSigner signer)
     {
         var body = BuildBody(signer.ProofKey);
-        var bodyStr = JsonSerializer.Serialize(body);
+        var bodyStr = JsonSerializer.Serialize(body, XboxJson.Options.GetTypeInfo(body.GetType()));
 
         var req = new HttpRequestMessage
         {

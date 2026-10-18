@@ -27,4 +27,17 @@ public class CodeFlowAccessTokenParameter : CodeFlowParameter
 
     [JsonPropertyName("client_assertion")]
     public string? CilentAssertion { get; set; }
+
+    protected override void AddQueries(Dictionary<string, string?> query)
+    {
+        base.AddQueries(query);
+
+        AddQuery(query, "code", Code);
+        AddQuery(query, "redirect_uri", RedirectUrl);
+        AddQuery(query, "grant_type", GrantType);
+        AddQuery(query, "code_verifier", CodeVerifier);
+        AddQuery(query, "client_secret", ClientSecret);
+        AddQuery(query, "client_assertion_type", ClientAssertionType);
+        AddQuery(query, "client_assertion", CilentAssertion);
+    }
 }

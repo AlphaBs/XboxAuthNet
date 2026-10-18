@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace XboxAuthNet.OAuth.CodeFlow.Parameters;
 
@@ -17,27 +17,25 @@ public class CodeFlowParameter
     public Dictionary<string, string?> ToQueryDictionary()
     {
         var query = new Dictionary<string, string?>();
-        var props = GetType().GetProperties();
-        foreach (var prop in props)
+        AddQueries(query);
+        foreach (var pair in ExtraQueries)
         {
-            var value = prop.GetMethod?.Invoke(this, null)?.ToString();
-            if (string.IsNullOrEmpty(value))
-                continue;
-
-            var attr = prop
-                .GetCustomAttributes(typeof(JsonPropertyNameAttribute), true)
-                .FirstOrDefault();
-            if (attr is not JsonPropertyNameAttribute jsonAttr)
-                continue;
-
-            var propName = jsonAttr.Name;
-            query[propName] = value;
+            query[pair.Key] = pair.Value;
         }
 
-        foreach (var kv in ExtraQueries)
-        {
-            query[kv.Key] = kv.Value;
-        }
         return query;
     }
+
+    protected virtual void AddQueries(Dictionary<string, string?> query)
+    {
+        AddQuery(query, "client_id", ClientId);
+        AddQuery(query, "scope", Scope);
+    }
+
+    protected static void AddQuery(Dictionary<string, string?> query, string name, string? value)
+    {
+        if (!string.IsNullOrEmpty(value))
+            query[name] = value;
+    }
+
 }
