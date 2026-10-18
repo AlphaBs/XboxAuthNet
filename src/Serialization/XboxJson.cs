@@ -51,9 +51,4 @@ internal static class XboxJson
     {
         return (JsonTypeInfo<T>)Options.GetTypeInfo(typeof(T));
     }
-
-    internal static string Serialize(object body)
-    {
-        return JsonSerializer.Serialize(body, Options.GetTypeInfo(body.GetType()));
-    }
 }

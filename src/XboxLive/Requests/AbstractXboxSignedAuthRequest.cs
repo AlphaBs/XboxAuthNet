@@ -30,7 +30,7 @@ public abstract class AbstractXboxSignedAuthRequest
     private HttpRequestMessage buildRequest(IXboxRequestSigner signer)
     {
         var body = BuildBody(signer.ProofKey);
-        var bodyStr = SerializeBody(body);
+        var bodyStr = JsonSerializer.Serialize(body, XboxJson.Options.GetTypeInfo(body.GetType()));
 
         var req = new HttpRequestMessage
         {
@@ -43,11 +43,6 @@ public abstract class AbstractXboxSignedAuthRequest
         req.Headers.Add("Signature", signature);
         CommonRequestHeaders.AddDefaultHeaders(req);
         return req;
-    }
-
-    protected virtual string SerializeBody(object body)
-    {
-        return XboxJson.Serialize(body);
     }
 
     protected abstract object BuildBody(object proofKey);
