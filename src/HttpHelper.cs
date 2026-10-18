@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace XboxAuthNet
 {
@@ -20,13 +21,15 @@ namespace XboxAuthNet
 
         public static JsonContent CreateJsonContent<T>(T obj)
         {
-            return JsonContent.Create(obj,
-                mediaType: new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"),
-                options: new JsonSerializerOptions
-                {
-                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-                    PropertyNamingPolicy = null
-                });
+            return CreateJsonContent(obj,
+                (JsonTypeInfo<T>)XboxJson.RequestOptions.GetTypeInfo(typeof(T)));
+        }
+
+        /// <summary>사용자 정의 타입도 생성된 메타데이터를 전달해 전송할 수 있다.</summary>
+        public static JsonContent CreateJsonContent<T>(T obj, JsonTypeInfo<T> typeInfo)
+        {
+            return JsonContent.Create(obj, typeInfo,
+                mediaType: new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
         }
     }
 }

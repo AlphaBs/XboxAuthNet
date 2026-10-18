@@ -1,0 +1,30 @@
+name: Native AOT
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  native-aot:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: 전체 대상 프레임워크 빌드
+        run: dotnet build src/XboxAuthNet.csproj -c Release
+      - name: 기존 테스트
+        run: dotnet test test/XboxAuthNet.Test.csproj -c Release -p:TargetFramework=net10.0 -p:TargetFrameworks=net10.0
+      - name: JIT 사용자 정의 모델 호환성
+        run: dotnet run --project smoke/NativeAotSmoke -c Release -p:PublishAot=false -p:JsonSerializerIsReflectionEnabledByDefault=true
+      - name: JSON 리플렉션 없는 프로토콜 검증
+        run: dotnet run --project smoke/NativeAotSmoke -c Release
+      - name: Native AOT 게시
+        run: dotnet publish smoke/NativeAotSmoke -c Release -r win-x64 -o artifacts/native-smoke
+      - name: Native AOT 실행
+        run: ./artifacts/native-smoke/NativeAotSmoke.exe

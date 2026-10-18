@@ -27,9 +27,9 @@ namespace XboxAuthNet.XboxLive.Requests
             var id = this.Id ?? nextUUID();
             var serialNumber = this.SerialNumber ?? nextUUID();
 
-            return new
+            return new XboxTokenRequestBody<DeviceProperties>
             {
-                Properties = new
+                Properties = new DeviceProperties
                 {
                     AuthMethod = "ProofOfPossession",
                     Id = "{" + id + "}",

@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using XboxAuthNet.Jwt;
 
@@ -60,7 +60,7 @@ public class MicrosoftOAuthResponse
 
         try
         {
-            var resObj = JsonSerializer.Deserialize<MicrosoftOAuthResponse>(resBody);
+            var resObj = JsonSerializer.Deserialize(resBody, XboxJsonContext.Default.MicrosoftOAuthResponse);
             if (resObj == null)
                 throw new MicrosoftOAuthException("The response was empty.", statusCode);
 

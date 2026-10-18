@@ -21,9 +21,9 @@ namespace XboxAuthNet.XboxLive.Requests
             if (string.IsNullOrEmpty(RelyingParty))
                 throw new InvalidOperationException("RelyingParty was null");
                 
-            return new 
+            return new XboxTokenRequestBody<TitleProperties>
             {
-                Properties = new
+                Properties = new TitleProperties
                 {
                     AuthMethod = "RPS",
                     DeviceToken = DeviceToken,

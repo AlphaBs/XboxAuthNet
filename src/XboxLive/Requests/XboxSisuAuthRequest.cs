@@ -22,7 +22,7 @@ namespace XboxAuthNet.XboxLive.Requests
             if (string.IsNullOrEmpty(RelyingParty))
                 throw new InvalidOperationException("RelyingParty was null");
                 
-            return new
+            return new SisuRequestBody
             {
                 AccessToken = TokenPrefix + AccessToken,
                 AppId = ClientId,

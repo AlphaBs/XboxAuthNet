@@ -2,12 +2,19 @@ using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace XboxAuthNet.XboxLive.Responses
 {
     public class XboxAuthResponseHandler
     {
-        public async Task<T> HandleResponse<T>(HttpResponseMessage res)
+        public Task<T> HandleResponse<T>(HttpResponseMessage res)
+        {
+            return HandleResponse(res, XboxJson.TypeInfo<T>());
+        }
+
+        /// <summary>사용자 정의 응답 모델의 생성 메타데이터를 지정한다.</summary>
+        public async Task<T> HandleResponse<T>(HttpResponseMessage res, JsonTypeInfo<T> typeInfo)
         {
             var resBody = await res.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
@@ -15,7 +22,7 @@ namespace XboxAuthNet.XboxLive.Responses
             try
             {
                 res.EnsureSuccessStatusCode();
-                return JsonSerializer.Deserialize<T>(resBody)
+                return JsonSerializer.Deserialize(resBody, typeInfo)
                     ?? throw new JsonException();
             }
             catch (Exception ex) when (

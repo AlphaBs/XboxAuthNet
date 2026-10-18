@@ -27,11 +27,11 @@ namespace XboxAuthNet.XboxLive.Requests
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(UserAuthenticateUrl),
-                Content = HttpHelper.CreateJsonContent(new
+                Content = HttpHelper.CreateJsonContent(new XboxUserRequestBody<RpsProperties>
                 {
                     RelyingParty = RelyingParty,
                     TokenType = "JWT",
-                    Properties = new
+                    Properties = new RpsProperties
                     {
                         AuthMethod = "RPS",
                         SiteName = "user.auth.xboxlive.com",

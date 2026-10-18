@@ -20,11 +20,11 @@ namespace XboxAuthNet.XboxLive.Requests
             if (string.IsNullOrEmpty(RelyingParty))
                 throw new InvalidOperationException("RelyingParty was null");
 
-            return new
+            return new XboxUserRequestBody<RpsProperties>
             {
                 RelyingParty = RelyingParty,
                 TokenType = "JWT",
-                Properties = new
+                Properties = new RpsProperties
                 {
                     AuthMethod = "RPS",
                     SiteName = "user.auth.xboxlive.com",

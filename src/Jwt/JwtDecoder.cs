@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Text.Json;
 
@@ -52,7 +52,7 @@ namespace XboxAuthNet.Jwt
         internal static T? DecodePayload<T>(string jwt) where T : class
         {
             string payload = DecodePayloadString(jwt);
-            return JsonSerializer.Deserialize<T>(payload);
+            return JsonSerializer.Deserialize(payload, XboxJson.TypeInfo<T>());
         }
     }
 }

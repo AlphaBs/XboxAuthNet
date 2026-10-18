@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -30,7 +30,7 @@ namespace XboxAuthNet.XboxLive
         {
             try
             {
-                var errRes = JsonSerializer.Deserialize<XboxErrorResponse>(responseBody);
+                var errRes = JsonSerializer.Deserialize(responseBody, XboxJsonContext.Default.XboxErrorResponse);
 
                 if (string.IsNullOrEmpty(errRes?.XErr) && string.IsNullOrEmpty(errRes?.Message))
                     throw new FormatException();

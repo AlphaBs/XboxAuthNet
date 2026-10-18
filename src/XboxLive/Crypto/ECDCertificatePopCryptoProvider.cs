@@ -19,14 +19,14 @@ namespace XboxAuthNet.XboxLive.Crypto
         private object generateNewProofKey()
         {
             var parameters = _signer.ExportParameters(false);
-            return new
+            return new ProofKeyBody
             {
-                kty = "EC",
-                x = parameters.Q.X != null ? Base64UrlHelper.Encode(parameters.Q.X) : null,
-                y = parameters.Q.Y != null ? Base64UrlHelper.Encode(parameters.Q.Y) : null,
-                crv = "P-256",
-                alg = "ES256",
-                use = "sig"
+                KeyType = "EC",
+                X = parameters.Q.X != null ? Base64UrlHelper.Encode(parameters.Q.X) : null,
+                Y = parameters.Q.Y != null ? Base64UrlHelper.Encode(parameters.Q.Y) : null,
+                Curve = "P-256",
+                Algorithm = "ES256",
+                Use = "sig"
             };
         }
 

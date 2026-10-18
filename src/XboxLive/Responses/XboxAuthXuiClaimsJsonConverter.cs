@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace XboxAuthNet.XboxLive.Responses
 {
@@ -37,6 +38,7 @@ namespace XboxAuthNet.XboxLive.Responses
 
         private XboxAuthXuiClaims? readXui(ref Utf8JsonReader reader, JsonSerializerOptions options)
         {
+            var typeInfo = (JsonTypeInfo<XboxAuthXuiClaims>)options.GetTypeInfo(typeof(XboxAuthXuiClaims));
             XboxAuthXuiClaims? claims = null;
 
             if (reader.TokenType == JsonTokenType.StartArray)
@@ -47,14 +49,14 @@ namespace XboxAuthNet.XboxLive.Responses
                         break;
 
                     if (claims == null && reader.TokenType == JsonTokenType.StartObject)
-                        claims = JsonSerializer.Deserialize<XboxAuthXuiClaims>(ref reader, options);
+                        claims = JsonSerializer.Deserialize(ref reader, typeInfo);
                     else
                         reader.Skip();
                 }
             }
             else if (reader.TokenType == JsonTokenType.StartObject)
             {
-                claims = JsonSerializer.Deserialize<XboxAuthXuiClaims>(ref reader, options);
+                claims = JsonSerializer.Deserialize(ref reader, typeInfo);
             }
 
             return claims;
@@ -65,7 +67,8 @@ namespace XboxAuthNet.XboxLive.Responses
             writer.WriteStartObject();
             writer.WritePropertyName("xui");
             writer.WriteStartArray();
-            JsonSerializer.Serialize(writer, value, options);
+            var typeInfo = (JsonTypeInfo<XboxAuthXuiClaims>)options.GetTypeInfo(typeof(XboxAuthXuiClaims));
+            JsonSerializer.Serialize(writer, value, typeInfo);
             writer.WriteEndArray();
             writer.WriteEndObject();
         }

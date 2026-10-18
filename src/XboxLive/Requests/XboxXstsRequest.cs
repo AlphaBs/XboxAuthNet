@@ -32,13 +32,13 @@ namespace XboxAuthNet.XboxLive.Requests
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(XstsAuthorizeUrl),
-                Content = HttpHelper.CreateJsonContent(new
+                Content = HttpHelper.CreateJsonContent(new XboxUserRequestBody<XstsProperties>
                 {
                     RelyingParty = RelyingParty,
                     TokenType = "JWT",
-                    Properties = new
+                    Properties = new XstsProperties
                     {
-                        UserTokens = new string[] { UserToken },
+                        UserTokens = new string[] { UserToken! },
                         DeviceToken = DeviceToken,
                         TitleToken = TitleToken,
                         OptionalDisplayClaims = OptionalDisplayClaims,
