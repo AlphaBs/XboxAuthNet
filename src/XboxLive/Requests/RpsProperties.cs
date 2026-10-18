@@ -1,4 +1,4 @@
-namespace XboxAuthNet.XboxLive.Requests.Bodies
+namespace XboxAuthNet.XboxLive.Requests
 {
     internal sealed class RpsProperties
     {

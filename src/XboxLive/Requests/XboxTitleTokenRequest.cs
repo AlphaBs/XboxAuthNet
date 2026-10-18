@@ -1,7 +1,6 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using XboxAuthNet.XboxLive.Requests.Bodies;
 using XboxAuthNet.XboxLive.Crypto;
 using XboxAuthNet.XboxLive.Responses;
 
