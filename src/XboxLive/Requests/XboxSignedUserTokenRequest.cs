@@ -21,11 +21,11 @@ public class XboxSignedUserTokenRequest : AbstractXboxSignedAuthRequest
         if (string.IsNullOrEmpty(RelyingParty))
             throw new InvalidOperationException("RelyingParty was null");
 
-        return new XboxUserRequestBody<RpsProperties>
+        return new SignedUserRequestBody
         {
             RelyingParty = RelyingParty,
             TokenType = "JWT",
-            Properties = new RpsProperties
+            Properties = new SignedRpsProperties
             {
                 AuthMethod = "RPS",
                 SiteName = "user.auth.xboxlive.com",
@@ -38,4 +38,22 @@ public class XboxSignedUserTokenRequest : AbstractXboxSignedAuthRequest
     {
         return Send<XboxAuthResponse>(httpClient, signer);
     }
+}
+
+internal sealed class SignedUserRequestBody
+{
+    public string? RelyingParty { get; set; }
+
+    public string TokenType { get; set; } = "JWT";
+
+    public SignedRpsProperties? Properties { get; set; }
+}
+
+internal sealed class SignedRpsProperties
+{
+    public string AuthMethod { get; set; } = "RPS";
+
+    public string SiteName { get; set; } = "user.auth.xboxlive.com";
+
+    public string? RpsTicket { get; set; }
 }

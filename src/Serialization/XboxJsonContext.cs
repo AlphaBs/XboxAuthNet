@@ -18,6 +18,7 @@ namespace XboxAuthNet;
 [JsonSerializable(typeof(XboxTokenRequestBody<DeviceProperties>))]
 [JsonSerializable(typeof(XboxTokenRequestBody<TitleProperties>))]
 [JsonSerializable(typeof(XboxUserRequestBody<RpsProperties>))]
+[JsonSerializable(typeof(SignedUserRequestBody))]
 [JsonSerializable(typeof(XboxUserRequestBody<XstsProperties>))]
 [JsonSerializable(typeof(SisuRequestBody))]
 [JsonSerializable(typeof(ProofKeyBody))]

@@ -21,8 +21,7 @@ public class HttpHelper
 
     public static JsonContent CreateJsonContent<T>(T obj)
     {
-        return CreateJsonContent(obj,
-            (JsonTypeInfo<T>)XboxJson.RequestOptions.GetTypeInfo(typeof(T)));
+        return CreateJsonContent(obj, XboxJson.TypeInfo<T>());
     }
 
     public static JsonContent CreateJsonContent<T>(T obj, JsonTypeInfo<T> typeInfo)

@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive.Responses;
 
@@ -59,13 +60,18 @@ public class XboxXstsRequest : AbstractXboxAuthRequest
 
 internal sealed class XstsProperties
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string[]? UserTokens { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DeviceToken { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? TitleToken { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string[]? OptionalDisplayClaims { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string SandboxId { get; set; } = "RETAIL";
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using XboxAuthNet.XboxLive.Responses;
 
@@ -48,4 +49,16 @@ public class XboxUserTokenRequest : AbstractXboxAuthRequest
     {
         return Send<XboxAuthResponse>(httpClient);
     }
+}
+
+internal sealed class RpsProperties
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string AuthMethod { get; set; } = "RPS";
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string SiteName { get; set; } = "user.auth.xboxlive.com";
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RpsTicket { get; set; }
 }
