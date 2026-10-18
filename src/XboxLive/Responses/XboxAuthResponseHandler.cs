@@ -15,8 +15,7 @@ public class XboxAuthResponseHandler
 
     public async Task<T> HandleResponse<T>(HttpResponseMessage res, JsonTypeInfo<T> typeInfo)
     {
-        var resBody = await res.Content.ReadAsStringAsync()
-            .ConfigureAwait(false);
+        var resBody = await res.Content.ReadAsStringAsync();
 
         try
         {

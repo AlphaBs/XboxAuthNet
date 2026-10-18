@@ -1,4 +1,4 @@
-﻿using XboxAuthNet.OAuth.CodeFlow.Parameters;
+using XboxAuthNet.OAuth.CodeFlow.Parameters;
 
 namespace XboxAuthNet.OAuth.CodeFlow;
 
@@ -44,7 +44,7 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
         $"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/logout";
 
     public Task<MicrosoftOAuthResponse> GetAccessToken(
-        CodeFlowAccessTokenParameter parameter, 
+        CodeFlowAccessTokenParameter parameter,
         CancellationToken cancellationToken) =>
         requestToken(setAccessTokenParameters(parameter), cancellationToken);
 
@@ -70,7 +70,7 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
     }
 
     private async Task<MicrosoftOAuthResponse> requestToken(
-        CodeFlowParameter parameter, 
+        CodeFlowParameter parameter,
         CancellationToken cancellationToken)
     {
         setCommonParameters(parameter);
@@ -80,7 +80,7 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
             Method = HttpMethod.Post,
             RequestUri = new Uri(OAuthToken),
             Content = new FormUrlEncodedContent(queryDict!)
-        }, cancellationToken).ConfigureAwait(false);
+        }, cancellationToken);
     }
 
     private async Task<MicrosoftOAuthResponse> microsoftOAuthRequest(
@@ -91,11 +91,9 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
         req.Headers.Add("Accept-Encoding", "gzip");
         req.Headers.Add("Accept-Language", "en-US");
 
-        var res = await httpClient.SendAsync(req, cancellationToken)
-            .ConfigureAwait(false);
+        var res = await httpClient.SendAsync(req, cancellationToken);
 
-        var resBody = await res.Content.ReadAsStringAsync()
-            .ConfigureAwait(false);
+        var resBody = await res.Content.ReadAsStringAsync();
         var statusCode = (int)res.StatusCode;
         var reasonPhrase = res.ReasonPhrase;
         return MicrosoftOAuthResponse.FromHttpResponse(resBody, statusCode, reasonPhrase);
@@ -104,7 +102,7 @@ public class CodeFlowLiveApiClient : ICodeFlowApiClient
     private void setCommonParameters(CodeFlowParameter parameter)
     {
         parameter.Tenant = "consumer";
-        
+
         if (string.IsNullOrEmpty(parameter.ClientId))
             parameter.ClientId = ClientId;
         if (string.IsNullOrEmpty(parameter.Scope))
