@@ -2,6 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using XboxAuthNet.OAuth;
+using XboxAuthNet.XboxLive.Crypto;
+using XboxAuthNet.XboxLive.Requests.Bodies;
 using XboxAuthNet.XboxLive.Responses;
 
 namespace XboxAuthNet;
