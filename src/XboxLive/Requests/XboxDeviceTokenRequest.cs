@@ -15,6 +15,7 @@ public class XboxDeviceTokenRequest : AbstractXboxSignedAuthRequest
     public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
 
     protected override string RequestUrl => "https://device.auth.xboxlive.com/device/authenticate";
+
     protected override object BuildBody(object proofKey)
     {
         if (string.IsNullOrEmpty(DeviceType))

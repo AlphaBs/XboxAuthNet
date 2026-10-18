@@ -13,6 +13,7 @@ public class XboxSignedUserTokenRequest : AbstractXboxSignedAuthRequest
     public string? AccessToken { get; set; }
 
     protected override string RequestUrl => "https://user.auth.xboxlive.com/user/authenticate";
+
     protected override object BuildBody(object proofKey)
     {
         if (string.IsNullOrEmpty(AccessToken))

@@ -15,6 +15,7 @@ public class XboxSisuAuthRequest : AbstractXboxSignedAuthRequest
     public string? DeviceToken { get; set; }
 
     protected override string RequestUrl => "https://sisu.xboxlive.com/authorize";
+
     protected override object BuildBody(object proofKey)
     {
         if (string.IsNullOrEmpty(AccessToken))

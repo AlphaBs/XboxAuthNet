@@ -14,6 +14,7 @@ public class XboxTitleTokenRequest : AbstractXboxSignedAuthRequest
     public string? RelyingParty { get; set; } = XboxAuthConstants.XboxAuthRelyingParty;
 
     protected override string RequestUrl => "https://title.auth.xboxlive.com/title/authenticate";
+
     protected override object BuildBody(object proofKey)
     {
         if (string.IsNullOrEmpty(AccessToken))
